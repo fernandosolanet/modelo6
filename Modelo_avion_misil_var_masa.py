@@ -143,60 +143,41 @@ def viscosity(alt):
         alfa_isa = -0.0065
         t = t_0 + alfa_isa * (alt- h_0)
     elif alt< H_ISA2:
-      
-	    h_0 = H_ISA1
-	    t_0 = 216.65   
-	    alfa_isa = 0
-	    t = t_0 + alfa_isa * (alt- h_0)  
-		 
+        h_0 = H_ISA1
+        t_0 = 216.65
+        alfa_isa = 0
+        t = t_0 + alfa_isa * (alt- h_0)	 
     elif alt< H_ISA3:
-   
-	    h_0 = H_ISA2
-	    t_0 = 216.65
-	    alfa_isa = 0.001
-		   
-	    t = t_0 + alfa_isa * (alt- h_0) 
-                    
+        h_0 = H_ISA2
+        t_0 = 216.65
+        alfa_isa = 0.001
+        t = t_0 + alfa_isa * (alt- h_0)
     elif alt< H_ISA4:
-          
         h_0 = H_ISA3
-        t_0 = 228.65                          
+        t_0 = 228.65
         alfa_isa = 0.0028
-     
-        t = t_0 + alfa_isa * (alt- h_0)                           
-                          
+        t = t_0 + alfa_isa * (alt- h_0)
     elif alt< H_ISA5:
-        
         h_0 = H_ISA4
-        t_0 = 270.65                                                               
-        alfa_isa = 0                                 
-        t = t_0 + alfa_isa * (alt- h_0)                                  
-    
+        t_0 = 270.65
+        alfa_isa = 0
+        t = t_0 + alfa_isa * (alt- h_0)
     elif alt< H_ISA6:
-       
         h_0 = H_ISA5
-        t_0 = 270.65                                     
+        t_0 = 270.65
         alfa_isa = -0.0028
-    
-        t = t_0 + alfa_isa * (alt- h_0)                                         
-    
+        t = t_0 + alfa_isa * (alt- h_0)
     elif alt< H_ISA7:
-    
         h_0 = H_ISA6
-        t_0 = 214.65                                               
+        t_0 = 214.65
         alfa_isa = -0.002
-                                               
-        t = t_0 + alfa_isa * (alt- h_0)                                         
-        
-    elif alt> H_ISA7: 
-                                                                                             
-	    h_0 = H_ISA7
-	    t_0 = 214.65 - 0.002 * (H_ISA7 - H_ISA6)													                                                    
-	    alfa_isa = 0
-	    t = t_0 + alfa_isa * (alt- h_0)                                                    
-		
-    return (beta_visc * t ** (3 / 2)) / (t + S_visc)   
-
+        t = t_0 + alfa_isa * (alt- h_0)
+    elif alt> H_ISA7:
+        h_0 = H_ISA7
+        t_0 = 214.65 - 0.002 * (H_ISA7 - H_ISA6)
+        alfa_isa = 0
+        t = t_0 + alfa_isa * (alt- h_0)
+    return (beta_visc * t ** (3 / 2)) / (t + S_visc)
 '''
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
 '''
