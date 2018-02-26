@@ -226,29 +226,28 @@ M_D098 = .98 * M_D
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL-------------------
 '''
 
-diametro_m=0.5           #diametro misil
-longitud_cono = 0.9      #longitud cono misil
-longitud_misil = 3       #longitud total misil
+diametro_m = .5  # Diámetro del misil (m).
+longitud_cono = .9  # Longitud del cono del misil (m).
+longitud_misil = 3  # Longitud total del misil (m).
+
+Sw_aleta = .07875  # Superficie de una aleta del AIM (tomado como ref., m2).
+Craiz_aleta = .24  # Cuerda raiz de la aleta (m).
+Cmedia_aleta = .18  # Cuerda media de la aleta (m).
+espesor_aleta = .0065  # Espesor de la aleta (m).
+tao_aleta = espesor_aleta / Cmedia_aleta  # TAO de la aleta.
+num_aletas = 4  # Número de aletas.
+
+Swtotal_aletas=Sw_aleta*num_aletas  # Superficie total de aletas (m2).
+Sref_aletas = Swtotal_aletas / 2  # Superficie de referencia aletas (m2).
 
 
-Sw_aleta = 0.07875                           #Superficie de una aleta del AIM (tomado como ref.)
-Craiz_aleta = 0.24                           #cuerda raiz de aleta
-Cmedia_aleta = 0.18                          #cuerda media de aleta
-espesor_aleta = 0.0065                       #espesor de aleta
-tao_aleta = espesor_aleta/Cmedia_aleta       #tao aleta
-num_aletas = 4                               #numero aletas
- 
-Swtotal_aletas=Sw_aleta*num_aletas           #Superficie total de aletas
-Sref_aletas = Swtotal_aletas/2               #Superficie de referencia aletas
+Sup_cono = pi * (diametro_m / 2) * (longitud_cono**2 + (diametro_m / 2)**2)**(1 / 2)  # Superficie exterior del cono (m2).
+Sup_total = 2 * pi * (diametro_m / 2) * (longitud_misil - longitud_cono)  # Superficie exterior del misil (m2).
+Sref_misil = pi * (diametro_m / 2)**2  #Superficie de referencia del misil (m2).
+angulo_cono = atan(.5 * diametro_m / longitud_cono) * (180 / pi)  # Ángulo de la generatriz del cono (deg).
 
-
-Sup_cono=pi*(diametro_m/2)*(longitud_cono**2+(diametro_m/2)**2)**(1/2)
-Sup_total=2*pi*(diametro_m/2)*(longitud_misil-longitud_cono)
-Sref_misil=pi*(diametro_m/2)**2
-angulo_cono = atan(0.5*diametro_m/longitud_cono)*(180/pi)  #angulo de la generatriz del cono
-
-Empuje_misil=50000                          #Empuje constante del misil
-masa_misil=1000                              #masa del misil, es necesario cambiarlo tambien abajo
+Empuje_misil = 50000  # Empuje constante del misil (N).
+masa_misil = 1000  # Masa del misil (kg). Es necesario cambiarlo también abajo.
 
 '''
 ---------------------------CURVAS DE EMPUJE DEL F-4---------------------------
