@@ -138,11 +138,10 @@ def viscosity(alt):
     '''Cálculo de la viscosidad en función de la altura dada por el modelo ISA
     '''							
     if alt < H_ISA1:
-	    h_0 = 0
-	    t_0 = 288.15
-	    alfa_isa = -0.0065
-	    t = t_0 + alfa_isa * (alt- h_0)
-     
+        h_0 = 0
+        t_0 = 288.15
+        alfa_isa = -0.0065
+        t = t_0 + alfa_isa * (alt- h_0)
     elif alt< H_ISA2:
       
 	    h_0 = H_ISA1
