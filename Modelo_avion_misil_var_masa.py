@@ -383,118 +383,82 @@ def sustentacion(vel, dens, c_l):
     '''
     return .5 * dens * S_W * c_l * vel**2
 
-
 def Cdll(Ml):
-
     def coef_resistencia_base_misil(Ml):
-    
-    	if Ml < 0.8:
-    		x0 = 0
-    		x1 = 0
-    		x2 = 0
-    		x3 = 0
-    		x4 = 0
-    	elif Ml < 1:
-    		x0 = -1.548523
-    		x1 = 6.05972764
-    		x2 = -7.30548391
-    		x3 = 2.96129532
-    		x4 = 0
-    	elif Ml < 1.1:
-    		x0 = 5.79090984*10**3
-    		x1 = -2.19843314*10**4
-    		x2 = 3.12774812*10**4
-    		x3 = -1.97644892*10**4
-    		x4 = 4.68059822*10**3
-    	elif Ml < 1.5:
-    		x0 = -4.11856506
-    		x1 = 1.42267421*10**1
-    		x2 = -1.69678524*10**1
-    		x3 = 8.771665
-    		x4 = -1.67398037
-    	elif Ml < 2.2:
-    		x0 = 3.0748*10**-1
-    		x1 = -1.3258*10**-1
-    		x2 = 2.8812*10**-2
-    		x3 = 0
-    		x4 = 0
-    	elif Ml >2.2:                            
-    		x0 = 1.8481*10**-1
-    		x1 = -2.2895*10**-2
-    		x2 = 5.1876*10**-3
-    		x3 = -4.0742*10**-4
-    		x4 = 0
-#    	elif Ml >3.5:                            
-#    		x0 = 0.15
-#    		x1 = 0
-#    		x2 = 0
-#    		x3 = 0
-#    		x4 = 0
-    		    		
-    	return x4*Ml**4 + x3*Ml**3 + x2*Ml**2 + x1*Ml + x0
-     
+        if Ml < 0.8:
+            x0 = 0
+            x1 = 0
+            x2 = 0
+            x3 = 0
+            x4 = 0
+        elif Ml < 1:
+            x0 = -1.548523
+            x1 = 6.05972764
+            x2 = -7.30548391
+            x3 = 2.96129532
+            x4 = 0
+        elif Ml < 1.1:
+            x0 = 5790.90984
+            x1 = -21984.3314
+            x2 = 31277.4812
+            x3 = -19764.4892
+            x4 = 4680.59822
+        elif Ml < 1.5:
+            x0 = -4.11856506
+            x1 = 14.2267421
+            x2 = -16.9678524
+            x3 = 8.771665
+            x4 = -1.67398037
+        elif Ml < 2.2:
+            x0 = .30748
+            x1 = -.13258
+            x2 = .028812
+            x3 = 0
+            x4 = 0
+        elif Ml > 2.2:
+            x0 = .18481
+            x1 = -.022895
+            x2 = .0051876
+            x3 = -.00040742
+            x4 = 0
+        elif Ml >3.5:
+            x0 = .15
+            x1 = 0
+            x2 = 0
+            x3 = 0
+            x4 = 0
+        return x4 * Ml**4 + x3 * Ml**3 + x2 * Ml**2 + x1 * Ml + x0
     CD_base_misil = coef_resistencia_base_misil(Ml)
-    
-    
-    #CALCULO DEL COEFICIENTE DE FRICCION
-    ##COEFICIENTE DE FRICCIÓN DEL CONO
-    ###CALCULO DEL REYNOLDS1 
-    
-    Re_cono=rho*vl*longitud_cono/Mu_Visc #REYNOLDS 2
-    
+    #CÁLCULO DEL COEFICIENTE DE FRICCIÓN.
+    ##COEFICIENTE DE FRICCIÓN DEL CONO.
+    ###CÁLCULO DEL REYNOLDS.
+    Re_cono = rho * vl * longitud_cono / Mu_Visc  # REYNOLDS 2.
     def cfcono_misil(Re_cono):
-    		
         #LAMINAR
-    	if Re_cono < 1e6 :
-    			#CALCULO COEFICIENTE DE FRICCION LOCAL INCOMPRESIBLE
-    
-    	    cfi_cono=0.664*Re_cono**(-1/2)
-    		
-    
-    			#CALCULO COEFICIENTE DE FRICCION LOCAL MEDIO
-    
-    	    cf_cono=2*cfi_cono
-    
-    			#CALCULO COEFICIENTE DE FRICCION COMPRESIBLE
-    
-    	    cfm_cono=cf_cono*(1/(1+0.17*Ml**2))**0.1295
-    
-    			#CALCULO COEFICIENTE DE FRICCION DEL CONO
-    	    
-    		
-    		#TURBULENTO
+    	if Re_cono < 1e6:
+            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+            cfi_cono= .664 * Re_cono**(-1 / 2)
+            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
+            cf_cono = 2 * cfi_cono
+            #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
+    	    cfm_cono = cf_cono * (1 / (1 + .17 * Ml**2))**.1295
+            #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
+        #TURBULENTO
     	else:	
-    			#CALCULO COEFICIENTE DE FRICCION LOCAL INCOMPRESIBLE
-    
-    		cfi_cono=0.288*((log10(Re_cono))**(-2.45))
-    
-    			#CALCULO COEFICIENTE DE FRICCION LOCAL COMPRESIBLE
-    
-    		cf_cono=cfi_cono*1.597*((log10(Re_cono))**(-0.15))
-    
-    			#CALCULO COEFICIENTE DE FRICCION MEDIO
-    
-    		cfm_cono=cf_cono*(1/(1+(GAMMA-1)/2*Ml**2)**0.467)
-    
-    			#CALCULO COEFICIENTE DE FRICCION DEL CONO
-    
-    		
-    		
-    	return cfm_cono*Sup_cono/Sref_misil
-    
-    
-    ##COEFICIENTE DE FRICCIÓN DEL CILINDRO
-    
-    
-    Re_cil=rho*vl*(longitud_misil-longitud_cono)/Mu_Visc  #REYNOLDS 2
-    
-    
+            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+            cfi_cono = .288 * ((log10(Re_cono))**(-2.45))
+            #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
+            cf_cono = cfi_cono * 1.597 * ((log10(Re_cono))**(-.15))
+            #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
+            cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * Ml**2)**.467)
+            #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
+    	return cfm_cono * Sup_cono / Sref_misil
+    ##COEFICIENTE DE FRICCIÓN DEL CILINDRO.
+    Re_cil = rho * vl * (longitud_misil - longitud_cono) / Mu_Visc  # REYNOLDS 2.
     def cfcil(Re_cil):
-    	
-    		
-    		#LAMINAR
-    	if Re_cil < 1e6 :
-    			#CALCULO COEFICIENTE DE FRICCION LOCAL INCOMPRESIBLE
+        #LAMINAR
+        if Re_cil < 1e6:
+            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
     
     		cfi_cil=0.664*Re_cil**(-1/2)
     
