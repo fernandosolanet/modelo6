@@ -5,6 +5,7 @@
 from math import exp, radians, cos, pi, sin, degrees, atan, log10
 
 '''
+hhhhh
 Este programa servirá para establecer la trayectoria a describir por el
 avión.  Contiene la maniobra de giro, seguida por otra de ascenso.  Al final se
 procederá a exportar las características y cómo varían a lo largo de la
