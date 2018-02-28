@@ -47,7 +47,8 @@ H_ISA7 = 84852
 # y se relacionarán con los valores de T y alfa para cada altura estipulada.
 
 def temperature(alt):
-    '''Cálculo de la temperatura en función de la altura dada por el modelo ISA
+    '''Cálculo de la temperatura en función de la altura dada por el modelo
+    ISA.
     '''
     if alt < H_ISA1:
         h_0 = 0
@@ -84,7 +85,7 @@ def temperature(alt):
     return t_0 + alfa_isa * (alt - h_0)
 
 def density(alt):
-    '''Cálculo de la densidad en función de la altura dada por el modelo ISA
+    '''Cálculo de la densidad en función de la altura dada por el modelo ISA.
     '''
     rho0 = RHO_SL
     t_isa = temperature(alt)
@@ -130,53 +131,14 @@ def density(alt):
     return rho0 * exp(-GRAV * (alt - h_0) / (R_AIR * t_isa))
 
 def pressure(alt):
-    '''Cálculo de la presión en función de la altura dada por el modelo ISA
+    '''Cálculo de la presión en función de la altura dada por el modelo ISA.
     '''
     return density(alt) * R_AIR * temperature(alt)
 
 def viscosity(alt):	
-    '''Cálculo de la viscosidad en función de la altura dada por el modelo ISA
+    '''Cálculo de la viscosidad en función de la altura dada por el modelo ISA.
     '''							
-    if alt < H_ISA1:
-        h_0 = 0
-        t_0 = 288.15
-        alfa_isa = -0.0065
-        tempt = t_0 + alfa_isa * (alt - h_0)
-    elif alt < H_ISA2:
-        h_0 = H_ISA1
-        t_0 = 216.65
-        alfa_isa = 0
-        t = t_0 + alfa_isa * (alt - h_0)	 
-    elif alt < H_ISA3:
-        h_0 = H_ISA2
-        t_0 = 216.65
-        alfa_isa = 0.001
-        t = t_0 + alfa_isa * (alt - h_0)
-    elif alt < H_ISA4:
-        h_0 = H_ISA3
-        t_0 = 228.65
-        alfa_isa = 0.0028
-        t = t_0 + alfa_isa * (alt - h_0)
-    elif alt < H_ISA5:
-        h_0 = H_ISA4
-        t_0 = 270.65
-        alfa_isa = 0
-        t = t_0 + alfa_isa * (alt - h_0)
-    elif alt < H_ISA6:
-        h_0 = H_ISA5
-        t_0 = 270.65
-        alfa_isa = -0.0028
-        t = t_0 + alfa_isa * (alt - h_0)
-    elif alt < H_ISA7:
-        h_0 = H_ISA6
-        t_0 = 214.65
-        alfa_isa = -0.002
-        t = t_0 + alfa_isa * (alt - h_0)
-    elif alt > H_ISA7:
-        h_0 = H_ISA7
-        t_0 = 214.65 - 0.002 * (H_ISA7 - H_ISA6)
-        alfa_isa = 0
-        t = t_0 + alfa_isa * (alt- h_0)
+    temp = temperature(alt)
     return beta_visc * temp**(3 / 2) / (temp + S_visc)
 '''
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
