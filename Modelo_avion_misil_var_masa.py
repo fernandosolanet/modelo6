@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 @author: Team REOS
-"""
-from math import exp, radians, cos, pi, sin, degrees, atan, log10
 
-'''
 Este programa servirá para establecer la trayectoria a describir por el
 avión.  Contiene la maniobra de giro, seguida por otra de ascenso.  Al final se
 procederá a exportar las características y cómo varían a lo largo de la
 trayectoria para poder obtener sus gráficas.
-'''
+"""
+from math import exp, radians, cos, pi, sin, degrees, atan, log10
 
-'''Condiciones gravitatorias y constantes atmosféricas'''
+#-------------CONDICIONES GRAVITATORIAS Y CONSTANTES ATMOSFÉRICAS-------------
 G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
 MT = 5.972e24  # Masa terrestre (kg).
 MU = G * MT
@@ -20,10 +18,8 @@ R_AIR = 287  # Constante de los gases ideales (J/Kkg).
 GRAV = 9.80665  # Aceleración gravitatoria (m/s2).
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
 GAMMA = 1.4  # Coeficiente de dilatación adiabática.
-
-##Condiciones de viscosidad.
-beta_visc = .000001458
-S_visc = 110.4
+beta_visc = .000001458  # Viscosidad de referencia (Pa s/K.5).
+S_visc = 110.4  # Temperatura de referencia para la viscosidad (K).
 
 '''
 -----------------------ATMÓSFERA ESTÁNDAR INTERNACIONAL-----------------------
@@ -240,9 +236,7 @@ def thrust(mach, den):
     z_th = -.347382668*d_th + 1.71160358
     return TH_SL * (a_th + i * exp(-c_th * (mach - z_th)**2))
 
-'''
---------------------------COEFICIENTES AERODINÁMICOS--------------------------
-'''
+#--------------------------COEFICIENTES AERODINÁMICOS--------------------------
 
 def cl_alfa(mach):
     '''Cálculo de la pendiente del coeficiente de sustentación, que es lineal
@@ -354,50 +348,42 @@ def sustentacion(vel, dens, c_l):
     return .5 * dens * S_W * c_l * vel**2
 
 def Cdll(Ml):
-    def coef_resistencia_base_misil(Ml):
-        if Ml < 0.8:
-            x0 = 0
-            x1 = 0
-            x2 = 0
-            x3 = 0
-            x4 = 0
+    def coef_resistencia_base_misil(Machl):
+        if Machl < 0.8:
+            return 0
         elif Ml < 1:
             x0 = -1.548523
             x1 = 6.05972764
             x2 = -7.30548391
             x3 = 2.96129532
             x4 = 0
-        elif Ml < 1.1:
+        elif Machl < 1.1:
             x0 = 5790.90984
             x1 = -21984.3314
             x2 = 31277.4812
             x3 = -19764.4892
             x4 = 4680.59822
-        elif Ml < 1.5:
+        elif Machl < 1.5:
             x0 = -4.11856506
             x1 = 14.2267421
             x2 = -16.9678524
             x3 = 8.771665
             x4 = -1.67398037
-        elif Ml < 2.2:
+        elif Machl < 2.2:
             x0 = .30748
             x1 = -.13258
             x2 = .028812
             x3 = 0
             x4 = 0
-        elif Ml > 2.2:
+        elif Machl > 2.2:
             x0 = .18481
             x1 = -.022895
             x2 = .0051876
             x3 = -.00040742
             x4 = 0
-        elif Ml >3.5:
-            x0 = .15
-            x1 = 0
-            x2 = 0
-            x3 = 0
-            x4 = 0
-        return x4 * Ml**4 + x3 * Ml**3 + x2 * Ml**2 + x1 * Ml + x0
+        elif Machl >3.5:
+            return .15
+        return x4 * Machl**4 + x3 * Machl**3 + x2 * Machl**2 + x1 * Machl + x0
     CD_base_misil = coef_resistencia_base_misil(Ml)
     #CÁLCULO DEL COEFICIENTE DE FRICCIÓN.
     ##COEFICIENTE DE FRICCIÓN DEL CONO.
