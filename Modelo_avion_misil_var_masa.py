@@ -12,25 +12,25 @@ trayectoria para poder obtener sus gráficas.
 '''
 
 '''Condiciones gravitatorias y constantes atmosféricas'''
-G = 6.673e-11  # Constante de gravitación.
-MT = 5.972e24  # Masa terrestre.
+G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
+MT = 5.972e24  # Masa terrestre (kg).
 MU = G * MT
-RT = 6378136.3  # Radio terrestre.
-R_AIR = 287  # Constante de los gases ideales.
-GRAV = 9.80665  # Aceleración gravitatoria.
-RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad del aire a nivel del mar.
+RT = 6378136.3  # Radio terrestre (m).
+R_AIR = 287  # Constante de los gases ideales (J/Kkg).
+GRAV = 9.80665  # Aceleración gravitatoria (m/s2).
+RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad del aire a nivel del mar (kg/m3).
 GAMMA = 1.4  # Coeficiente de dilatación adiabática.
 
-##Condiciones de viscosidad
-beta_visc = 0.000001458
+##Condiciones de viscosidad.
+beta_visc = .000001458
 S_visc = 110.4
 
 '''
 -----------------------ATMÓSFERA ESTÁNDAR INTERNACIONAL-----------------------
 Esta subrutina nos permitirá obtener los valores de presión, temperatura y
 densidad del aire en funcióin de la altura. Están sacados de la ISA.  Más
-adelante, en los siguientes bucles, se llamará a las funciones de P, T y rho
-que variarán con respecto a h.
+adelante, en los siguientes bucles, se llamará a las funciones de P, T, rho y
+mu que variarán con respecto a h.
 '''
 
 #Estas son las alturas estipuladas según la normativa.
@@ -190,8 +190,8 @@ B = 11.7  # Envergadura (m).
 AR = B**2 / S_W  # Alargamiento = 2,78.
 FLECHA = radians(52)  # Flecha BA.
 FLECHA2 = radians(41.4)  # Flecha 1/4.
-LF = 19.2  # Longitud del fuselaje.
-BF = 2.87  # Longitud del fuselaje.
+LF = 19.2  # Longitud del fuselaje (m).
+BF = 2.87  # Longitud del fuselaje (m).
 #Se desrecian las pérdidas por consumo de combustible en el peso del avión.
 
 K = .4  # EL perfil del F-4 es el NACA0006.4-64 por tanto la K es 0,4.
@@ -210,15 +210,15 @@ MASS = 14273  # Masa de carga
 #A continuación, se definen las superficies de mando del avión, que nos
 # servirán para, más adelante, calcular el coeficiente de resistencia parásita.
 S_LEX = 0  # Área del Lex. [¡!]
-S_H = 6.39  # Área de la superficie de mando horizontal
-S_V = 5.035  # Área de la superficie de mando vertical
+S_H = 6.39  # Área de la superficie de mando horizontal (m2).
+S_V = 5.035  # Área de la superficie de mando vertical (m2).
 
 #Se necsitarán para más adelante los valores de Mach crítico y de divergencia,
 # los cuales son función de la flecha y del espesor relativo máximo.  Estos
 # valores marcarán los límites de los dominios que nos servirán para calcular
 # el coeficicente de resitencia inducida con efecto de compresibilidad.
-M_C = 1 - (.065 * (cos(FLECHA))**.6) * (100 * ESPESOR)**.637814  # Mach crítico
-M_D = 1.08 * M_C  # Mach de divergencia
+M_C = 1 - (.065 * (cos(FLECHA))**.6) * (100 * ESPESOR)**.637814  # Mach crítico.
+M_D = 1.08 * M_C  # Mach de divergencia.
 M_D098 = .98 * M_D
 
 
