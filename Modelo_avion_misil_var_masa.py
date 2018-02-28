@@ -644,7 +644,7 @@ for beta in range(50, 60, 10):
         # espaciales, temporales y de velocidad.  Los diferenciales se obtienen
         # del tramo anterior, y sirven para que estos nuevos valores actúen en
         # las nuevas condiciones para calcular nuevas variables.
-        '''Inicialización de variables y diferenciales para la maniobra del misil'''
+        #Inicialización de variables y diferenciales para la maniobra del misil.
         thetal = gama  # Inicialización del ángulo de asiento.
         thetalgrados = degrees(thetal)  # Ángulo de asiento (deg).
         yl = h  # Inicialización de la altitud.
@@ -719,7 +719,7 @@ for beta in range(50, 60, 10):
         dh = v * sin(gama) * dt  # Variación vertical de la posición (m).
         dtheta = omega * dt  # Variación del ángulo de asiento.
         masa_misil = 1000
-        '''BUCLE TIRO BALÍSTICO DEL MISIL'''
+        #BUCLE TIRO BALÍSTICO DEL MISIL.
         while thetal > 0:
             '''Con este bucle se calculan todas las variables correspondientes al tiro balístico del misil SIN EMPUJE . 
             La condición de parada del bucle es que el ángulo de asiento del misil deje de ser positivo. Esto es cuando
@@ -754,24 +754,22 @@ for beta in range(50, 60, 10):
             dyl = vyl * dtl  # Diferencial de la altitud (m).
             dsl = vl * dtl  # Diferencial del arco recorrido (m).
         Emec_misil = masa_misil * (GRAV * yl + vl**2 / 2)  # Trabajo de la resistencia (J).
-        f.write('%.8f\t' %tl) #Tiempo(s).
-        f.write('%.8f\t' %yl) #Altitud (m)
-        f.write('%.8f\t' %vl) #Velocidad (m/s)
-        f.write('%.8f\t' %Ml) #Mach de vuelo
-        f.write('%.8f\t' %thetalgrados) #Ángulo de asiento
-        f.write('%.8f\t' %masa_misil) #Ángulo de asiento
-        f.write('%.8f\n' %Emec_misil) #Energía mecánica final (J) 
-        
+        f.write('{0:.8f}\t'.format(tl))  # Tiempo(s).
+        f.write('{0:.8f}\t'.format(yl))  # Altitud (m).
+        f.write('{0:.8f}\t'.format(vl))  # Velocidad (m/s).
+        f.write('{0:.8f}\t'.format(Ml))  # Mach de vuelo.
+        f.write('{0:.8f}\t'.format(thetalgrados)) #Ángulo de asiento (deg).
+        f.write('{0:.8f}\t'.format(masa_misil))  # Masa del misil (kg).
+        f.write('{0:.8f}\t'.format(Emec_misil))  # Energía mecánica final (J).
     '''------SISTEMA DE ECUACIONES PARA TERCER TRAMO: MANIOBRA DE ASCENSO------
     Se comienza introduciendo los nuevos diferenciales para calcular las nuevas
     variables, ya que las condiciones de vuelo habrán cambiado.  Estos
     diferenciales permitirán calcular las primeras variables del sistema de la
     maniobra de ascenso.
     '''
-    # Segunda ley de Newton.
+    #Segunda ley de Newton.
     dv = dt * (Th * cos(alfa) - D - W * sin(gama)) / MASS  # Horizontal.
     dgama = (Th * sin(alfa) + L - W * cos(gama)) * GRAV * dt / W * v  # Vertical.
-    
     while v >= 0 and gama > 0:
         '''Con este bucle se pide que el programa continúe calculando todas las
         variables escritas abajo cuando termine el anterior.  La condición en
@@ -786,35 +784,30 @@ for beta in range(50, 60, 10):
         f.write('{0:.8f}\t'.format(h))  # Altitud (m).
         f.write('{0:.8f}\t'.format(v))  # Velocidad (m/s).
         f.write('{0:.8f}\t'.format(M))  # Número de Mach.
-        f.write('{0:.8f}\t'.format(alfa_grados))  # Ángulo de ataque (grados).
-        f.write('{0:.8f}\t'.format(gama_grados))  # Asiento de la velocidad (grados).
-        f.write('{0:.8f}\t'.format(theta_grados))  # Ángulo de asiento (grados).
+        f.write('{0:.8f}\t'.format(alfa_grados))  # Ángulo de ataque (deg).
+        f.write('{0:.8f}\t'.format(gama_grados))  # Asiento de la velocidad (deg).
+        f.write('{0:.8f}\t'.format(theta_grados))  # Ángulo de asiento (deg).
         f.write('{0:.8f}\t'.format(emecanica))  # Energía mecánica (J).
         f.write('{0:.8f}\t'.format(D))  # Fuerza de resistencia (N).
-        '''Inicialización de variables y diferenciales para la maniobra del misil'''
-        thetal = gama #Inicialización del ángulo de asiento
-        thetalgrados=thetal*(180/pi) #Conversión de radianes a grados del ángulo de asiento
-        yl = h #Inicialización de la altitud 
-        vl = v #Inicialización de la velocidad
-        vxl=vl*cos(thetal) #Inicialización de la componente horizontal de velocidad  
-        vyl=vl*sin(thetal) #Inicialización de la componente verical de velocidad 
-        tl = 0 #Inicialización temporal 
-        xl = 0 #Inicialización de la posición en el eje x 
-        sl = 0 #Inicialización del arco recorrido
-        dvxl=0 #Inicialización del diferencial de la componente horizontal de velocidad 
-        dvyl=0 #Inicialización del diferencial de la componente vertical de velocidad 
-        dsl=0 #Inicialización del diferncial del arco recorrido
-        dxl=0 #Inicialización del diferencial de la posición
-        dyl=0 #Inicialización del diferencial de la altitud
-        dtl=0.1 #Inicialización del diferencial de tiempo
-        dthetal = 0 #Inicialización del diferencial del ángulo de asiento
-        thetal = gama #Ángulo de asiento del avión
-                      #es igual al ángulo de asiento de la velocidad del misil
-                                    
-        thetalgrados=thetal*(180/pi)
-        
-     
-        
+        #Inicialización de variables y diferenciales para la maniobra del misil.
+        thetal = gama  # Inicialización del ángulo de asiento.
+        thetalgrados = degrees(thetal)  # Ángulo de asiento (deg).
+        yl = h  # Inicialización de la altitud (m).
+        vl = v  # Inicialización de la velocidad (m/s).
+        vxl = vl * cos(thetal)  # Inicialización de la componente horizontal de velocidad (m/s).
+        vyl = vl * sin(thetal)  # Inicialización de la componente vertical de velocidad (m/s).
+        tl = 0  # Inicialización temporal (s).
+        xl = 0  # Inicialización de la posición en el eje x (m).
+        sl = 0  # Inicialización del arco recorrido (m).
+        dvxl = 0  # Inicialización del diferencial de la componente horizontal de velocidad (m/s).
+        dvyl = 0  # Inicialización del diferencial de la componente vertical de velocidad (m/s).
+        dsl = 0  # Inicialización del diferencial del arco recorrido (m).
+        dxl = 0  # Inicialización del diferencial de la posición (m).
+        dyl = 0  # Inicialización del diferencial de la altitud (m).
+        dtl = .1  # Inicialización del diferencial de tiempo (s).
+        dthetal = 0  # Inicialización del diferencial del ángulo de asiento.
+        thetal = gama  # El ángulo de asiento del avión es igual al ángulo de asiento de la velocidad del misil.
+        thetalgrados = degrees(thetal)
         #Incrementos.
         t = t + dt  # Evolución temporal (s).
         v = v + dv  # Incremento de velocidad (m/s).
@@ -833,7 +826,7 @@ for beta in range(50, 60, 10):
         #Variables termodinámicas.
         rho = density(h)  # Densidad del aire (kg/m3).
         T = temperature(h)  # Temperatura (K).
-        Mu_Visc = viscosity(h) # Viscosidad 
+        Mu_Visc = viscosity(h) # Viscosidad (Pa s).
         M = v / (GAMMA * R_AIR * T)**.5  # Número de Mach.
         #Empuje.
         Th = thrust(M, rho)  # Empuje (N).
@@ -852,7 +845,6 @@ for beta in range(50, 60, 10):
             L = sustentacion(v, rho, CL)
             dgama = (Th * sin(alfa) + L - W * cos(gama)) * GRAV * dt / (W * v)
             gama = gama + dgama
-
         theta = gama + alfa
         #Coeficiente de resistencia.
         CD01 = cd0(M)
@@ -868,72 +860,51 @@ for beta in range(50, 60, 10):
         #Diferenciales.
         dx = vx * dt
         dh = vy * dt
-        
-        
-       
-        
-        
-        masa_misil = 1000
-        
-        '''BUCLE TIRO BALÍSTICO DEL MISIL'''
-        
-        
+        masa_misil = 1000  # Masa del misil (kg).
+        #BUCLE TIRO BALÍSTICO DEL MISIL.
         while thetal > 0:
-            
-            '''Con este bucle se calculan todas las variables correspondientes al tiro balístico del misil SIN EMPUJE . 
+            '''Con este bucle se calculan todas las variables correspondientes al tiro balístico del misil SIN EMPUJE.
             La condición de parada del bucle es que el ángulo de asiento del misil deje de ser positivo. Esto es cuando
             el misil se encuentre completamente en posición horizontal. La particularidad de este caso
             es que el ángulo de lanzamiento del misil (ángulo de asiento) es el ángulo de asiento de la VELOCIDAD del avión.
             '''
-
-            tl=tl+dtl #Evolución temporal (s)
-            xl=xl+dxl #Posición horizontal (m)
-            yl=yl+dyl #Altitud (m) 
-            sl=sl+dsl #Arco recorrido (m)
-            
-            thetal=thetal+dthetal #Ángulo de asiento
-            thetalgrados=thetal*(180/pi) #Conversión de radianes a grados
-            
-            
-            vxl=vxl+dvxl #Componente horizontal de la velocidad (m/s)
-            vyl=vyl+dvyl #Componente vertical de la velocidad (m/s)
-            vl=(vxl**2+vyl**2)**0.5 #Módulo de la velocidad (m/s)
-            
+            tl = tl + dtl  # Evolución temporal (s).
+            xl = xl + dxl  # Posición horizontal (m).
+            yl = yl + dyl  # Altitud (m).
+            sl = sl + dsl  # Arco recorrido (m).
+            thetal = thetal + dthetal  # Ángulo de asiento.
+            thetalgrados = degrees(thetal)  # Ángulo de asiento (deg).
+            vxl = vxl + dvxl  # Componente horizontal de la velocidad (m/s).
+            vyl = vyl + dvyl  # Componente vertical de la velocidad (m/s).
+            vl = (vxl**2 + vyl**2)**.5  # Módulo de la velocidad (m/s).
             rho = density(yl)  # Densidad (kg/m3).
             T = temperature(yl)  # Temperatura (K).
-            Mu_Visc = viscosity(yl) # Viscosidad 
-            
-            Ml=vl/((GAMMA*R_AIR*T)**0.5) #Mach de vuelo
-            Cdl=Cdll(Ml)   #Función que calcula el coeficiente de resistencia                                
-            D_misil=0.5*rho*Cdl*Sref_misil*vl**2 #Fuerza de resistencia (N)
-            Dx=D_misil*cos(thetal) #Componente horizontal de la fuerza de resistencia (N)
-            Dy=D_misil*sin(thetal) #Componente vertical de la fuerza de resistencia (N)
-            
-            dvxl=-(Dx/masa_misil)*dtl #Diferencial de la componente horizontal de la velocidad (m/s)
-            dvyl=-g0*dtl-(Dy/masa_misil)*dtl #Diferencial de la componente vertical de la velocidad (m/s)
-            
-            if tl<= 30.01:
-                dvxl=dvxl+Empuje_misil*cos(thetal)*dtl/masa_misil
-                dvyl=dvyl+Empuje_misil*sin(thetal)*dtl/masa_misil
-                masa_misil=masa_misil-20*dtl                                #la variacion de masa lineal
-            
-            dthetal=dtl*g0*cos(thetal)/(-vl) #Diferencial del ángulo de asiento
-            dxl=vxl*dtl #Diferencial de la posición (m)
-            dyl=vyl*dtl #Diferencial de la altitud (m)
-            dsl=vl*dtl #Diferencial del arco recorrido (m)
-    
-            Emec_misil=masa_misil*(GRAV*yl+(vl**2)/2) #Trabajo de la resistencia
-            
-        f.write('%.8f\t' %tl) #Tiempo(s)
-        f.write('%.8f\t' %yl) #Altitud (m)
-        f.write('%.8f\t' %vl) #Velocidad (m/s)
-        f.write('%.8f\t' %Ml) #Mach de vuelo
-        f.write('%.8f\t' %thetalgrados) #Ángulo de asiento
-        f.write('%.8f\t' %masa_misil) #Ángulo de asiento
-        f.write('%.8f\n' %Emec_misil) #Energía mecánica final (J) 
-    
+            Mu_Visc = viscosity(yl) # Viscosidad (Pa s).
+            Ml = vl / (GAMMA * R_AIR * T)**.5  # Mach de vuelo.
+            Cdl = Cdll(Ml)  # Coeficiente de resistencia.
+            D_misil = .5 * rho * Cdl * Sref_misil * vl**2  # Fuerza de resistencia (N).
+            Dx = D_misil * cos(thetal)  # Componente horizontal de la fuerza de resistencia (N).
+            Dy = D_misil * sin(thetal)  # Componente vertical de la fuerza de resistencia (N).
+            dvxl = -Dx / masa_misil * dtl  # Diferencial de la componente horizontal de la velocidad (m/s).
+            dvyl = -(g0 + Dy / masa_misil) * dtl  # Diferencial de la componente vertical de la velocidad (m/s).
+            if tl <= 30.01:
+                dvxl = dvxl + Empuje_misil * cos(thetal) * dtl / masa_misil
+                dvyl = dvyl + Empuje_misil * sin(thetal) * dtl / masa_misil
+                masa_misil = masa_misil - 20 * dtl  # Variación lineal de la masa del misil (kg).
+            dthetal = -dtl * g0 * cos(thetal) / vl  # Diferencial del ángulo de asiento.
+            dxl = vxl * dtl  # Diferencial de la posición (m).
+            dyl = vyl * dtl  # Diferencial de la altitud (m).
+            dsl = vl * dtl  # Diferencial del arco recorrido (m).
+            Emec_misil = masa_misil * (GRAV * yl + vl**2 / 2)  # Trabajo de la resistencia (J).
+        f.write('{0:.8f}\t'.format(tl))  # Tiempo (s).
+        f.write('{0:.8f}\t'.format(yl))  # Altitud (m).
+        f.write('{0:.8f}\t'.format(vl()  # Velocidad (m/s).
+        f.write('{0:.8f}\t'.format(Ml))  # Mach de vuelo.
+        f.write('{0:.8f}\t'.format(thetalgrados))  # Ángulo de asiento (deg).
+        f.write('{0:.8f}\t'.format(masa_misil))  # Masa del misil (kg).
+        f.write('{0:.8f}\t'.format(Emec_misil))  # Energía mecánica final (J).
     f.close()
-           
+
 '''
 Como resumen:
 1) El código ha empezado en una condición de vuelo uniforme.
@@ -942,12 +913,7 @@ constante, y con mínima resistencia.
 3) La última maniobra es un ascenso con el ángulo final del giro, con
 coeficiente de sustentación óptimo.
 
-Este programa nos exportará un total de 9 archivos (uno para cada incremento de
-10º del ángulo final de giro) que, exportados a Excel nos permiten observar
+Este programa exportará un total de 9 archivos (uno para cada incremento de 10
+grados del ángulo final de giro) que, exportados a Excel nos permiten observar
 cómo cambian las variables según las condiciones de vuelo.
 '''
-    
-
-            
-        
-             
