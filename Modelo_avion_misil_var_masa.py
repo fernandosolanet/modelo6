@@ -486,7 +486,7 @@ def Cdll(Ml):
 # durar todo el programa para conseguir que exporte los distintos ficheros
 # correspondientes a cada ángulo.
 
-for beta in range(50, 60, 10):
+for Isp in range(int(220*9.8), int(320*9.8), 100):
     '''beta es el ángulo de asiento al final del giro y lo variaremos en el
     bucle para obtener los resultados en función de sus distintos valores.  Se
     creará un fichero para cada ángulo que contenga los tiempos, las alturas,
@@ -496,14 +496,20 @@ for beta in range(50, 60, 10):
     las energías potenciales, los empujes, las fuerzas de resistencia y los
     factores de carga correspondientes a cada instante de la maniobra.
     '''
-    beta_texto = str(beta)  # Variable de texto.
+    gasto=60 
+    masa_misil=1000
+    masa_propulsante=750    
+    Empuje_misil= gasto*Isp #Gasto constante, empuje constante para un ensayo, variando en cada ensayo con el Isp
+    t_combustion= masa_propulsante/gasto 
+
+    beta = 89
     beta = radians(beta)
-    f = open(beta_texto, 'w')  # Fichero de escritura sin extensión.
-    f.write('TIEMPO DE LANZAMIENTO(s)\tALTURA DE LANZAMIENTO (m)\tVELOCIDAD DE LANZAMIENTO(m/s)\tMACH\tALFA ')
-    f.write('(deg)\tGAMMA (deg)\tTHETA (deg)\tE_MECÁNICA (J)')
-    f.write('\tD (N)')
-    f.write('\tTIEMPO (s)\tALTURA (m)')
-    f.write('\tVELOCIDAD (m/s)\tMACH\tTHETA (deg)\tMASA (kg)\tE_MECÁNICA MISIL (J)\n')
+    Isp_texto=str(Isp)
+    f = open(Isp_texto, 'w')  # Fichero de escritura sin extensión.
+    f.write('TIME (s)\tALTURA lanzamiento (m)\tVELOCIDAD (m/s)')
+    f.write('\tTHETA (deg)')
+    f.write('\tTimefinalmisil (s) \tAlturafinalmisil')
+    f.write('\tVelocidadfinalmisil \tThetafinalmisil \tmasafinalmisil \tEmecfinalm \txfinalmisil \tEmpujemisil \tIsp \n')
     #Cabezas de tabla.
     '''-------------------------CONDICIONES INICIALES-------------------------
     Ahora, para los próximos cálculos, se definen las variables termodinámicas
@@ -592,12 +598,7 @@ for beta in range(50, 60, 10):
         f.write('{0:.2f}\t'.format(t))  # Tiempo (s).
         f.write('{0:.3f}\t'.format(h))  # Altitud (m).
         f.write('{0:.3f}\t'.format(v))  # Velocidad (m/s).
-        f.write('{0:.3f}\t'.format(M))  # Número de Mach.
-        f.write('{0:.3f}\t'.format(alfa_grados))  # Ángulo de ataque (deg).
-        f.write('{0:.3f}\t'.format(gama_grados))  # Asiento de la velocidad (deg).
-        f.write('{0:.3f}\t'.format(theta_grados))  # Ángulo de asiento (deg).
-        f.write('{0:.3f}\t'.format(emecanica))  # Energía mecánica (J).
-        f.write('{0:.3f}\t'.format(D))  # Fuerza de resistencia (N).
+        f.write('{0:.3f}\t'.format(theta_grados))  # Ángulo de asiento (deg).     
         #Ya que este análisis de maniobra, a diferencia del anterior, lleva un
         # cálculo para distintos valores de tiempo y velocidad, se debe
         # programar su evolución en términos de sus variaciones diferenciales.
@@ -681,7 +682,7 @@ for beta in range(50, 60, 10):
         dtheta = omega * dt  # Variación del ángulo de asiento.
         masa_misil = 1000
         #BUCLE TIRO BALÍSTICO DEL MISIL.
-        while thetal > 0:
+        while thetal > 0 and yl <500000:
             '''Con este bucle se calculan todas las variables correspondientes al tiro balístico del misil SIN EMPUJE . 
             La condición de parada del bucle es que el ángulo de asiento del misil deje de ser positivo. Esto es cuando
             el misil se encuentre completamente en posición horizontal. La particularidad de este caso
@@ -715,13 +716,15 @@ for beta in range(50, 60, 10):
             dyl = vyl * dtl  # Diferencial de la altitud (m).
             dsl = vl * dtl  # Diferencial del arco recorrido (m).
         Emec_misil = masa_misil * (GRAV * yl + vl**2 / 2)  # Trabajo de la resistencia (J).
-        f.write('{0:.3f}\t'.format(tl))  # Tiempo (s).
-        f.write('{0:.3f}\t'.format(yl))  # Altitud (m).
-        f.write('{0:.3f}\t'.format(vl))  # Velocidad (m/s).
-        f.write('{0:.3f}\t'.format(Ml))  # Mach de vuelo.
-        f.write('{0:.3f}\t'.format(thetalgrados))  # Ángulo de asiento (deg).
-        f.write('{0:.3f}\t'.format(masa_misil))  # Masa del misil (kg).
-        f.write('{0:.3f}\n'.format(Emec_misil))  # Energía mecánica final (J).
+        f.write('%.8f\t' %tl) #Tiempo(s))        
+        f.write('%.8f\t' %yl) #Altitud (m)
+        f.write('%.8f\t' %vl) #Velocidad (m/s)
+        f.write('%.8f\t' %thetalgrados) #Ángulo de asiento
+        f.write('%.8f\t' %masa_misil) #Ángulo de asiento
+        f.write('%.8f\t' %Emec_misil) #Energía mecánica final (J) 
+        f.write('%.8f\t' %xl) #x final
+        f.write('%.8f\t' %Empuje_misil) #Empuje (J) 
+        f.write('%.8f\n' %Isp) #Impulso específico
     f.close()
 
 '''
