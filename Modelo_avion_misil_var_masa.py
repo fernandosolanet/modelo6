@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 @author: Team REOS
-"""
-from math import exp, radians, cos, pi, sin, degrees, atan, log10
 
-'''
 Este programa servirá para establecer la trayectoria a describir por el
 avión.  Contiene la maniobra de giro, seguida por otra de ascenso.  Al final se
 procederá a exportar las características y cómo varían a lo largo de la
 trayectoria para poder obtener sus gráficas.
-'''
+"""
+from math import exp, radians, cos, pi, sin, degrees, atan, log10
 
-'''Condiciones gravitatorias y constantes atmosféricas'''
+#-------------CONDICIONES GRAVITATORIAS Y CONSTANTES ATMOSFÉRICAS-------------
 G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
 MT = 5.972e24  # Masa terrestre (kg).
 MU = G * MT
@@ -20,10 +18,8 @@ R_AIR = 287  # Constante de los gases ideales (J/Kkg).
 GRAV = 9.80665  # Aceleración gravitatoria (m/s2).
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
 GAMMA = 1.4  # Coeficiente de dilatación adiabática.
-
-##Condiciones de viscosidad.
-beta_visc = .000001458
-S_visc = 110.4
+beta_visc = .000001458  # Viscosidad de referencia (Pa s/K.5).
+S_visc = 110.4  # Temperatura de referencia para la viscosidad (K).
 
 '''
 -----------------------ATMÓSFERA ESTÁNDAR INTERNACIONAL-----------------------
@@ -240,9 +236,7 @@ def thrust(mach, den):
     z_th = -.347382668*d_th + 1.71160358
     return TH_SL * (a_th + i * exp(-c_th * (mach - z_th)**2))
 
-'''
---------------------------COEFICIENTES AERODINÁMICOS--------------------------
-'''
+#--------------------------COEFICIENTES AERODINÁMICOS--------------------------
 
 def cl_alfa(mach):
     '''Cálculo de la pendiente del coeficiente de sustentación, que es lineal
@@ -354,51 +348,43 @@ def sustentacion(vel, dens, c_l):
     return .5 * dens * S_W * c_l * vel**2
 
 def Cdll(Ml):
-    def coef_resistencia_base_misil(Ml):
-        if Ml < 0.8:
-            x0 = 0
-            x1 = 0
-            x2 = 0
-            x3 = 0
-            x4 = 0
+    def coef_resistencia_base_misil(Machl):
+        if Machl < 0.8:
+            return 0
         elif Ml < 1:
             x0 = -1.548523
             x1 = 6.05972764
             x2 = -7.30548391
             x3 = 2.96129532
             x4 = 0
-        elif Ml < 1.1:
+        elif Machl < 1.1:
             x0 = 5790.90984
             x1 = -21984.3314
             x2 = 31277.4812
             x3 = -19764.4892
             x4 = 4680.59822
-        elif Ml < 1.5:
+        elif Machl < 1.5:
             x0 = -4.11856506
             x1 = 14.2267421
             x2 = -16.9678524
             x3 = 8.771665
             x4 = -1.67398037
-        elif Ml < 2.2:
+        elif Machl < 2.2:
             x0 = .30748
             x1 = -.13258
             x2 = .028812
             x3 = 0
             x4 = 0
-        elif Ml > 2.2:
+        elif Machl > 2.2:
             x0 = .18481
             x1 = -.022895
             x2 = .0051876
             x3 = -.00040742
             x4 = 0
-        elif Ml >3.5:
-            x0 = .15
-            x1 = 0
-            x2 = 0
-            x3 = 0
-            x4 = 0
-        return x4 * Ml**4 + x3 * Ml**3 + x2 * Ml**2 + x1 * Ml + x0
-    CD_base_misil = coef_resistencia_base_misil(Ml)
+        elif Machl >3.5:
+            return .15
+        return x4 * Machl**4 + x3 * Machl**3 + x2 * Machl**2 + x1 * Machl + x0
+    CD_base_misil = coef_resistencia_base_misil(Machl)
     #CÁLCULO DEL COEFICIENTE DE FRICCIÓN.
     ##COEFICIENTE DE FRICCIÓN DEL CONO.
     ###CÁLCULO DEL REYNOLDS.
@@ -411,7 +397,7 @@ def Cdll(Ml):
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
             cf_cono = 2 * cfi_cono
             #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-            cfm_cono = cf_cono * (1 / (1 + .17 * Ml**2))**.1295
+            cfm_cono = cf_cono * (1 / (1 + .17 * Machl**2))**.1295
             #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
         #TURBULENTO
         else:	
@@ -420,7 +406,7 @@ def Cdll(Ml):
             #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
             cf_cono = cfi_cono * 1.597 * ((log10(Re_cono))**(-.15))
             #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-            cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * Ml**2)**.467)
+            cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
             #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
         return cfm_cono * Sup_cono / Sref_misil
     ##COEFICIENTE DE FRICCIÓN DEL CILINDRO.
@@ -434,7 +420,7 @@ def Cdll(Ml):
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
             cf_cil = 2 * cfi_cil
             #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-            cfm_cil = cf_cil * (1 / (1 + .17 * Ml**2))**.1295
+            cfm_cil = cf_cil * (1 / (1 + .17 * Machl**2))**.1295
         #TURBULENTO
         else:			
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
@@ -442,7 +428,7 @@ def Cdll(Ml):
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
             cf_cil = cfi_cil * 1.597 * ((log10(Re_cil))**(-.15))
             #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-            cfm_cil = cf_cil * (1 / (1 + (GAMMA - 1) / 2 * Ml**2)**.467)
+            cfm_cil = cf_cil * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
         return cfm_cil*Sup_total/Sref_misil
     #CÁLCULO DEL COEFICIENTE DE FRICCIÓN TOTAL REFERIDO A LA SUPERFICIE
     # TRANSVERSAL.
@@ -450,23 +436,24 @@ def Cdll(Ml):
     CDFriccion_cil = cfcil(Re_cil)
     CDFriccion = CDFriccion_cono + CDFriccion_cil    
     #CÁLCULO DEL COEFICIENTE DE ONDA.
-    def cd_onda(Ml, angulo_cono):
-        if Ml >= 1:
-            return (.083 + .096 / Ml**2) * (angulo_cono / 10)**1.69
+    def cd_onda(Machl, angulo):
+        if Machl >= 1:
+            return (.083 + .096 / Machl**2) * (angulo / 10)**1.69
         #RÉGIMEN SUBSÓNICO.
-        elif Ml < 1:
+        elif Machl < 1:
             ratio = longitud_cono / diametro_m
             return (60 / ratio**3 + .0025 * ratio) * CDFriccion
-    CD_onda = cd_onda(Ml, angulo_cono)
+    CD_onda = cd_onda(Machl, angulo_cono)
     #RESISTENCIA DE LAS ALETAS.
     ##COEFICIENTE DE ONDA.
-    def cd_onda_aletas(Ml):
-        if Ml >= 1:
-            return 4 * tao_aleta**2 / ((Ml**2 - 1)**.5) * Swtotal_aletas / Sref_misil
+    def cd_onda_aletas(Machl):
+        if Machl >= 1:
+            return 4 * tao_aleta**2 / (Machl**2 - 1)**.5 * (Swtotal_aletas
+                                                            / Sref_misil)
         #RÉGIMEN SUBSÓNICO.
-        elif Ml < 1:
+        elif Machl < 1:
             return 0
-    CD_onda_aletas = cd_onda_aletas(Ml, angulo_cono)
+    CD_onda_aletas = cd_onda_aletas(Machl)
     Re_aletas = rho * vl * Craiz_aleta / Mu_Visc  # REYNOLDS DE LAS ALETAS.
     #COEFICIENTE DE FRICCIÓN DE LAS ALETAS.
     def cf_aletas(Re_aletas):
@@ -477,7 +464,7 @@ def Cdll(Ml):
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
             cf1aletas = 2 * cfialetas
             #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-            cfmaletas = cf1aletas / (1 + .17 * Ml**2)**.1295
+            cfmaletas = cf1aletas / (1 + .17 * Machl**2)**.1295
         #TURBULENTO.
         else:
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
@@ -485,10 +472,11 @@ def Cdll(Ml):
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
             cf1aletas = cfialetas * 1.597 * ((log10(Re_aletas))**(-.15))
             #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-            cfmaletas = cf1aletas / (1 + (GAMMA - 1) / 2 * Ml**2)**.467
+            cfmaletas = cf1aletas / (1 + (GAMMA - 1) / 2 * Machl**2)**.467
         return cfmaletas * Swtotal_aletas / Sref_misil
     CDFriccion_aletas = cf_aletas(Re_aletas)
-    return CD_base_misil + CDFriccion + CD_onda + CD_onda_aletas + CDFriccion_aletas
+    return (CD_base_misil + CDFriccion + CD_onda + CD_onda_aletas
+            + CDFriccion_aletas)
 
 #A partir de aquí, se abre un bucle en función del ángulo theta ("beta" en el
 # código).  Este ángulo sirve para determinar el ángulo final de la maniobra de
