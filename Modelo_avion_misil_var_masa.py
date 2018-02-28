@@ -86,6 +86,7 @@ def temperature(alt):
 
 def density(alt):
     '''Cálculo de la densidad en función de la altura dada por el modelo ISA.
+    Se implementa el principio de Pascal.
     '''
     rho0 = RHO_SL
     t_isa = temperature(alt)
@@ -132,11 +133,13 @@ def density(alt):
 
 def pressure(alt):
     '''Cálculo de la presión en función de la altura dada por el modelo ISA.
+    Se implementa la ley de los gases ideales.
     '''
     return density(alt) * R_AIR * temperature(alt)
 
 def viscosity(alt):	
     '''Cálculo de la viscosidad en función de la altura dada por el modelo ISA.
+    Se implementa la ley de Sutherland.
     '''							
     temp = temperature(alt)
     return beta_visc * temp**(3 / 2) / (temp + S_visc)
