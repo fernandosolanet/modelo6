@@ -436,11 +436,11 @@ def Cdll(Ml):
     CDFriccion_cil = cfcil(Re_cil)
     CDFriccion = CDFriccion_cono + CDFriccion_cil    
     #CÁLCULO DEL COEFICIENTE DE ONDA.
-    def cd_onda(Ml, angulo_cono):
-        if Ml >= 1:
-            return (.083 + .096 / Ml**2) * (angulo_cono / 10)**1.69
+    def cd_onda(Machl, angulo):
+        if Machl >= 1:
+            return (.083 + .096 / Machl**2) * (angulo / 10)**1.69
         #RÉGIMEN SUBSÓNICO.
-        elif Ml < 1:
+        elif Machl < 1:
             ratio = longitud_cono / diametro_m
             return (60 / ratio**3 + .0025 * ratio) * CDFriccion
     CD_onda = cd_onda(Ml, angulo_cono)
