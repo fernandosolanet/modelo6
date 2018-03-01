@@ -18,8 +18,8 @@ R_AIR = 287  # Constante de los gases ideales (J/Kkg).
 GRAV = 9.80665  # Aceleración gravitatoria (m/s2).
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
 GAMMA = 1.4  # Coeficiente de dilatación adiabática.
-beta_visc = .000001458  # Viscosidad de referencia (Pa s/K.5).
-S_visc = 110.4  # Temperatura de referencia para la viscosidad (K).
+BETA_VISC = .000001458  # Viscosidad de referencia (Pa s/K.5).
+S_VISC = 110.4  # Temperatura de referencia para la viscosidad (K).
 
 '''
 -----------------------ATMÓSFERA ESTÁNDAR INTERNACIONAL-----------------------
@@ -98,10 +98,14 @@ def density(alt):
     Se implementa el principio de Pascal.
     '''
     t_isa = temperature(alt)
-    def density_alfa_0(altit, rho_0, h0):
-        return rho_0 * exp(-GRAV * (altit - h0) / (R_AIR * t_isa))
-    def density_alfa_no0(rho_0, t0, alfa_den):
-        return rho_0 * (t_isa / t0)**(-GRAV / (R_AIR * alfa_den) - 1)
+    def density_alfa_0(altit, rho_0, alt_0):
+        '''Fórmula de la densidad cuando alfa es 0.
+        '''
+        return rho_0 * exp(-GRAV * (altit - alt_0) / (R_AIR * t_isa))
+    def density_alfa_no0(rho_0, temp_0, alfa_den):
+        '''Fórmula de la densidad cuando alfa no es 0.
+        '''
+        return rho_0 * (t_isa / temp_0)**(-GRAV / (R_AIR * alfa_den) - 1)
     r_1 = density_alfa_no0(RHO_SL, temperature(H_ISA1), alfa_isa(0))
     r_2 = density_alfa_0(H_ISA2, r_1, H_ISA1)
     r_3 = density_alfa_no0(r_2, temperature(H_ISA3), alfa_isa(H_ISA2))
@@ -157,7 +161,7 @@ def viscosity(alt):
     Se implementa la ley de Sutherland.
     '''
     temp = temperature(alt)
-    return beta_visc * temp**(3 / 2) / (temp + S_visc)
+    return BETA_VISC * temp**(3 / 2) / (temp + S_VISC)
 '''
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
 '''
@@ -206,37 +210,33 @@ M_D098 = .98 * M_D
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL-------------------
 '''
 
-diametro_m = .5  # Diámetro del misil (m).
-longitud_cono = .9  # Longitud del cono del misil (m).
-longitud_misil = 3  # Longitud total del misil (m).
+DIAMETRO_M = .5  # Diámetro del misil (m).
+LONGITUD_CONO = .9  # Longitud del cono del misil (m).
+LONGITUD_MISIL = 3  # Longitud total del misil (m).
 
-Sw_aleta = .07875  # Superficie de una aleta del AIM (tomado como ref., m2).
-Craiz_aleta = .24  # Cuerda raiz de la aleta (m).
-Cmedia_aleta = .18  # Cuerda media de la aleta (m).
-espesor_aleta = .0065  # Espesor de la aleta (m).
-tao_aleta = espesor_aleta / Cmedia_aleta  # TAO de la aleta.
-num_aletas = 4  # Número de aletas.
+SW_ALETA = .07875  # Superficie de una aleta del AIM (tomado como ref., m2).
+CRAIZ_ALETA = .24  # Cuerda raiz de la aleta (m).
+CMEDIA_ALETA = .18  # Cuerda media de la aleta (m).
+ESPESOR_ALETA = .0065  # Espesor de la aleta (m).
+TAO_ALETA = ESPESOR_ALETA / CMEDIA_ALETA  # TAO de la aleta.
+NUM_ALETAS = 4  # Número de aletas.
+SWTOTAL_ALETAS = SW_ALETA * NUM_ALETAS  # Superficie total de aletas (m2).
 
-Swtotal_aletas =Sw_aleta*num_aletas  # Superficie total de aletas (m2).
-Sref_aletas = S wtotal_aletas / 2  # Superficie de referencia aletas (m2).
-
-
-Sup_cono = pi * diametro_m / 2 * (longitud_cono**2 + diametro_m**2 / 4)**(1 / 2)
+SUP_CONO = pi * DIAMETRO_M / 2 * (LONGITUD_CONO**2 + DIAMETRO_M**2 / 4)**(1 / 2)
 # Superficie exterior del cono (m2).
-Sup_total = pi * diametro_m * (longitud_misil - longitud_cono)
+SUP_TOTAL = pi * DIAMETRO_M * (LONGITUD_MISIL - LONGITUD_CONO)
 # Superficie exterior del misil (m2).
-Sref_misil = pi * diametro_m**2 / 4  #Superficie de referencia del misil (m2).
-angulo_cono = degrees(atan(.5 * diametro_m / longitud_cono))
+SREF_MISIL = pi * DIAMETRO_M**2 / 4  #Superficie de referencia del misil (m2).
+ANGULO_CONO = degrees(atan(.5 * DIAMETRO_M / LONGITUD_CONO))
 # Ángulo del cono (deg).
 
-Empuje_misil = 50000  # Empuje constante del misil (N).
-masa_misil = 1000  # Masa del misil (kg). Es necesario cambiarlo también abajo.
+EMPUJE_MISIL = 50000  # Empuje constante del misil (N).
 
 '''
----------------------------CURVAS DE EMPUJE DEL F-4---------------------------
+---------------------------CURVAS DE EMPUJE DEL F-18---------------------------
 Previamente a este código, se han obtenido unas funciones de coeficientes
 relativas a las curvas de empuje de la aeronave.  Partiendo del empuje máximo
-del F-4 (el empuje máximo a nivel del mar) y con el dato de la altura, el cual
+del F-18 (el empuje máximo a nivel del mar) y con el dato de la altura, el cual
 nos dará el valor de densidad, podremos obtener el valor del empuje equivalente
 a cada altura en la que nos estemos moviendo.
 '''
@@ -366,139 +366,156 @@ def sustentacion(vel, dens, c_l):
     '''
     return .5 * dens * S_W * c_l * vel**2
 
-def coef_resistencia_base_misil(Mach):
+def coef_resistencia_base_misil(mach):
     '''Coeficiente de resistencia base del misil. Varía con el número de Mach.
     '''
-    if Mach < .8:
+    if mach < .8:
         return 0
-    elif Mach < 1:
-        x0 = -1.548523
-        x1 = 6.05972764
-        x2 = -7.30548391
-        x3 = 2.96129532
-        x4 = 0
-    elif Mach < 1.1:
-        x0 = 5790.90984
-        x1 = -21984.3314
-        x2 = 31277.4812
-        x3 = -19764.4892
-        x4 = 4680.59822
-    elif Mach < 1.5:
-        x0 = -4.11856506
-        x1 = 14.2267421
-        x2 = -16.9678524
-        x3 = 8.771665
-        x4 = -1.67398037
-    elif Mach < 2.2:
-        x0 = .30748
-        x1 = -.13258
-        x2 = .028812
-        x3 = 0
-        x4 = 0
-    elif Mach > 2.2:
-        x0 = .18481
-        x1 = -.022895
-        x2 = .0051876
-        x3 = -.00040742
-        x4 = 0
-    elif Mach > 3.5:
+    elif mach < 1:
+        x_0 = -1.548523
+        x_1 = 6.05972764
+        x_2 = -7.30548391
+        x_3 = 2.96129532
+        x_4 = 0
+    elif mach < 1.1:
+        x_0 = 5790.90984
+        x_1 = -21984.3314
+        x_2 = 31277.4812
+        x_3 = -19764.4892
+        x_4 = 4680.59822
+    elif mach < 1.5:
+        x_0 = -4.11856506
+        x_1 = 14.2267421
+        x_2 = -16.9678524
+        x_3 = 8.771665
+        x_4 = -1.67398037
+    elif mach < 2.2:
+        x_0 = .30748
+        x_1 = -.13258
+        x_2 = .028812
+        x_3 = 0
+        x_4 = 0
+    elif mach > 2.2:
+        x_0 = .18481
+        x_1 = -.022895
+        x_2 = .0051876
+        x_3 = -.00040742
+        x_4 = 0
+    elif mach > 3.5:
         return .15
-    return x4 * Mach**4 + x3 * Mach**3 + x2 * Mach**2 + x1 * Mach + x0
+    return x_4 * mach**4 + x_3 * mach**3 + x_2 * mach**2 + x_1 * mach + x_0
 
-def cfcono_misil(Re_cono, Machl):
+def cfcono_misil(re_cono, machl):
     '''Coeficiente de fricción del cono.
     '''
     #LAMINAR
-    if Re_cono < 1e6:
+    if re_cono < 1e6:
         #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cono = .664 * Re_cono**(-1 / 2)
+        cfi_cono = .664 * re_cono**(-1 / 2)
         #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
         cf_cono = 2 * cfi_cono
         #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-        cfm_cono = cf_cono * (1 / (1 + .17 * Machl**2))**.1295
+        cfm_cono = cf_cono * (1 / (1 + .17 * machl**2))**.1295
         #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
     #TURBULENTO
     else:
         #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cono = .288 * ((log10(Re_cono))**(-2.45))
+        cfi_cono = .288 * ((log10(re_cono))**(-2.45))
         #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-        cf_cono = cfi_cono * 1.597 * ((log10(Re_cono))**(-.15))
+        cf_cono = cfi_cono * 1.597 * ((log10(re_cono))**(-.15))
         #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-        cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
+        cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * machl**2)**.467)
         #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
-    return cfm_cono * Sup_cono / Sref_misil
+    return cfm_cono * SUP_CONO / SREF_MISIL
 
-def Cdll(Ml):
-    CD_base_misil = coef_resistencia_base_misil(Machl)
-    Re_cono = rho * vl * longitud_cono / Mu_Visc
+def cfcil(re_cilindro, machl):
+    '''Coeficiente de fricción del cilindro.
+    '''
+    #LAMINAR
+    if re_cilindro < 1e6:
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        cfi_cil = .664 * re_cilindro**(-1 / 2)
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
+        cf_cil = 2 * cfi_cil
+        #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
+        cfm_cil = cf_cil * (1 / (1 + .17 * machl**2))**.1295
+    #TURBULENTO
+    else:
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        cfi_cil = .288 * ((log10(re_cilindro))**(-2.45))
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
+        cf_cil = cfi_cil * 1.597 * ((log10(re_cilindro))**(-.15))
+        #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
+        cfm_cil = cf_cil * (1 / (1 + (GAMMA - 1) / 2 * machl**2)**.467)
+    return cfm_cil * SUP_TOTAL / SREF_MISIL
+
+def cd_wave(mach, angulo):
+    '''Coeficiente de onda del misil.
+    '''
+    if mach >= 1:
+        return (.083 + .096 / mach**2) * (angulo / 10)**1.69
+    #RÉGIMEN SUBSÓNICO.
+    ratio = LONGITUD_CONO / DIAMETRO_M
+    return (60 / ratio**3 + .0025 * ratio) * cd_friccion
+
+def cd_wave_aletas(mach):
+    '''Coeficiente de onda de las aletas.
+    '''
+    #RÉGIMEN SUPERSÓNICO
+    if mach >= 1:
+        return 4 * TAO_ALETA**2 / (mach**2 - 1)**.5 * (SWTOTAL_ALETAS
+                                                       / SREF_MISIL)
+    #RÉGIMEN SUBSÓNICO.
+    return 0
+
+def cf_aletas(reyn_aleta, mach):
+    '''Coeficiente de fricción de las aletas.
+    '''
+    #LAMINAR.
+    if reyn_aleta < 1e6:
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        cfialetas = .664 * reyn_aleta**(-1 / 2)
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
+        cf1aletas = 2 * cfialetas
+        #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
+        cfmaletas = cf1aletas / (1 + .17 * mach**2)**.1295
+    #TURBULENTO.
+    else:
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        cfialetas = .288 * (log10(reyn_aleta))**(-2.45)
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
+        cf1aletas = cfialetas * 1.597 * ((log10(reyn_aleta))**(-.15))
+        #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
+        cfmaletas = cf1aletas / (1 + (GAMMA - 1) / 2 * mach**2)**.467
+    return cfmaletas * SWTOTAL_ALETAS / SREF_MISIL
+
+def cdll(machl):
+    '''Coeficiente de resistencia total del misil.
+    '''
+    #CÁLCULO DEL COEFICIENTE DE RESISTENCIA BASE.
+    cd_base_misil = coef_resistencia_base_misil(machl)
+    re_cono = rho * vl * LONGITUD_CONO / Mu_Visc
     # Número de Reynolds en el cono.
-    Re_cil = rho * vl * (longitud_misil - longitud_cono) / Mu_Visc
+    re_cil = rho * vl * (LONGITUD_MISIL - LONGITUD_CONO) / Mu_Visc
     # Número de Reynolds en el cilindro.
-    def cfcil(Re_cil):
-        #LAMINAR
-        if Re_cil < 1e6:
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-            cfi_cil = .664 * Re_cil**(-1 / 2)
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
-            cf_cil = 2 * cfi_cil
-            #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-            cfm_cil = cf_cil * (1 / (1 + .17 * Machl**2))**.1295
-        #TURBULENTO
-        else:
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-            cfi_cil = .288 * ((log10(Re_cil))**(-2.45))
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-            cf_cil = cfi_cil * 1.597 * ((log10(Re_cil))**(-.15))
-            #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-            cfm_cil = cf_cil * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
-        return cfm_cil * Sup_total / Sref_misil
     #CÁLCULO DEL COEFICIENTE DE FRICCIÓN TOTAL REFERIDO A LA SUPERFICIE
     # TRANSVERSAL.
-    CDFriccion_cono = cfcono_misil(Re_cono, Machl)
-    CDFriccion_cil = cfcil(Re_cil)
-    CDFriccion = CDFriccion_cono + CDFriccion_cil
+    cd_friccion_cono = cfcono_misil(re_cono, machl)
+    # Coeficiente de fricción en el cono.
+    cd_friccion_cil = cfcil(re_cil, machl)
+    # Coeficiente de fricción en el cilindro.
+    cd_friccion = cd_friccion_cono + cd_friccion_cil
     #CÁLCULO DEL COEFICIENTE DE ONDA.
-    def cd_onda(Machl, angulo):
-        if Machl >= 1:
-            return (.083 + .096 / Machl**2) * (angulo / 10)**1.69
-        #RÉGIMEN SUBSÓNICO.
-        elif Machl < 1:
-            ratio = longitud_cono / diametro_m
-            return (60 / ratio**3 + .0025 * ratio) * CDFriccion
-    CD_onda = cd_onda(Machl, angulo_cono)
+    cd_onda = cd_wave(machl, ANGULO_CONO, cd_friccion)
     #RESISTENCIA DE LAS ALETAS.
     ##COEFICIENTE DE ONDA.
-    def cd_onda_aletas(Machl):
-        if Machl >= 1:
-            return 4 * tao_aleta**2 / (Mach**2 - 1)**.5 * (Swtotal_aletas
-                                                           / Sref_misil)
-        #RÉGIMEN SUBSÓNICO.
-        elif Machl < 1:
-            return 0
-    CD_onda_aletas = cd_onda_aletas(Machl)
-    Re_aletas = rho * vl * Craiz_aleta / Mu_Visc  # REYNOLDS DE LAS ALETAS.
+    cd_onda_aletas = cd_wave_aletas(machl)
+    re_aletas = rho * vl * CRAIZ_ALETA / Mu_Visc
+    # Número de Reynolds en las aletas.
     #COEFICIENTE DE FRICCIÓN DE LAS ALETAS.
-    def cf_aletas(Re_aletas):
-        #LAMINAR.
-        if Re_aletas < 1e6:
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-            cfialetas = .664 * Re_aletas**(-1 / 2)
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
-            cf1aletas = 2 * cfialetas
-            #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-            cfmaletas = cf1aletas / (1 + .17 * Machl**2)**.1295
-        #TURBULENTO.
-        else:
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-            cfialetas = .288 * (log10(Re_aletas))**(-2.45)
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-            cf1aletas = cfialetas * 1.597 * ((log10(Re_aletas))**(-.15))
-            #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-            cfmaletas = cf1aletas / (1 + (GAMMA - 1) / 2 * Machl**2)**.467
-        return cfmaletas * Swtotal_aletas / Sref_misil
-    CDFriccion_aletas = cf_aletas(Re_aletas)
-    return (CD_base_misil + CDFriccion + CD_onda + CD_onda_aletas
-            + CDFriccion_aletas)
+    cdfriccion_aletas = cf_aletas(re_aletas)
+    return (cd_base_misil + cd_friccion + cd_onda + cd_onda_aletas
+            + cdfriccion_aletas)
 
 #A partir de aquí, se abre un bucle en función del ángulo theta ("beta" en el
 # código).  Este ángulo sirve para determinar el ángulo final de la maniobra de
@@ -591,8 +608,8 @@ for beta in range(50, 60, 10):
     dtheta = v * dt / radius  # Variación del ángulo de empuje.
     vl = v
     Ml = vl / (GAMMA * R_AIR * T)**.5
-    Cdl = Cdll(Ml)
-    D_misil = .5 * rho * Cdl * Sref_misil * vl**2
+    Cdl = cdll(Ml)
+    D_misil = .5 * rho * Cdl * SREF_MISIL * vl**2
     '''-------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO-------
     Ahora comienza el bucle relativo al giro ascendente, que analiza la
     trayectoria con nuevas ecuaciones y condiciones de vuelo que se detallan
@@ -731,7 +748,7 @@ for beta in range(50, 60, 10):
             Mu_Visc = viscosity(yl)  # Viscosidad (Pa s).
             Ml = vl / (GAMMA * R_AIR * T)**.5  # Mach de vuelo.
             Cdl = Cdll(Ml)  # Coeficiente de resistencia.
-            D_misil = .5 * rho * Cdl * Sref_misil * vl**2
+            D_misil = .5 * rho * Cdl * SREF_MISIL * vl**2
             # Fuerza de resistencia (N).
             Dx = D_misil * cos(thetal)
             # Componente horizontal de la fuerza de resistencia (N).
@@ -742,8 +759,8 @@ for beta in range(50, 60, 10):
             dvyl = -g0 * dtl - Dy / masa_misil * dtl
             # Diferencial de la componente vertical de la velocidad (m/s).
             if tl <= 30:
-                dvxl = dvxl + Empuje_misil * cos(thetal) * dtl / masa_misil
-                dvyl = dvyl + Empuje_misil * sin(thetal) * dtl / masa_misil
+                dvxl = dvxl + EMPUJE_MISIL * cos(thetal) * dtl / masa_misil
+                dvyl = dvyl + EMPUJE_MISIL * sin(thetal) * dtl / masa_misil
                 masa_misil = masa_misil - 20 * dtl
                 # Variación de masa lineal (kg).
             dthetal = -dtl * g0 * cos(thetal) / vl
