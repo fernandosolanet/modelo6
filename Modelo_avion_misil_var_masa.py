@@ -100,7 +100,7 @@ def density(alt):
     t_isa = temperature(alt)
     def density_alfa_0(altit, rho_0, h0):
         return rho_0 * exp(-GRAV * (altit - h0) / (R_AIR * t_isa))
-    def density_alfa_no0 (rho_0, t0, alfa_den):
+    def density_alfa_no0(rho_0, t0, alfa_den):
         return rho_0 * (t_isa / t0)**(-GRAV / (R_AIR * alfa_den) - 1)
     r_1 = density_alfa_no0(RHO_SL, temperature(H_ISA1), alfa_isa(0))
     r_2 = density_alfa_0(H_ISA2, r_1, H_ISA1)
@@ -152,10 +152,10 @@ def pressure(alt):
     '''
     return density(alt) * R_AIR * temperature(alt)
 
-def viscosity(alt):	
+def viscosity(alt):
     '''Cálculo de la viscosidad en función de la altura dada por el modelo ISA.
     Se implementa la ley de Sutherland.
-    '''							
+    '''
     temp = temperature(alt)
     return beta_visc * temp**(3 / 2) / (temp + S_visc)
 '''
@@ -217,8 +217,8 @@ espesor_aleta = .0065  # Espesor de la aleta (m).
 tao_aleta = espesor_aleta / Cmedia_aleta  # TAO de la aleta.
 num_aletas = 4  # Número de aletas.
 
-Swtotal_aletas=Sw_aleta*num_aletas  # Superficie total de aletas (m2).
-Sref_aletas = Swtotal_aletas / 2  # Superficie de referencia aletas (m2).
+Swtotal_aletas =Sw_aleta*num_aletas  # Superficie total de aletas (m2).
+Sref_aletas = S wtotal_aletas / 2  # Superficie de referencia aletas (m2).
 
 
 Sup_cono = pi * diametro_m / 2 * (longitud_cono**2 + diametro_m**2 / 4)**(1 / 2)
@@ -411,14 +411,14 @@ def cfcono_misil(Re_cono, Machl):
     #LAMINAR
     if Re_cono < 1e6:
         #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cono= .664 * Re_cono**(-1 / 2)
+        cfi_cono = .664 * Re_cono**(-1 / 2)
         #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
         cf_cono = 2 * cfi_cono
         #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
         cfm_cono = cf_cono * (1 / (1 + .17 * Machl**2))**.1295
         #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
     #TURBULENTO
-    else:	
+    else:
         #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
         cfi_cono = .288 * ((log10(Re_cono))**(-2.45))
         #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
@@ -444,7 +444,7 @@ def Cdll(Ml):
             #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
             cfm_cil = cf_cil * (1 / (1 + .17 * Machl**2))**.1295
         #TURBULENTO
-        else:			
+        else:
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
             cfi_cil = .288 * ((log10(Re_cil))**(-2.45))
             #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
@@ -456,7 +456,7 @@ def Cdll(Ml):
     # TRANSVERSAL.
     CDFriccion_cono = cfcono_misil(Re_cono, Machl)
     CDFriccion_cil = cfcil(Re_cil)
-    CDFriccion = CDFriccion_cono + CDFriccion_cil    
+    CDFriccion = CDFriccion_cono + CDFriccion_cil
     #CÁLCULO DEL COEFICIENTE DE ONDA.
     def cd_onda(Machl, angulo):
         if Machl >= 1:
@@ -470,8 +470,8 @@ def Cdll(Ml):
     ##COEFICIENTE DE ONDA.
     def cd_onda_aletas(Machl):
         if Machl >= 1:
-            return 4 * tao_aleta**2 / (Machl**2 - 1)**.5 * (Swtotal_aletas
-                                                            / Sref_misil)
+            return 4 * tao_aleta**2 / (Mach**2 - 1)**.5 * (Swtotal_aletas
+                                                           / Sref_misil)
         #RÉGIMEN SUBSÓNICO.
         elif Machl < 1:
             return 0
