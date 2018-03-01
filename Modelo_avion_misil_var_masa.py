@@ -1,13 +1,34 @@
 # -*- coding: utf-8 -*-
 """
 @author: Team REOS
-nu
+
 Este programa servirá para establecer la trayectoria a describir por el
-avión.  Contiene la maniobra de giro, seguida por otra de ascenso.  Al final se
-procederá a exportar las características y cómo varían a lo largo de la
-trayectoria para poder obtener sus gráficas.
+avión y la puesta en órbita del cohete REOS.  Contiene el loop del avión, 
+la maniobra de ascenso del mismo y el lanzamiento del cohete de una sola etapa. 
+Se extraen en un archivo de texto las variables de interés durante el vuelo
+para su posterior análisis.
+
 """
+
+
+
 from math import exp, radians, cos, pi, sin, degrees, atan, log10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #-------------CONDICIONES GRAVITATORIAS Y CONSTANTES ATMOSFÉRICAS-------------
 G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
@@ -21,11 +42,25 @@ GAMMA = 1.4  # Coeficiente de dilatación adiabática.
 beta_visc = .000001458  # Viscosidad de referencia (Pa s/K.5).
 S_visc = 110.4  # Temperatura de referencia para la viscosidad (K).
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
 -----------------------ATMÓSFERA ESTÁNDAR INTERNACIONAL-----------------------
 Esta subrutina nos permitirá obtener los valores de presión, temperatura y
-densidad del aire en funcióin de la altura. Están sacados de la ISA.  Más
-adelante, en los siguientes bucles, se llamará a las funciones de P, T, rho y
+densidad del aire en función de la altura. Modelo ISA. 
+Más adelante, en los siguientes bucles, se llamará a las funciones de P, T, rho y
 mu que variarán con respecto a h.
 '''
 
@@ -139,6 +174,22 @@ def viscosity(alt):
     '''							
     temp = temperature(alt)
     return beta_visc * temp**(3 / 2) / (temp + S_visc)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
 '''
@@ -153,7 +204,7 @@ FLECHA = radians(52)  # Flecha BA.
 FLECHA2 = radians(41.4)  # Flecha 1/4.
 LF = 19.2  # Longitud del fuselaje (m).
 BF = 2.87  # Longitud del fuselaje (m).
-#Se desrecian las pérdidas por consumo de combustible en el peso del avión.
+#Se desprecian las pérdidas por consumo de combustible en el peso del avión.
 
 K = .4  # EL perfil del F-4 es el NACA0006.4-64 por tanto la K es 0,4.
 ESTRECHAMIENTO = .26  # Estrechamiento.
@@ -166,7 +217,7 @@ LM = 0  # Longitud de cada motor.
 # refelejado todavía en los cálculos la importancia de la geometría de los
 # motores.
 
-MASS = 14273  # Masa de carga
+MASS = 14273  # Masa del avión cargado 
 
 #A continuación, se definen las superficies de mando del avión, que nos
 # servirán para, más adelante, calcular el coeficiente de resistencia parásita.
@@ -174,7 +225,7 @@ S_LEX = 0  # Área del Lex. [¡!]
 S_H = 6.39  # Área de la superficie de mando horizontal (m2).
 S_V = 5.035  # Área de la superficie de mando vertical (m2).
 
-#Se necsitarán para más adelante los valores de Mach crítico y de divergencia,
+#Se necesitarán para más adelante los valores de Mach crítico y de divergencia,
 # los cuales son función de la flecha y del espesor relativo máximo.  Estos
 # valores marcarán los límites de los dominios que nos servirán para calcular
 # el coeficicente de resitencia inducida con efecto de compresibilidad.
@@ -183,12 +234,28 @@ M_D = 1.08 * M_C  # Mach de divergencia.
 M_D098 = .98 * M_D
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
 -------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL-------------------
 '''
 
 diametro_m = .5  # Diámetro del misil (m).
-longitud_cono = .9  # Longitud del cono del misil (m).
+longitud_cono = .9  # Longitud del eje del cono del misil (m).
 longitud_misil = 3  # Longitud total del misil (m).
 
 Sw_aleta = .07875  # Superficie de una aleta del AIM (tomado como ref., m2).
@@ -210,16 +277,33 @@ Sref_misil = pi * diametro_m**2 / 4  #Superficie de referencia del misil (m2).
 angulo_cono = degrees(atan(.5 * diametro_m / longitud_cono))
 # Ángulo del cono (deg).
 
-Empuje_misil = 50000  # Empuje constante del misil (N).
-masa_misil = 1000  # Masa del misil (kg). Es necesario cambiarlo también abajo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
----------------------------CURVAS DE EMPUJE DEL F-4---------------------------
+---------------------------CURVAS DE EMPUJE DEL F-18-------------------------
+
+Funciones de las curvas de empuje de los motores del F-18. Modelo GE F404.
 Previamente a este código, se han obtenido unas funciones de coeficientes
 relativas a las curvas de empuje de la aeronave.  Partiendo del empuje máximo
-del F-4 (el empuje máximo a nivel del mar) y con el dato de la altura, el cual
+del F-18 (el empuje máximo a nivel del mar) y con el dato de la altura, el cual
 nos dará el valor de densidad, podremos obtener el valor del empuje equivalente
 a cada altura en la que nos estemos moviendo.
+
 '''
 
 def thrust(mach, den):
@@ -236,7 +320,31 @@ def thrust(mach, den):
     z_th = -.347382668*d_th + 1.71160358
     return TH_SL * (a_th + i * exp(-c_th * (mach - z_th)**2))
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #--------------------------COEFICIENTES AERODINÁMICOS--------------------------
+
+# En esta parte del código se detallan las funciones que nos dan los coeficientes
+# aerodinámicos tanto del avión F4 como del cohete REOS. Coeficientes aerodinámicos
+# de sustentación y de resistencia y todo aquello relacionado con los mismos.
+
 
 def cl_alfa(mach):
     '''Cálculo de la pendiente del coeficiente de sustentación, que es lineal
@@ -478,42 +586,59 @@ def Cdll(Ml):
     return (CD_base_misil + CDFriccion + CD_onda + CD_onda_aletas
             + CDFriccion_aletas)
 
-#A partir de aquí, se abre un bucle en función del ángulo theta ("beta" en el
-# código).  Este ángulo sirve para determinar el ángulo final de la maniobra de
-# giro; es decir, es el ángulo con el que se quiera que comience el ascenso
-# tras el giro vertical.  Dado que se contempla un abanico de posibilidadaes,
-# se decide estudiar in rango desde 10 grados hasta 90 grados.  Este bucle debe
-# durar todo el programa para conseguir que exporte los distintos ficheros
-# correspondientes a cada ángulo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#------------------------TRAYECTORIA/PUESTA EN ÓRBITA---------------------
+
+# En esta parte del código se escribe la integración de las ecuaciones 
+# de los distintos tramos del vuelo y la puesta en órbita del cohete.
+# Se comienza abriendo un bucle para distintos valores del impulso específico
+# del propulsante del cohete REOS. 
+# Este bucle debe durar todo el programa para conseguir que exporte los 
+# distintos ficheros correspondientes a cada Isp.
+
 
 for Isp in range(int(220*9.8), int(320*9.8), 100):
-    '''beta es el ángulo de asiento al final del giro y lo variaremos en el
-    bucle para obtener los resultados en función de sus distintos valores.  Se
-    creará un fichero para cada ángulo que contenga los tiempos, las alturas,
-    las posiciones, las velocidades, los números de Mach, los ángulos de
-    ataque, los ángulos de asiento de la velocidad, los ángulos de asiento, las
-    fuerzas de sustentación, las energías mecánicas, las energías cinéticas,
-    las energías potenciales, los empujes, las fuerzas de resistencia y los
-    factores de carga correspondientes a cada instante de la maniobra.
-    '''
-    gasto=60 
-    masa_misil=1000
-    masa_propulsante=750    
-    Empuje_misil= gasto*Isp #Gasto constante, empuje constante para un ensayo, variando en cada ensayo con el Isp
-    t_combustion= masa_propulsante/gasto 
-
-    beta = 89
+    
+    # Bucle para el impùlso específico, desde un valor en segundos de 220
+    # hasta un valor de 320. Así se verá la influencia de este parámetro
+    # en la puesta en órbita del cohete. 
+   
+    gasto=60 #Gasto másico del misil (kg/s)
+    masa_misil=1000 # Masa total del cohete REOS (kg)
+    masa_propulsante=750 # Masa de propulsante del cohete REOS (Kg)
+    Empuje_misil= gasto*Isp #Empuje variable para cada ensayo (varía con el Isp a gasto cte)
+    t_combustion= masa_propulsante/gasto #Tiempo de combustión
+    beta = 89 # El ángulo beta determina el ángulo final de la maniobra de giro;
+              # es decir, es el ángulo de asiento del avión con el que se quiere que
+              # comience el ascenso tras el giro en el plano vertical.
+ 
     beta = radians(beta)
-    Isp_texto=str(Isp)
+    Isp_texto=str(Isp) #Para el nombre del archivo de texto que recoge los datos
     f = open(Isp_texto, 'w')  # Fichero de escritura sin extensión.
     f.write('TIME (s)\tALTURA lanzamiento (m)\tVELOCIDAD (m/s)')
     f.write('\tTHETA (deg)')
     f.write('\tTimefinalmisil (s) \tAlturafinalmisil')
     f.write('\tVelocidadfinalmisil \tThetafinalmisil \tmasafinalmisil \tEmecfinalm \txfinalmisil \tEmpujemisil \tIsp \n')
     #Cabezas de tabla.
+    
+    
+    
     '''-------------------------CONDICIONES INICIALES-------------------------
-    Ahora, para los próximos cálculos, se definen las variables termodinámicas
-    obtenidas del modelo ISA.
+    Ahora, para los próximos cálculos, se definen las condiciones iniciales de las variables.
     '''
     h = 12000  # Altitud inicial (m).
     r = RT + h  # Distancia desde el centro de la Tierra (m).
@@ -540,17 +665,17 @@ for Isp in range(int(220*9.8), int(320*9.8), 100):
     CD01 = cd0(M)
     CD_inducida1 = cd_inducida(k1, CL)
     CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+    
+    
     '''-------------------------INICIO DE LA MANIOBRA-------------------------
     '''
-    #Se impone un valor constante del radio de giro, es decir, giro ascendente
-    # a radio constante.  En futuras versiones de este cálculo, esto se
-    # cambiará para buscar una solución más realista.  Por ahora, con objeto de
-    # facilitar cálculos, se dejará así.
-    radius = v**2 / (g0 * (N - 1))  #Radio de giro inicial (m).
+ 
+    radius = v**2 / (g0 * (N - 1))  #Radio de giro (m).
     #Este radio de giro se obtiene para la velocidad inicial en vuelo
     # estacionario y para un factor de carga máximo según los pilones de carga
     # n = 3,5.
     dt = 0.1  # Diferencial de tiempo (s).
+    
     '''------SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
     '''
     #Energías.
@@ -580,10 +705,12 @@ for Isp in range(int(220*9.8), int(320*9.8), 100):
     Ml = vl / (GAMMA * R_AIR * T)**.5
     Cdl = Cdll(Ml)
     D_misil = .5 * rho * Cdl * Sref_misil * vl**2
+    
+    
     '''-------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO-------
     Ahora comienza el bucle relativo al giro ascendente, que analiza la
     trayectoria con nuevas ecuaciones y condiciones de vuelo que se detallan
-    más afelante.  El significado de theta < beta implica que el bucle realice
+    más adlante.  El significado de theta < beta implica que el bucle realice
     el cálculo requerido siempre que el ángulo theta sea menor que beta.  Se ha
     obligado a que beta sea el ángulo de final de giro (al inicio del programa
     se le ha dado un rango de valores).  Por tanto, una vez que theta sea igual
@@ -681,12 +808,135 @@ for Isp in range(int(220*9.8), int(320*9.8), 100):
         dh = v * sin(gama) * dt  # Variación vertical de la posición (m).
         dtheta = omega * dt  # Variación del ángulo de asiento.
         masa_misil = 1000
-        #BUCLE TIRO BALÍSTICO DEL MISIL.
+        
+        
+        #    '''------SISTEMA DE ECUACIONES PARA TERCER TRAMO: MANIOBRA DE ASCENSO------
+#    Se comienza introduciendo los nuevos diferenciales para calcular las nuevas
+#    variables, ya que las condiciones de vuelo habrán cambiado.  Estos
+#    diferenciales permitirán calcular las primeras variables del sistema de la
+#    maniobra de ascenso.
+#    '''
+#    # Segunda ley de Newton.
+#    dv = dt * (Th * cos(alfa) - D - W * sin(gama)) / (W/g0)  # Horizontal.
+#    dgama = (Th * sin(alfa) + L - W * cos(gama)) * g0 * dt / W * v  # Vertical.
+#    
+#    while v >= 0 and gama > 0:
+#        '''Con este bucle se pide que el programa continúe calculando todas las
+#        variables escritas abajo cuando termine el anterior.  La condición en
+#        el bucle sirve para imponer el punto final de la simulación, que es que
+#        el ángulo de asiento de la deje de ser positivo.  Que el ángulo de asiento
+#        sea negativo significa que la dirección del empuje va a estar por
+#        debajo de la horizontal, luego el avión caerá.  Por tanto, y dado que
+#        en ese punto no interesa estudiar si es viable lanzar el misil.  Se
+#        consifera como punto final.
+#        '''
+#        f.write('%.8f\t' %t)  # Tiempo (s).
+#        f.write('%.8f\t' %h)  # Altitud (m).
+#        f.write('%.8f\t' %v)  # Velocidad (m/s).
+#        f.write('%.8f\t' %M)  # Número de Mach.
+#        f.write('%.8f\t' %alfa_grados)  # Ángulo de ataque (grados).
+#        f.write('%.8f\t' %gama_grados)  # Asiento de la velocidad (grados).
+#        f.write('%.8f\t' %theta_grados)  # Ángulo de asiento (grados).
+#        f.write('%.8f\t' %emecanica)  # Energía mecánica (J).
+#        f.write('%.8f\t' %D)  # Fuerza de resistencia (N).
+#        
+#        
+#        
+#        '''Inicialización de variables y diferenciales para la maniobra del misil'''
+#        
+#        thetal = gama #Inicialización del ángulo de asiento
+#        thetalgrados=thetal*(180/pi) #Conversión de radianes a grados del ángulo de asiento
+#        yl = h #Inicialización de la altitud 
+#        vl = v #Inicialización de la velocidad
+#        vxl=vl*cos(thetal) #Inicialización de la componente horizontal de velocidad  
+#        vyl=vl*sin(thetal) #Inicialización de la componente verical de velocidad 
+#        tl = 0 #Inicialización temporal 
+#        xl = 0 #Inicialización de la posición en el eje x 
+#        sl = 0 #Inicialización del arco recorrido
+#        dvxl=0 #Inicialización del diferencial de la componente horizontal de velocidad 
+#        dvyl=0 #Inicialización del diferencial de la componente vertical de velocidad 
+#        dsl=0 #Inicialización del diferncial del arco recorrido
+#        dxl=0 #Inicialización del diferencial de la posición
+#        dyl=0 #Inicialización del diferencial de la altitud
+#        dtl=0.1 #Inicialización del diferencial de tiempo
+#        dthetal = 0 #Inicialización del diferencial del ángulo de asiento
+#        thetal = gama #Ángulo de asiento del avión
+#                      #es igual al ángulo de asiento de la velocidad del misil
+#                                    
+#        thetalgrados=thetal*(180/pi)
+#        
+#     
+#        
+#        #Incrementos.
+#        t = t + dt  # Evolución temporal (s).
+#        v = v + dv  # Incremento de velocidad (m/s).
+#        x = x + dx  # Desplazamiento horizontal (m).
+#        h = h + dh  # Desplazamiento vertical (m).
+#        #Gravitación.
+#        r = RT + h  # Distancia al centro de la Tierra (m).
+#        g0 = MU / r**2  # Aceleración gravitatoria (m/s2).
+#        W = 14273 * g0
+#        #Energías.
+#        ecinetica = .5 * (W/g0) * v**2  # Energía cinética (J).
+#        epotencial = (W/g0) * g0 * h  # Energía potencial (J).
+#        emecanica = ecinetica + epotencial  # Energía mecánica (J).
+#        #Proyecciones de la velocidad de vuelo.
+#        vx = v * cos(gama)  # Horizontal.
+#        vy = v * sin(gama)  # Vertical.
+#        #Variables termodinámicas.
+#        rho = density(h)  # Densidad del aire (kg/m3).
+#        T = temperature(h)  # Temperatura (K).
+#        Mu_Visc = viscosity(h) # Viscosidad 
+#        M = v / (GAMMA * R_AIR * T)**.5  # Número de Mach.
+#        #Empuje.
+#        Th = thrust(M, rho)  # Empuje (N).
+#        #Ecuación eje vertical.
+#        L = W * cos(gama)
+#        #Coeficientes de sustentación teóricos.
+#        CL = L / (.5 * rho * S_W * v**2)
+#        CL_alfa1 = cl_alfa(M)
+#        alfa_numerico = CL / CL_alfa1
+#        alfa = angulo_ataque(alfa_numerico, M)
+#        if alfa != alfa_numerico:
+#            '''Pérdida.  No se puede mantener la condición de ángulo de asiento
+#            de la velocidad constante.
+#            '''
+#            CL = alfa * CL_alfa1
+#            L = sustentacion(v, rho, CL)
+#            dgama = (Th * sin(alfa) + L - W * cos(gama)) * g0 * dt / (W * v)
+#            gama = gama + dgama
+#
+#        theta = gama + alfa
+#        #Coeficiente de resistencia.
+#        CD01 = cd0(M)
+#        k_factor = k(M)
+#        CD = CD01 + k_factor * CL**2
+#        D = resistencia(v, rho, CD)
+#        #Cambio a grados.
+#        alfa_grados = degrees(alfa)
+#        gama_grados = degrees(gama)
+#        theta_grados = degrees(theta)
+#        #Segunda ley de Newton.
+#        dv = (dt * g0 / W) * (Th * cos(alfa) - D - W * sin(gama))
+#        #Diferenciales.
+#        dx = vx * dt
+#        dh = vy * dt
+#        
+#        
+#       
+#        
+#        
+#        masa_misil = 1000
+        
+        
+        
+        
+#-----------------------PUESTA EN ÓRBITA DEL MISIL----------------------
+
         while thetal > 0 and yl <500000:
-            '''Con este bucle se calculan todas las variables correspondientes al tiro balístico del misil SIN EMPUJE . 
+            '''Con este bucle se calculan todas las variables correspondientes al lanzamiento del cohete.
             La condición de parada del bucle es que el ángulo de asiento del misil deje de ser positivo. Esto es cuando
-            el misil se encuentre completamente en posición horizontal. La particularidad de este caso
-            es que el ángulo de lanzamiento del misil (ángulo de asiento) es el ángulo de asiento de la VELOCIDAD del avión.
+            el misil se encuentre completamente en posición horizontal y que se alcancen los 500km de altitud.     
             '''
             tl = tl + dtl  # Evolución temporal (s).
             xl = xl + dxl  # Posición horizontal (m)
@@ -732,8 +982,9 @@ Como resumen:
 1) El código ha empezado en una condición de vuelo uniforme.
 2) La siguiente maniobra es un giro ascendente, a factor de carga máximo y
 constante, y con mínima resistencia.
-3) La última maniobra es un ascenso con el ángulo final del giro, con
+3) La siguiente maniobra es un ascenso con el ángulo final del giro, con
 coeficiente de sustentación óptimo.
+4) Despliegue del cohete REOS. 1 Etapa. Con empuje y resistencia aerodinámica.
 
 Este programa exportará un archivo que, exportado a Excel nos permite observar
 cómo cambian las variables según las condiciones de vuelo.
