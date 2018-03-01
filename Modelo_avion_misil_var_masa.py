@@ -42,6 +42,27 @@ H_ISA7 = 84852
 #Ahora se programan las variables termodinámicas, en función de la altura,
 # y se relacionarán con los valores de T y alfa para cada altura estipulada.
 
+def alfa_isa(alt):
+    '''Parámetro alfa de la ISA.
+    '''
+    if alt < H_ISA1:
+        alf = -.0065
+    elif alt < H_ISA2:
+        alf = 0
+    elif alt < H_ISA3:
+        alf = .001
+    elif alt < H_ISA4:
+        alf = .0028
+    elif alt < H_ISA5:
+        alf = 0
+    elif alt < H_ISA6:
+        alf = -.0028
+    elif alt < H_ISA7:
+        alf = -.002
+    else:
+        alf = 0
+    return alf
+
 def temperature(alt):
     '''Cálculo de la temperatura en función de la altura dada por el modelo
     ISA.
@@ -49,83 +70,81 @@ def temperature(alt):
     if alt < H_ISA1:
         h_0 = 0
         t_0 = 288.15
-        alfa_isa = -.0065
     elif alt < H_ISA2:
         h_0 = H_ISA1
         t_0 = 216.65
-        alfa_isa = 0
     elif alt < H_ISA3:
         h_0 = H_ISA2
         t_0 = 216.65
-        alfa_isa = .001
     elif alt < H_ISA4:
         h_0 = H_ISA3
         t_0 = 228.65
-        alfa_isa = .0028
     elif alt < H_ISA5:
         h_0 = H_ISA4
         t_0 = 270.65
-        alfa_isa = 0
     elif alt < H_ISA6:
         h_0 = H_ISA5
         t_0 = 270.65
-        alfa_isa = -.0028
     elif alt < H_ISA7:
         h_0 = H_ISA6
         t_0 = 214.65
-        alfa_isa = -.002
     else:
         h_0 = H_ISA7
         t_0 = 214.65 - .002 * (H_ISA7 - H_ISA6)
-        alfa_isa = 0
-    return t_0 + alfa_isa * (alt - h_0)
+    return t_0 + alfa_isa(alt) * (alt - h_0)
 
 def density(alt):
     '''Cálculo de la densidad en función de la altura dada por el modelo ISA.
     Se implementa el principio de Pascal.
     '''
-    rho0 = RHO_SL
     t_isa = temperature(alt)
-    h_0 = 0
-    t_0 = 288.15
-    alfa_isa = -.0065
+    def density_alfa_0(altit, rho_0, h0):
+        return rho_0 * exp(-GRAV * (altit - h0) / (R_AIR * t_isa))
+    def density_alfa_no0 (rho_0, t0, alfa_den):
+        return rho_0 * (t_isa / t0)**(-GRAV / (R_AIR * alfa_den) - 1)
+    r_1 = density_alfa_no0(RHO_SL, temperature(H_ISA1), alfa_isa(0))
+    r_2 = density_alfa_0(H_ISA2, r_1, H_ISA1)
+    r_3 = density_alfa_no0(r_2, temperature(H_ISA3), alfa_isa(H_ISA2))
+    r_4 = density_alfa_no0(r_3, temperature(H_ISA4), alfa_isa(H_ISA3))
+    r_5 = density_alfa_0(H_ISA5, r_4, H_ISA4)
+    r_6 = density_alfa_no0(r_5, temperature(H_ISA6), alfa_isa(H_ISA5))
+    r_7 = density_alfa_no0(r_6, temperature(H_ISA7), alfa_isa(H_ISA6))
+    alf = alfa_isa(alt)
     if alt < H_ISA1:
-        return rho0 * (t_isa / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    rho0 = rho0 * (temperature(H_ISA1) / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    h_0 = H_ISA1
-    if alt < H_ISA2:
-        return rho0 * exp(-GRAV * (alt - h_0) / (R_AIR * t_isa))
-    rho0 = rho0 * exp(-GRAV * (H_ISA2 - h_0) / (R_AIR * temperature(H_ISA2)))
-    h_0 = H_ISA2
-    t_0 = 216.65
-    alfa_isa = .001
-    if alt < H_ISA3:
-        return rho0 * (t_isa / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    rho0 = rho0 * (temperature(H_ISA3) / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    h_0 = H_ISA3
-    t_0 = 228.65
-    alfa_isa = .0028
-    if alt < H_ISA4:
-        return rho0 * (t_isa / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    rho0 = rho0 * (temperature(H_ISA4) / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    h_0 = H_ISA4
-    if alt < H_ISA5:
-        return rho0 * exp(-GRAV * (alt - h_0)/(R_AIR * t_isa))
-    rho0 = rho0 * exp(-GRAV * (H_ISA5 - h_0)/(R_AIR * temperature(H_ISA5)))
-    h_0 = H_ISA5
-    t_0 = 270.65
-    alfa_isa = -.0028
-    if alt < H_ISA6:
-        return rho0 * (t_isa / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    rho0 = rho0 * (temperature(H_ISA6) / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    h_0 = H_ISA6
-    t_0 = 214.65
-    alfa_isa = -.002
-    if alt < H_ISA7:
-        return rho0 * (t_isa / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    rho0 = rho0 * (temperature(H_ISA7) / t_0)**(-GRAV / (R_AIR * alfa_isa) - 1)
-    h_0 = H_ISA7
-    return rho0 * exp(-GRAV * (alt - h_0) / (R_AIR * t_isa))
+        h_0 = 0
+        t_0 = temperature(h_0)
+        rho0 = RHO_SL
+    if alt >= H_ISA1 and alt < H_ISA2:
+        h_0 = H_ISA1
+        t_0 = temperature(h_0)
+        rho0 = r_1
+    if alt >= H_ISA2 and alt < H_ISA3:
+        h_0 = H_ISA2
+        t_0 = temperature(h_0)
+        rho0 = r_2
+    if alt >= H_ISA3 and alt < H_ISA4:
+        h_0 = H_ISA3
+        t_0 = temperature(h_0)
+        rho0 = r_3
+    if alt >= H_ISA4 and alt < H_ISA5:
+        h_0 = H_ISA4
+        t_0 = temperature(h_0)
+        rho0 = r_4
+    if alt >= H_ISA5 and alt < H_ISA6:
+        h_0 = H_ISA5
+        t_0 = temperature(h_0)
+        rho0 = r_5
+    if alt >= H_ISA6 and alt < H_ISA7:
+        h_0 = H_ISA6
+        t_0 = temperature(h_0)
+        rho0 = r_6
+    if alt >= H_ISA7:
+        h_0 = H_ISA7
+        t_0 = temperature(h_0)
+        rho0 = r_7
+    if alf == 0:
+        return density_alfa_0(alt, rho0, h_0)
+    return density_alfa_no0(rho0, t_0, alf)
 
 def pressure(alt):
     '''Cálculo de la presión en función de la altura dada por el modelo ISA.
@@ -347,71 +366,74 @@ def sustentacion(vel, dens, c_l):
     '''
     return .5 * dens * S_W * c_l * vel**2
 
+def coef_resistencia_base_misil(Mach):
+    '''Coeficiente de resistencia base del misil. Varía con el número de Mach.
+    '''
+    if Mach < .8:
+        return 0
+    elif Mach < 1:
+        x0 = -1.548523
+        x1 = 6.05972764
+        x2 = -7.30548391
+        x3 = 2.96129532
+        x4 = 0
+    elif Mach < 1.1:
+        x0 = 5790.90984
+        x1 = -21984.3314
+        x2 = 31277.4812
+        x3 = -19764.4892
+        x4 = 4680.59822
+    elif Mach < 1.5:
+        x0 = -4.11856506
+        x1 = 14.2267421
+        x2 = -16.9678524
+        x3 = 8.771665
+        x4 = -1.67398037
+    elif Mach < 2.2:
+        x0 = .30748
+        x1 = -.13258
+        x2 = .028812
+        x3 = 0
+        x4 = 0
+    elif Mach > 2.2:
+        x0 = .18481
+        x1 = -.022895
+        x2 = .0051876
+        x3 = -.00040742
+        x4 = 0
+    elif Mach > 3.5:
+        return .15
+    return x4 * Mach**4 + x3 * Mach**3 + x2 * Mach**2 + x1 * Mach + x0
+
+def cfcono_misil(Re_cono, Machl):
+    '''Coeficiente de fricción del cono.
+    '''
+    #LAMINAR
+    if Re_cono < 1e6:
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        cfi_cono= .664 * Re_cono**(-1 / 2)
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
+        cf_cono = 2 * cfi_cono
+        #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
+        cfm_cono = cf_cono * (1 / (1 + .17 * Machl**2))**.1295
+        #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
+    #TURBULENTO
+    else:	
+        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        cfi_cono = .288 * ((log10(Re_cono))**(-2.45))
+        #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
+        cf_cono = cfi_cono * 1.597 * ((log10(Re_cono))**(-.15))
+        #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
+        cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
+        #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
+    return cfm_cono * Sup_cono / Sref_misil
+
 def Cdll(Ml):
-    def coef_resistencia_base_misil(Machl):
-        if Machl < 0.8:
-            return 0
-        elif Ml < 1:
-            x0 = -1.548523
-            x1 = 6.05972764
-            x2 = -7.30548391
-            x3 = 2.96129532
-            x4 = 0
-        elif Machl < 1.1:
-            x0 = 5790.90984
-            x1 = -21984.3314
-            x2 = 31277.4812
-            x3 = -19764.4892
-            x4 = 4680.59822
-        elif Machl < 1.5:
-            x0 = -4.11856506
-            x1 = 14.2267421
-            x2 = -16.9678524
-            x3 = 8.771665
-            x4 = -1.67398037
-        elif Machl < 2.2:
-            x0 = .30748
-            x1 = -.13258
-            x2 = .028812
-            x3 = 0
-            x4 = 0
-        elif Machl > 2.2:
-            x0 = .18481
-            x1 = -.022895
-            x2 = .0051876
-            x3 = -.00040742
-            x4 = 0
-        elif Machl >3.5:
-            return .15
-        return x4 * Machl**4 + x3 * Machl**3 + x2 * Machl**2 + x1 * Machl + x0
     CD_base_misil = coef_resistencia_base_misil(Machl)
-    #CÁLCULO DEL COEFICIENTE DE FRICCIÓN.
-    ##COEFICIENTE DE FRICCIÓN DEL CONO.
-    ###CÁLCULO DEL REYNOLDS.
-    Re_cono = rho * vl * longitud_cono / Mu_Visc  # REYNOLDS 2.
-    def cfcono_misil(Re_cono):
-        #LAMINAR
-        if Re_cono < 1e6:
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-            cfi_cono= .664 * Re_cono**(-1 / 2)
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
-            cf_cono = 2 * cfi_cono
-            #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-            cfm_cono = cf_cono * (1 / (1 + .17 * Machl**2))**.1295
-            #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
-        #TURBULENTO
-        else:	
-            #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-            cfi_cono = .288 * ((log10(Re_cono))**(-2.45))
-            #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-            cf_cono = cfi_cono * 1.597 * ((log10(Re_cono))**(-.15))
-            #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-            cfm_cono = cf_cono * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
-            #CÁLCULO COEFICIENTE DE FRICCIÓN DEL CONO.
-        return cfm_cono * Sup_cono / Sref_misil
-    ##COEFICIENTE DE FRICCIÓN DEL CILINDRO.
+    Re_cono = rho * vl * longitud_cono / Mu_Visc
+    # Número de Reynolds en el cono.
     Re_cil = rho * vl * (longitud_misil - longitud_cono) / Mu_Visc
-    # REYNOLDS 2.
+    # Número de Reynolds en el cilindro.
     def cfcil(Re_cil):
         #LAMINAR
         if Re_cil < 1e6:
@@ -429,10 +451,10 @@ def Cdll(Ml):
             cf_cil = cfi_cil * 1.597 * ((log10(Re_cil))**(-.15))
             #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
             cfm_cil = cf_cil * (1 / (1 + (GAMMA - 1) / 2 * Machl**2)**.467)
-        return cfm_cil*Sup_total/Sref_misil
+        return cfm_cil * Sup_total / Sref_misil
     #CÁLCULO DEL COEFICIENTE DE FRICCIÓN TOTAL REFERIDO A LA SUPERFICIE
     # TRANSVERSAL.
-    CDFriccion_cono = cfcono_misil(Re_cono)
+    CDFriccion_cono = cfcono_misil(Re_cono, Machl)
     CDFriccion_cil = cfcil(Re_cil)
     CDFriccion = CDFriccion_cono + CDFriccion_cil    
     #CÁLCULO DEL COEFICIENTE DE ONDA.
