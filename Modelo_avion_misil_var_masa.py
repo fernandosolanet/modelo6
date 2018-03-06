@@ -5,7 +5,7 @@
 Este programa servirá para establecer la trayectoria a describir por el
 avión.  Contiene la maniobra de giro, seguida por otra de ascenso.  Al final se
 procederá a exportar las características y cómo varían a lo largo de la
-trayectoria para poder obtener sus gráficas.pattasa
+trayectoria para poder obtener sus gráficas.
 """
 from math import exp, radians, cos, pi, sin, degrees, atan, log10
 from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
