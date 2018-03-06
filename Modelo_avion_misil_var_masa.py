@@ -102,17 +102,22 @@ def density(alt):
         '''Fórmula de la densidad cuando alfa es 0.
         '''
         return rho_0 * exp(-GRAV * (altit - alt_0) / (R_AIR * t_isa))
-    def density_alfa_no0(rho_0, temp_0, alfa_den):
+    def density_alfa_no0(rho_0, temp_0, temp_m, alfa_den):
         '''Fórmula de la densidad cuando alfa no es 0.
         '''
-        return rho_0 * (t_isa / temp_0)**(-GRAV / (R_AIR * alfa_den) - 1)
-    r_1 = density_alfa_no0(RHO_SL, temperature(H_ISA1), alfa_isa(0))
+        return rho_0 * (temp_m / temp_0)**(-GRAV / (R_AIR * alfa_den) - 1)
+    r_1 = density_alfa_no0(RHO_SL, temperature(0), temperature(H_ISA1),
+                           alfa_isa(0))
     r_2 = density_alfa_0(H_ISA2, r_1, H_ISA1)
-    r_3 = density_alfa_no0(r_2, temperature(H_ISA3), alfa_isa(H_ISA2))
-    r_4 = density_alfa_no0(r_3, temperature(H_ISA4), alfa_isa(H_ISA3))
+    r_3 = density_alfa_no0(r_2, temperature(H_ISA2), temperature(H_ISA3),
+                           alfa_isa(H_ISA2))
+    r_4 = density_alfa_no0(r_3, temperature(H_ISA3), temperature(H_ISA4),
+                           alfa_isa(H_ISA3))
     r_5 = density_alfa_0(H_ISA5, r_4, H_ISA4)
-    r_6 = density_alfa_no0(r_5, temperature(H_ISA6), alfa_isa(H_ISA5))
-    r_7 = density_alfa_no0(r_6, temperature(H_ISA7), alfa_isa(H_ISA6))
+    r_6 = density_alfa_no0(r_5, temperature(H_ISA5), temperature(H_ISA6),
+                           alfa_isa(H_ISA5))
+    r_7 = density_alfa_no0(r_6, temperature(H_ISA6), temperature(H_ISA7),
+                           alfa_isa(H_ISA6))
     alf = alfa_isa(alt)
     if alt < H_ISA1:
         h_0 = 0
@@ -148,7 +153,7 @@ def density(alt):
         rho0 = r_7
     if alf == 0:
         return density_alfa_0(alt, rho0, h_0)
-    return density_alfa_no0(rho0, t_0, alf)
+    return density_alfa_no0(rho0, t_0, t_isa, alf)
 
 def pressure(alt):
     '''Cálculo de la presión en función de la altura dada por el modelo ISA.
