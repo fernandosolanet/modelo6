@@ -10,7 +10,7 @@ para su posterior análisis.
 
 """
 
-from math import exp, radians, cos, pi, sin, degrees, atan, log10
+from math import radians, cos, pi, sin, degrees, atan, log10
 from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from modelo_empuje import thrust
 
