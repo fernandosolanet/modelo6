@@ -12,7 +12,7 @@ las variables de interés durante el vuelo para su posterior análisis.
 from math import radians, cos, pi, sin, degrees, atan, log10
 from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from modelo_empuje import thrust
-from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida
+from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
 from aero_avion import resistencia, sustentacion
 
 
@@ -24,47 +24,11 @@ RT = 6378136.3  # Radio terrestre (m).
 GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
 
 
-#-------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
-
+#------------------------CARACTERÍSTICAS DE LA AERONAVE------------------------
 
 N = 3.5  # Factor de carga máximo.
-S_W = 49.2  # Superficie alar (m2).
-B = 11.7  # Envergadura (m).
-AR = B**2 / S_W  # Alargamiento = 2,78.
-FLECHA = radians(52)  # Flecha BA.
-FLECHA2 = radians(41.4)  # Flecha 1/4.
-LF = 19.2  # Longitud del fuselaje (m).
-BF = 2.87  # Longitud del fuselaje (m).
-#Se desprecian las pérdidas por consumo de combustible en el peso del avión.
-
-K = .4  # EL perfil del F-4 es el NACA0006.4-64 por tanto la K es 0,4.
-ESTRECHAMIENTO = .26  # Estrechamiento.
-ESPESOR = .064  # Espesor relativo máximo.
-
-NE = 2  # Número de motores.
-DM = 0  # Diámetro de cada motor.
-LM = 0  # Longitud de cada motor.
-#La longitud y el diámetro de cada motor aparecen nulos porque no se ha
-# refelejado todavía en los cálculos la importancia de la geometría de los
-# motores.
-
 MASS = 14273  # Masa del avión cargado (kg).
 W = MASS * GRAV  # Peso del avión (N).
-
-#A continuación, se definen las superficies de mando del avión, que nos
-# servirán para, más adelante, calcular el coeficiente de resistencia parásita.
-S_LEX = 0  # Área del Lex. [¡!]
-S_H = 6.39  # Área de la superficie de mando horizontal (m2).
-S_V = 5.035  # Área de la superficie de mando vertical (m2).
-
-#Se necesitarán para más adelante los valores de Mach crítico y de divergencia,
-# los cuales son función de la flecha y del espesor relativo máximo.  Estos
-# valores marcarán los límites de los dominios que nos servirán para calcular
-# el coeficicente de resitencia inducida con efecto de compresibilidad.
-M_C = 1 - (.065 * (cos(FLECHA))**.6) * (100 * ESPESOR)**.637814
-# Mach crítico.
-M_D = 1.08 * M_C  # Mach de divergencia.
-M_D098 = .98 * M_D
 
 
 '''
