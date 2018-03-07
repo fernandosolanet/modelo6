@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-@author: fernando.solanet
+@author: TeamREOS
 
 Funciones que nos dan los coeficientes aerodinámicos del avión F4.
 Coeficientes aerodinámicos de sustentación y de resistencia y todo aquello
