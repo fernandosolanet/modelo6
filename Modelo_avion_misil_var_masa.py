@@ -3,17 +3,18 @@
 @author: Team REOS
 
 Este programa servirá para establecer la trayectoria a describir por el
-avión y la puesta en órbita del cohete REOS.  Contiene el loop del avión y el 
+avión y la puesta en órbita del cohete REOS.  Contiene el loop del avión y el
 lanzamiento del cohete de una sola etapa.  Se extraen en un archivo de texto
 las variables de interés durante el vuelo para su posterior análisis.
 
 """
 
-from math import radians, cos, pi, sin, degrees, atan, log10
+from math import radians, cos, sin, degrees
 from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from modelo_empuje import thrust
 from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
 from aero_avion import resistencia, sustentacion
+from aero_misil import cdll, SREF_MISIL, SGASES
 
 
 #--------------------------CONDICIONES GRAVITATORIAS--------------------------
@@ -30,187 +31,6 @@ N = 3.5  # Factor de carga máximo.
 MASS = 14273  # Masa del avión cargado (kg).
 W = MASS * GRAV  # Peso del avión (N).
 
-
-'''
--------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL-------------------
-'''
-
-DIAMETRO_M = .5  # Diámetro del misil (m).
-LONGITUD_CONO = .9  # Longitud del cono del misil (m).
-LONGITUD_MISIL = 3  # Longitud total del misil (m).
-
-SW_ALETA = .07875  # Superficie de una aleta del AIM (tomado como ref., m2).
-CRAIZ_ALETA = .24  # Cuerda raiz de la aleta (m).
-CMEDIA_ALETA = .18  # Cuerda media de la aleta (m).
-ESPESOR_ALETA = .0065  # Espesor de la aleta (m).
-TAO_ALETA = ESPESOR_ALETA / CMEDIA_ALETA  # TAO de la aleta.
-NUM_ALETAS = 4  # Número de aletas.
-SWTOTAL_ALETAS = SW_ALETA * NUM_ALETAS  # Superficie total de aletas (m2).
-
-SUP_CONO = pi * DIAMETRO_M / 2 * (LONGITUD_CONO**2 + DIAMETRO_M**2 / 4)**.5
-# Superficie exterior del cono (m2).
-SUP_TOTAL = pi * DIAMETRO_M * (LONGITUD_MISIL - LONGITUD_CONO)
-# Superficie exterior del misil (m2).
-SREF_MISIL = pi * DIAMETRO_M**2 / 4  # Superficie de referencia del misil (m2).
-SGASES = pi * (DIAMETRO_M * .45)**2
-# Área de salida de los gases (consideramos el área de salida de la tobera,
-# m2).
-RATIO_AREAS = 1 - SGASES / SREF_MISIL  # Relación de áreas.
-ANGULO_CONO = degrees(atan(.5 * DIAMETRO_M / LONGITUD_CONO))
-# Ángulo del cono (deg).
-
-
-#----------------------------AERODINÁMICA DEL MISIL----------------------------
-
-def coef_resistencia_base_misil(mach):
-    '''Coeficiente de resistencia base del misil.  Varía con el número de Mach.
-    '''
-    if mach < .8:
-        return 0
-    elif mach < 1:
-        x_0 = -1.548523
-        x_1 = 6.05972764
-        x_2 = -7.30548391
-        x_3 = 2.96129532
-        x_4 = 0
-    elif mach < 1.1:
-        x_0 = 5790.90984
-        x_1 = -21984.3314
-        x_2 = 31277.4812
-        x_3 = -19764.4892
-        x_4 = 4680.59822
-    elif mach < 1.5:
-        x_0 = -4.11856506
-        x_1 = 14.2267421
-        x_2 = -16.9678524
-        x_3 = 8.771665
-        x_4 = -1.67398037
-    elif mach < 2.2:
-        x_0 = .30748
-        x_1 = -.13258
-        x_2 = .028812
-        x_3 = 0
-        x_4 = 0
-    elif mach > 2.2:
-        x_0 = .18481
-        x_1 = -.022895
-        x_2 = .0051876
-        x_3 = -.00040742
-        x_4 = 0
-    elif mach > 3.5:
-        return .15
-    return x_4 * mach**4 + x_3 * mach**3 + x_2 * mach**2 + x_1 * mach + x_0
-
-def cfcono_misil(re_cono, machl):
-    '''Coeficiente de fricción del cono.
-    '''
-    #LAMINAR
-    if re_cono < 1e6:
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cono = .664 * re_cono**(-1 / 2)
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
-        cf_cono = 2 * cfi_cono
-        #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-        cfm_cono = cf_cono / (1 + .17 * machl**2)**.1295
-    #TURBULENTO
-    else:
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cono = .288 / log10(re_cono)**2.45
-        #CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-        cf_cono = cfi_cono * 1.597 / log10(re_cono)**.15
-        #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-        cfm_cono = cf_cono / (1 + (GAMMA - 1) / 2 * machl**2)**.467
-    return cfm_cono * SUP_CONO / SREF_MISIL
-
-def cfcil(re_cilindro, machl):
-    '''Coeficiente de fricción del cilindro.
-    '''
-    #LAMINAR
-    if re_cilindro < 1e6:
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cil = .664 * re_cilindro**(-1 / 2)
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
-        cf_cil = 2 * cfi_cil
-        #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-        cfm_cil = cf_cil / (1 + .17 * machl**2)**.1295
-    #TURBULENTO
-    else:
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfi_cil = .288 / log10(re_cilindro)**2.45
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-        cf_cil = cfi_cil * 1.597 / log10(re_cilindro)**.15
-        #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-        cfm_cil = cf_cil / (1 + (GAMMA - 1) / 2 * machl**2)**.467
-    return cfm_cil * SUP_TOTAL / SREF_MISIL
-
-def cd_wave(mach, angulo, cd_f):
-    '''Coeficiente de onda del misil.
-    '''
-    if mach >= 1:
-        #RÉGIMEN SUPERSÓNICO.
-        return (.083 + .096 / mach**2) * (angulo / 10)**1.69
-    #RÉGIMEN SUBSÓNICO.
-    ratio = LONGITUD_CONO / DIAMETRO_M
-    return (60 / ratio**3 + .0025 * ratio) * cd_f
-
-def cd_wave_aletas(mach):
-    '''Coeficiente de onda de las aletas.
-    '''
-    #RÉGIMEN SUPERSÓNICO
-    if mach >= 1:
-        return 4 * TAO_ALETA**2 / (mach**2 - 1)**.5 * (SWTOTAL_ALETAS
-                                                       / SREF_MISIL)
-    #RÉGIMEN SUBSÓNICO.
-    return 0
-
-def cf_aletas(reyn_aleta, mach):
-    '''Coeficiente de fricción de las aletas.
-    '''
-    #LAMINAR.
-    if reyn_aleta < 1e6:
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfialetas = .664 / reyn_aleta**.5
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
-        cf1aletas = 2 * cfialetas
-        #CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
-        cfmaletas = cf1aletas / (1 + .17 * mach**2)**.1295
-    #TURBULENTO.
-    else:
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
-        cfialetas = .288 * (log10(reyn_aleta))**(-2.45)
-        #CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
-        cf1aletas = cfialetas * 1.597 * ((log10(reyn_aleta))**(-.15))
-        #CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
-        cfmaletas = cf1aletas / (1 + (GAMMA - 1) / 2 * mach**2)**.467
-    return cfmaletas * SWTOTAL_ALETAS / SREF_MISIL
-
-def cdll(machl):
-    '''Coeficiente de resistencia total del misil.
-    '''
-    #CÁLCULO DEL COEFICIENTE DE RESISTENCIA BASE.
-    cd_base_misil = coef_resistencia_base_misil(machl) * RATIO_AREAS
-    re_cono = rho * vl * LONGITUD_CONO / Mu_Visc
-    # Número de Reynolds en el cono.
-    re_cil = rho * vl * (LONGITUD_MISIL - LONGITUD_CONO) / Mu_Visc
-    # Número de Reynolds en el cilindro.
-    #CÁLCULO DEL COEFICIENTE DE FRICCIÓN TOTAL REFERIDO A LA SUPERFICIE
-    # TRANSVERSAL.
-    cd_friccion_cono = cfcono_misil(re_cono, machl)
-    # Coeficiente de fricción en el cono.
-    cd_friccion_cil = cfcil(re_cil, machl)
-    # Coeficiente de fricción en el cilindro.
-    cd_friccion = cd_friccion_cono + cd_friccion_cil
-    #CÁLCULO DEL COEFICIENTE DE ONDA.
-    cd_onda = cd_wave(machl, ANGULO_CONO, cd_friccion)
-    #RESISTENCIA DE LAS ALETAS.
-    ##COEFICIENTE DE ONDA.
-    cd_onda_aletas = cd_wave_aletas(machl)
-    re_aletas = rho * vl * CRAIZ_ALETA / Mu_Visc
-    # Número de Reynolds en las aletas.
-    #COEFICIENTE DE FRICCIÓN DE LAS ALETAS.
-    cdfriccion_aletas = cf_aletas(re_aletas, machl)
-    return (cd_base_misil + cd_friccion + cd_onda + cd_onda_aletas
-            + cdfriccion_aletas)
 
 #-------------------------TRAYECTORIA/PUESTA EN ÓRBITA-------------------------
 #En esta parte del código se escribe la integración de las ecuaciones de los
@@ -306,7 +126,7 @@ for isp in range(int(220 * 9.8), int(320 * 9.8), 100):
     dtheta = v * dt / radius  # Variación del ángulo de empuje.
     vl = v
     Ml = vl / (GAMMA * R_AIR * T)**.5
-    Cdl = cdll(Ml)
+    Cdl = cdll(Ml, h)
     D_misil = .5 * rho * Cdl * SREF_MISIL * vl**2
     '''-------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO-------
     Ahora comienza el bucle relativo al giro ascendente, que analiza la
@@ -449,7 +269,7 @@ for isp in range(int(220 * 9.8), int(320 * 9.8), 100):
                 RATIO_AREAS = 1 - SGASES / SREF_MISIL
             else:
                 RARIO_AREAS = 1
-            Cdl = cdll(Ml)  # Coeficiente de resistencia.
+            Cdl = cdll(Ml, yl)  # Coeficiente de resistencia.
             D_misil = .5 * rho * Cdl * SREF_MISIL * vl**2
             # Fuerza de resistencia (N).
             Dx = D_misil * cos(thetal)
@@ -490,7 +310,7 @@ for isp in range(int(220 * 9.8), int(320 * 9.8), 100):
 # 1) El código ha empezado en una condición de vuelo uniforme.
 # 2) La siguiente maniobra es un giro ascendente, a factor de carga máximo y
 # constante, y con mínima resistencia.
-# 3) Despliegue del cohete REOS. 1 Etapa. Con empuje y resistencia
+# 3) Despliegue del cohete REOS. 1 Etapa.  Con empuje y resistencia
 # aerodinámica.
 #
 # Este programa exportará un archivo que, exportado a Excel nos permite
