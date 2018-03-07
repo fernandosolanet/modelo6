@@ -16,7 +16,7 @@ from math import radians, pi, cos
 
 S_W = 49.2  # Superficie alar (m2).
 LF = 19.2  # Longitud del fuselaje (m).
-BF = 2.87  # Longitud del fuselaje (m).
+BF = 2.87  # Envergadura del fuselaje (m).
 NE = 2  # Número de motores.
 DM = 0  # Diámetro de cada motor.
 LM = 0  # Longitud de cada motor.
