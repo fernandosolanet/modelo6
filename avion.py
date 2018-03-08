@@ -8,6 +8,7 @@ from modelo_empuje import thrust
 from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
 from aero_avion import resistencia, sustentacion
 from aero_misil import cdll, SREF_MISIL, SGASES
+from velocidad_crucero import vuelo_crucero
 
 
 #--------------------------CONDICIONES GRAVITATORIAS--------------------------
@@ -64,8 +65,10 @@ Mu_Visc = viscosity(z0) # Viscosidad inicial
 W = MASS * g0  # Peso inicial del avión dependiente de la gravedad
 
 #A la altura inicial el avión vuela en vuelo estacionario.
-M = 1.8  # Número de Mach inicial.
+M1 = 1.4  # Número de Mach inicial.
+M = vuelo_crucero(M1)
 v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
+
 CL_alfa1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
 
 # Ángulos de asiento, de ataque y de asiento de la velocidad iniciales.
@@ -77,19 +80,31 @@ gama_grados = degrees(gama)  # Ángulo de asiento de la velocidad en grados.
 theta = gama + alfa  # Ángulo de asiento de la velocidad.
 theta_grados = degrees(theta)  # Ángulo de asiento en grados.
 
+CL = 2 * W / (rho * v**2 * S_W)
+k1 = k(M)
+CD01 = cd0(M)
+CDmisilavion = cdll(M, v)
+CD_inducida1 = cd_inducida(k1, CL)
+CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+
+
+#Fuerzas.
+Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+Dmisil = 0.5 * rho * CDmisilavion * SREF_MISIL * v**2
+D = Davion + Dmisil
+
+Th = thrust(M, rho)  # Empuje (N).
+
+''' Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos cumplir
+por ello calculamos la diferencia y en el while se intenta que sea 0 '''
+
+diferencia_T_D = Th - D
+
 # Ángulos de movimiento bidimensional terrestre iniciales
 psi = 0      # Ángulo desplazado de la Tierra
 fi = - psi - gama + pi / 2    # Ángulo de la velocidad sobre vertical local
 psi_grados = degrees(psi) # Ángulo desplazado de la Tierra en grados
 fi_grados = degrees(fi)   # Ángulo velocidad sobre vertical local en grados
-
-
-# Coeficientes aerodinámicos del avión 
-CL = alfa * CL_alfa1  # Coeficiente de sustentación inicial.
-k1 = k(M)  # Parámetro k de la resistencia del avión 
-CD01 = cd0(M)  # Coeficiente de resistencia sin sustentación 
-CD_inducida1 = cd_inducida(k1, CL)  # Coeficiente de resistencia inducida
-CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
 
 velocidad.append(v)
 psi_list.append(psi_grados)
@@ -113,13 +128,7 @@ dt = 0.1  # Diferencial de tiempo (s).
 ecinetica = .5 * MASS * v**2  # Energía cinética (J).
 epotencial = MASS * g0 * z0  # Energía potencial (J).
 emecanica = ecinetica + epotencial  # Energía mecánica (J).
-#Fuerzas.
-D = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
-L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
-Th = thrust(M, rho)  # Empuje (N).
-diferencia_T_D = Th - D
-#Esto nos va a permitir calcular en qué momento el empuje se verá superado
-# por la resistencia
+
 n = L / W  # Factor de carga.
 
 #Condiciones iniciales para la integración.
@@ -304,4 +313,3 @@ cómo cambian las variables según las condiciones de vuelo.
 
             
         
-             
