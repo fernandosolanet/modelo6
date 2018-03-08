@@ -43,94 +43,62 @@ Mu_Visc = viscosity(h) # Viscosidad
 #A la altura inicial el avión vuela en vuelo estacionario.
 M = 1.63865 # Número de Mach inicial.
 v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
-CL_alfa1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
-#Ángulos de asiento, de ataque y de asiento de la velocidad iniciales.
-alfa_numerico = 2 * W / (rho * v**2 * S_W * CL_alfa1)
-alfa = angulo_ataque(alfa_numerico, M)  # Ángulo de ataque.
-alfa_grados = degrees(alfa)  # Ángulo de ataque en grados.
-gama = 0  # Ángulo de asiento.
-gama_grados = degrees(gama)  # Ángulo de asiento de la velocidad en grados.
-theta = gama + alfa  # Ángulo de asiento de la velocidad.
-theta_grados = degrees(theta)  # Ángulo de asiento en grados.
+
 #Coeficientes aerodinámicos
-CL = alfa*CL_alfa1  # Coeficiente de sustentación inicial.
+
+'''Ecuacion de vuelo en crucero L = W ''' 
+CL = 2 * W / (rho * v**2 * S_W)
 k1 = k(M)
 CD01 = cd0(M)
 CDmisilavion = cdll(M, v)
 CD_inducida1 = cd_inducida(k1, CL)
 CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
-'''-------------------------INICIO DE LA MANIOBRA-------------------------
-'''
 
-'''------SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
-'''
 
 #Fuerzas.
 Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
 Dmisil = resistenciamisil(v, rho, CDmisilavion)
-
 D = Davion + Dmisil
 
 L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
 Th = thrust(M, rho)  # Empuje (N).
+
+''' Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos cumplir
+por ello calculamos la diferencia y en el while se intenta que sea 0 '''
+
 diferencia_T_D = Th - D
 
 
-dM = 0.00001
-
-'''-------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO-------
-Ahora comienza el bucle relativo al giro ascendente, que analiza la
-trayectoria con nuevas ecuaciones y condiciones de vuelo que se detallan
-más afelante.  El significado de theta < beta implica que el bucle realice
-el cálculo requerido siempre que el ángulo theta sea menor que beta.  Se ha
-obligado a que beta sea el ángulo de final de giro (al inicio del programa
-se le ha dado un rango de valores).  Por tanto, una vez que theta sea igual
-a beta, se dará por concluida la maniobra de giro y se comenzará con el
-siguiente tramo. Todo ello mientras la velocidad sea positiva, condición
-que permite ver si el resultado es realista o no.
-'''
+dM = 0.00001 #Variaremos el Mach para iterar
 while diferencia_T_D >= 0:
-    '''A continuación, se escriben en un fichero todas las variables aquí
-    detalladas para cada valor de theta < beta.
-    '''
-    
-    
-    
-    
+  
     M = M + dM
     v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
     
-    CL_alfa1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
-    #Ángulos de asiento, de ataque y de asiento de la velocidad iniciales.
-    alfa_numerico = 2 * W / (rho * v**2 * S_W * CL_alfa1)
-    alfa = angulo_ataque(alfa_numerico, M)  # Ángulo de ataque.
-    alfa_grados = degrees(alfa)  # Ángulo de ataque en grados.
-    gama = 0  # Ángulo de asiento.
-    gama_grados = degrees(gama)  # Ángulo de asiento de la velocidad en grados.
-    theta = gama + alfa  # Ángulo de asiento de la velocidad.
-    theta_grados = degrees(theta)  # Ángulo de asiento en grados.
+    v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
+
     #Coeficientes aerodinámicos
-    CL = alfa*CL_alfa1  # Coeficiente de sustentación inicial.
+
+    '''Ecuacion de vuelo en crucero L = W ''' 
+    CL = 2 * W / (rho * v**2 * S_W)
     k1 = k(M)
     CD01 = cd0(M)
     CDmisilavion = cdll(M, v)
     CD_inducida1 = cd_inducida(k1, CL)
     CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
-    '''-------------------------INICIO DE LA MANIOBRA-------------------------
-    '''
-    #Se impone un valor constante del radio de giro, es decir, giro ascendente
-    # a radio constante.  En futuras versiones de este cálculo, esto se
-    # cambiará para buscar una solución más realista.  Por ahora, con objeto de
-    # facilitar cálculos, se dejará así.
-    
-    
+
+
+    #Fuerzas.
     Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
     Dmisil = resistenciamisil(v, rho, CDmisilavion)
-    
     D = Davion + Dmisil
-    
+
     L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
     Th = thrust(M, rho)  # Empuje (N).
+
+    ''' Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos cumplir
+    por ello calculamos la diferencia y en el while se intenta que sea 0 '''
+
     diferencia_T_D = Th - D
 
 print('El número de Mach es: ',M)
