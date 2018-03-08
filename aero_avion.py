@@ -5,7 +5,7 @@
 
 Funciones que nos dan los coeficientes aerodinámicos del avión F4.
 Coeficientes aerodinámicos de sustentación y de resistencia y todo aquello
-relacionado con los mismos.
+relacionado con los mismos. Modifico la aerodinámica del avión.
 
 """
 
