@@ -1,0 +1,140 @@
+# -*- coding: utf-8 -*-
+"""
+
+@author: Team REOS
+
+Esta función proporciona la velocidad exacta de crucero para que el
+empuje sea igual a la resistencia.
+
+"""
+
+from math import degrees
+from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modelo_empuje import thrust
+from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
+from aero_avion import resistencia, sustentacion
+from aero_misil import cdll, resistenciamisil
+
+#--------------------------CONDICIONES GRAVITATORIAS--------------------------
+G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
+MT = 5.972e24  # Masa terrestre (kg).
+MU = G * MT
+RT = 6378136.3  # Radio terrestre (m).
+GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
+
+
+#------------------------CARACTERÍSTICAS DE LA AERONAVE------------------------
+
+N = 3.5  # Factor de carga máximo.
+MASS = 14273  # Masa del avión cargado (kg).
+W = MASS * GRAV  # Peso del avión (N).
+
+
+beta = 89
+
+h = 12000  # Altitud inicial (m).
+r = RT + h  # Distancia desde el centro de la Tierra (m).
+g0 = MU / r**2  # Aceleración g0itatoria (m/s2).
+W = 14273 * g0
+rho = density(h)  # Densidad inicial del aire (kg/m3).
+p = pressure(h)  # Presión inicial del aire (Pa).
+T = temperature(h)  # Temperatura inicial del aire (K).
+Mu_Visc = viscosity(h) # Viscosidad 
+#A la altura inicial el avión vuela en vuelo estacionario.
+M = 1.63865 # Número de Mach inicial.
+v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
+CL_alfa1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
+#Ángulos de asiento, de ataque y de asiento de la velocidad iniciales.
+alfa_numerico = 2 * W / (rho * v**2 * S_W * CL_alfa1)
+alfa = angulo_ataque(alfa_numerico, M)  # Ángulo de ataque.
+alfa_grados = degrees(alfa)  # Ángulo de ataque en grados.
+gama = 0  # Ángulo de asiento.
+gama_grados = degrees(gama)  # Ángulo de asiento de la velocidad en grados.
+theta = gama + alfa  # Ángulo de asiento de la velocidad.
+theta_grados = degrees(theta)  # Ángulo de asiento en grados.
+#Coeficientes aerodinámicos
+CL = alfa*CL_alfa1  # Coeficiente de sustentación inicial.
+k1 = k(M)
+CD01 = cd0(M)
+CDmisilavion = cdll(M, v)
+CD_inducida1 = cd_inducida(k1, CL)
+CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+'''-------------------------INICIO DE LA MANIOBRA-------------------------
+'''
+
+'''------SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
+'''
+
+#Fuerzas.
+Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+Dmisil = resistenciamisil(v, rho, CDmisilavion)
+
+D = Davion + Dmisil
+
+L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
+Th = thrust(M, rho)  # Empuje (N).
+diferencia_T_D = Th - D
+
+
+dM = 0.00001
+
+'''-------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO-------
+Ahora comienza el bucle relativo al giro ascendente, que analiza la
+trayectoria con nuevas ecuaciones y condiciones de vuelo que se detallan
+más afelante.  El significado de theta < beta implica que el bucle realice
+el cálculo requerido siempre que el ángulo theta sea menor que beta.  Se ha
+obligado a que beta sea el ángulo de final de giro (al inicio del programa
+se le ha dado un rango de valores).  Por tanto, una vez que theta sea igual
+a beta, se dará por concluida la maniobra de giro y se comenzará con el
+siguiente tramo. Todo ello mientras la velocidad sea positiva, condición
+que permite ver si el resultado es realista o no.
+'''
+while diferencia_T_D >= 0:
+    '''A continuación, se escriben en un fichero todas las variables aquí
+    detalladas para cada valor de theta < beta.
+    '''
+    
+    
+    
+    
+    M = M + dM
+    v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
+    
+    CL_alfa1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
+    #Ángulos de asiento, de ataque y de asiento de la velocidad iniciales.
+    alfa_numerico = 2 * W / (rho * v**2 * S_W * CL_alfa1)
+    alfa = angulo_ataque(alfa_numerico, M)  # Ángulo de ataque.
+    alfa_grados = degrees(alfa)  # Ángulo de ataque en grados.
+    gama = 0  # Ángulo de asiento.
+    gama_grados = degrees(gama)  # Ángulo de asiento de la velocidad en grados.
+    theta = gama + alfa  # Ángulo de asiento de la velocidad.
+    theta_grados = degrees(theta)  # Ángulo de asiento en grados.
+    #Coeficientes aerodinámicos
+    CL = alfa*CL_alfa1  # Coeficiente de sustentación inicial.
+    k1 = k(M)
+    CD01 = cd0(M)
+    CDmisilavion = cdll(M, v)
+    CD_inducida1 = cd_inducida(k1, CL)
+    CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+    '''-------------------------INICIO DE LA MANIOBRA-------------------------
+    '''
+    #Se impone un valor constante del radio de giro, es decir, giro ascendente
+    # a radio constante.  En futuras versiones de este cálculo, esto se
+    # cambiará para buscar una solución más realista.  Por ahora, con objeto de
+    # facilitar cálculos, se dejará así.
+    
+    
+    Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+    Dmisil = resistenciamisil(v, rho, CDmisilavion)
+    
+    D = Davion + Dmisil
+    
+    L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
+    Th = thrust(M, rho)  # Empuje (N).
+    diferencia_T_D = Th - D
+
+print('El número de Mach es: ',M)
+
+print('Thrust: ', Th) 
+
+print('Drag: ', D)     
