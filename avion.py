@@ -67,6 +67,7 @@ W = MASS * g0  # Peso inicial del avión dependiente de la gravedad
 #A la altura inicial el avión vuela en vuelo estacionario.
 M1 = 1.4  # Número de Mach inicial.
 M = vuelo_crucero(M1)
+v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
 
 CL_alfa1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
 
@@ -78,6 +79,26 @@ gama = 0  # Ángulo de asiento de la velocidad.
 gama_grados = degrees(gama)  # Ángulo de asiento de la velocidad en grados.
 theta = gama + alfa  # Ángulo de asiento de la velocidad.
 theta_grados = degrees(theta)  # Ángulo de asiento en grados.
+
+CL = 2 * W / (rho * v**2 * S_W)
+k1 = k(M)
+CD01 = cd0(M)
+CDmisilavion = cdll(M, v)
+CD_inducida1 = cd_inducida(k1, CL)
+CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+
+
+#Fuerzas.
+Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+Dmisil = 0.5 * rho * CDmisilavion * SREF_MISIL * v**2
+D = Davion + Dmisil
+
+Th = thrust(M, rho)  # Empuje (N).
+
+''' Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos cumplir
+por ello calculamos la diferencia y en el while se intenta que sea 0 '''
+
+diferencia_T_D = Th - D
 
 # Ángulos de movimiento bidimensional terrestre iniciales
 psi = 0      # Ángulo desplazado de la Tierra
@@ -292,4 +313,3 @@ cómo cambian las variables según las condiciones de vuelo.
 
             
         
-             
