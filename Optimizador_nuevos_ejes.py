@@ -15,12 +15,12 @@ GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
 
 '''Aqui empieza el programa'''
 archivo = open("LanzBalistico_ejesnuevos(modelo7)" ,"w")
-archivo.write('Time (s)  \tAltura  \tvelocidad \tv_loss \tmasa total \ttheta  \tfil\n')  
+archivo.write('Time (s)  \tAltura lanzamiento  \tAngulo lanz \tAltura \tVelocidad final \tVelocidad perdida \tmasa total \ttheta  \tfil\n')  
   
 fi_grados = fi_list
 psi_grados = psi_list 
   
-for i in range (148,len(fi_grados),1):
+for i in range (110,304,1):
     #-----------------------------------------------------------------INPUTS DE MANIOBRA-------------------------------------------------------------------
     #-----------------------------------------------------------------DATOS DE INTEGRACIÓN Y DEL MISIL-------------------------------------------------------------------
     '''Caracterisitcas del cohete'''
@@ -54,7 +54,7 @@ for i in range (148,len(fi_grados),1):
         psil_grados0 = psi_grados[i]                                  # ángulo de la vertical local en ejes centro tierra, estamos cogiendo el dato del avión
         theta_grados0 = 90 - fil_grados0 - psil_grados0
         
-        veli = v0
+         
         zl = z0
         fil_grados = fil_grados0
         psil_grados = psil_grados0
@@ -62,7 +62,7 @@ for i in range (148,len(fi_grados),1):
         fil = radians (fil_grados)                                                                                  # Conversión a grados del ángulo fil                                                                                                 # Ángulo inicial de vertical local 
         psil = radians (psil_grados)                                                                                # Conversión a grados de psil
         rl = RT + zl
-        vl = veli                                                                                                   # Inicialización de la velocidad
+        vl = v0 + v_rotacional                                                                                      # Añadimos a la velocidad inicial la rotacional
         Ml = vl / ((GAMMA * R_AIR * temperature(zl))**0.5)
         vxl = vl * sin(fil)                                                                                         # Inicialización de la componente horizontal de velocidad  
         vyl = vl * cos(fil)                                                                                         # Inicialización de la componente verical de velocidad 
@@ -83,7 +83,7 @@ for i in range (148,len(fi_grados),1):
         
         g = gravity (zl)# Aceleración de la gravedad (m/s2).
         
-        velocidad_ideal = v_orb - v_rotacional + v_loss - veli
+        velocidad_ideal = v_orb - v_rotacional + v_loss - v0
         f = ((1 + ratio_estructural)/exp(velocidad_ideal / (2 * isp1 * gravity(zl)))) - ratio_estructural
         
         masa_total = masa_util / (f**2)
