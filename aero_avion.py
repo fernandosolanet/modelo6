@@ -67,52 +67,42 @@ def angulo_ataque(alfa_posible, mach):
     return angulo_perdida
 
 def cd0(mach):
-    '''CD0 (coeficiente de resistencia parásita).  El estudio de este
-    coeficiente se da en dos partes: una incompresible y otra compresible.  Es
-    función del número de Mach y de distintos coeficientes referidos a las
-    partes del avión.
+     '''Esta función calcula el CD0 del avión. Las ecuaciones se han implementado 
+    gracias a una gráfica que representa la variación de CD0 con respecto al Mach 
+    para el avión  F-4 Phantom. Las instrucciones if y elif se refieren a los 
+    distintos tramos de la gráfica. 
     '''
-    #Coeficientes de las distintas partes del avión, son coeficientes
-    # experimentales que se introducen en la fórmula para calcular CD0.
-    x_ala = .003
-    x_fuselaje = .0024
-    x_gondolas = .006
-    x_med = (x_fuselaje + x_gondolas) / 2
-    x_cola = .0025
-    #Áreas totales de las partes del avión mojdadas por la corriente de aire y
-    # que, por tanto, influyen en la resistencia.
-    a_ala = 2 * S_W
-    a_fuselaje = .75 * pi * LF * BF
-    a_gondolas = pi * LM * DM * NE
-    a_cola = 2 * (S_H + S_V)
-    incremento = 1.1 # Incremento por interferencias e imperfecciones (10%)
-    #No se tiene en cuenta el efecto de la compresibilidad; pero su cálculo es
-    # necesario para el cálculo del coeficiente de resistencia parásita con
-    # compresibilidad.
-    cd0_inc = ((x_ala * a_ala + x_med * a_fuselaje + x_gondolas * a_gondolas
-                + x_cola * a_cola) * incremento) / S_W
-    n_comp = 3 / (1 + (1 / AR))
-    # Coeficiente de la fórmula con compresibilidad.
-    #Cálculo de CD0 con efectos de compresibilidad.
-    #Se emplea Md98, el 98% del Mach de divergencia ya que la fórmula tiende
-    # asintóticamente a infinito en rangos cercanos al Mach de divergencia.
-    if mach < M_D098 and mach < M_C:
-        cd0_compresible = cd0_inc / ((1 - (mach / M_D)**2)**.25)
-        cd_incremento = 0
-        return cd0_compresible + cd_incremento
-    #Para valores superiores al Mach crítico aparece un incremento por
-    # resistencia de onda.
-    if mach < M_D098 and mach >= M_C:
-        cd0_compresible = cd0_inc / ((1 - (mach / M_D)**2)**.25)
-        cd_incremento = (K / 1000) * ((10 * (mach - M_C)) / ((1 / cos(FLECHA))
-                                                             - M_C))**n_comp
-        return cd0_compresible + cd_incremento
-    if 1.2 >= mach > M_D098:
-        return (-379.32512053 * mach**5 + 1994.1499524 * mach**4
-                - 4177.4704011 * mach**3 + 4358.3944768 * mach**2
-                - 2264.4097020 * mach + 468.71342687)
-    if mach > 1.2:
-        return .031
+    if mach <= 0.85:
+        
+        return 0.0277
+    
+    elif 0.85 < mach <= 1:
+        
+        return 0.1287 * mach - 0.0817
+    
+    elif 1 < mach <=1.05:
+        
+        return 0.036 * mach +0.011
+    
+    elif 1.05 < mach <=1.20:
+        
+        return 0.014 * mach + 0.0341
+    
+    elif 1.20 < mach <= 1.32:
+        
+        return -0.0058 * mach + 0.0579
+    
+    elif 1.32 < mach <=1.5:
+        
+        return -0.0133 * mach + 0.0678
+    
+    elif 1.5 < mach <= 1.9:
+        
+        return 0.0478
+    
+    elif 1.9 < mach <= 2:
+        
+        return -0.019 * mach + 0.0839
 
 def k(mach):
     '''Coeficiente de resistencia inducida que multiplica al coeficiente
