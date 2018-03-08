@@ -3,7 +3,7 @@
 @author: Team REOS
 """
 from math import radians, cos, sin, degrees, pi
-from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR, gravity
 from modelo_empuje import thrust
 from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
 from aero_avion import resistencia, sustentacion
@@ -23,15 +23,6 @@ GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
 N = 3.5  # Factor de carga máximo.
 MASS = 14273  # Masa del avión cargado (kg).
 W = MASS * GRAV  # Peso del avión (N).
-
-
-def gravity(alt):
-    '''Cálculo de la gravedad en función de la altura en metros
-    '''
-    R = 6378000 + alt
-    
-    return MU/(R**2)
-   
 
 beta=89 
                        
