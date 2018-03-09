@@ -14,8 +14,12 @@ requieren una variable de entrada: la altitud.
 from math import exp
 
 #Constantes atmosféricas.
-R_AIR = 287  # Constante de los gases ideales (J/Kkg).
-GRAV = 9.80665  # Aceleración gravitatoria (m/s2).
+R_AIR = 287  # Constante de los gases ideales (J/Kkg)
+G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
+MT = 5.972e24  # Masa terrestre (kg).
+MU = G * MT
+RT = 6378136.3  # Radio terrestre (m).
+GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2)..
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
 GAMMA = 1.4  # Coeficiente de dilatación adiabática.
 BETA_VISC = .000001458  # Viscosidad de referencia (Pa s/K.5).
@@ -160,3 +164,10 @@ def viscosity(alt):
     '''
     temp = temperature(alt)
     return BETA_VISC * temp**(3 / 2) / (temp + S_VISC)
+
+def gravity(alt):
+    '''Cálculo de la gravedad en función de la altura en metros
+    '''
+    R = 6378000 + alt
+    
+    return MU/(R**2)
