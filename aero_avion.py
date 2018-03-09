@@ -72,9 +72,7 @@ def angulo_ataque(alfa_posible, mach):
 def cd0(mach):
     '''Esta función calcula el CD0 del avión. Las ecuaciones se han
     implementado gracias a una gráfica que representa la variación de
-    CD0 con respecto al Mach para el avión  F-4 Phantom.  Las
-    instrucciones if y elif se refieren a los distintos tramos de la
-    gráfica.
+    CD0 con respecto al Mach para el avión  F-4 Phantom.
     '''
     if mach <= .85:
         cd_0 = .0277
