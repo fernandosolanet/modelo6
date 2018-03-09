@@ -166,8 +166,7 @@ def viscosity(alt):
     return BETA_VISC * temp**(3 / 2) / (temp + S_VISC)
 
 def gravity(alt):
-    '''Cálculo de la gravedad en función de la altura en metros
+    '''Cálculo de la gravedad en función de la altura en metros.
     '''
-    R = 6378000 + alt
-    
-    return MU/(R**2)
+    R = RT + alt
+    return MU / R**2
