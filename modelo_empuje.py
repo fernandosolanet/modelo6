@@ -16,7 +16,7 @@ from math import exp
 from modeloISA import density
 
 
-TH_SL = 100000  # Empuje a nivel del mar (máximo).
+TH_SL = 170000  # Empuje a nivel del mar (máximo).
 
 def thrust(mach, den):
     '''Cálculo del empuje de la aeronave. Esta función se obtiene a partir de
