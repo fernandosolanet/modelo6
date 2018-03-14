@@ -121,6 +121,15 @@ def cd_inducida(k_d, c_l):
     '''Coeficiente de resistencia inducida.
     '''
     return k_d * c_l**2
+def CD_interferencia(mach):
+    if mach < 0.955:
+        return 4.9704382*10**3*mach**6 - 2.5004431*10**4*mach**5 + 5.2386095*10**4*mach**4 - 5.8503607*10**4*mach**3 + 3.6730317*10**4*mach**2 - 1.2291490*10**4*mach + 1.7127795*10**3
+    if 0.955 < mach < 0.9655:
+        return -1.6067616*10*mach**2 + 3.0869911*10*mach - 1.4799698*10
+    if 0.9655 < mach < 0.99:
+        return 1.963091*10**4*mach**4 - 7.7677873*10**4*mach**3 + 1.1526168*10**5*mach**2 - 7.6013338*10**4*mach + 1.8798642*10**4
+    if mach > 0.99:
+        return -4.8641024*mach**5 + 2.9106203*10*mach**4 - 6.9459659*10*mach**3 + 8.2653785*10*mach**2 - 4.9067894*10*mach + 1.1650697*10
 
 def resistencia(vel, dens, c_d):
     '''Fuerza aerodinámica de resistencia total.
