@@ -1,6 +1,7 @@
 from math import radians, cos, sin, degrees, pi, exp
 
-from modeloISA import density, temperature, GAMMA, viscosity, R_AIR, gravity
+from modeloISA import density, temperature, GAMMA, viscosity, R_AIR
+from gravedad import gravity
 from aero_misil import cdll, SREF_MISIL, SGASES
 from avion import velocidad, altura, psi_list, fi_list
 
