@@ -153,18 +153,18 @@ for gasto in [14]:
 
             velocidad_ideal = v_orb - v_rotacional + v_loss - v0
             # Velocidad ideal, necesaria para 'f'.
-            f = (((1 + ratio_estructural) / exp(velocidad_ideal /
-                  (2 * isp1 * gravity(zl)))) - ratio_estructural)
+            f = ((1 + ratio_estructural) / exp(velocidad_ideal
+                 / (2 * isp1 * gravity(zl)))) - ratio_estructural
             # Coeficiente dado por el optimizador.
 
             # MASAS DEL COHETE
 
             masa_total = masa_util / (f**2)  # Masa inicial del cohete.
             masa_etapa2 = masa_util / f  # Masa de la segunda etapa.
-            masa_propulsante_etapa1 = ((masa_total - masa_etapa2) /
-                                       (1 + ratio_estructural))
-            masa_propulsante_etapa2 = ((masa_etapa2 - masa_util) /
-                                       (1 + ratio_estructural))
+            masa_propulsante_etapa1 = ((masa_total - masa_etapa2)
+                                       / (1 + ratio_estructural))
+            masa_propulsante_etapa2 = ((masa_etapa2 - masa_util)
+                                       / (1 + ratio_estructural))
             masa_estructura1 = masa_propulsante_etapa1 * ratio_estructural
             masa_estructura2 = masa_propulsante_etapa2 * ratio_estructural
 
@@ -175,8 +175,8 @@ for gasto in [14]:
             retardo_encendido = 0
             # Tiempo desde que se apaga la primera etapa y se enciende
             # la segunda.
-            t_fin_combustion2 = (t_combustion + t_combustion_2_etapa +
-                                 retardo_encendido)
+            t_fin_combustion2 = (t_combustion + t_combustion_2_etapa
+                                 + retardo_encendido)
             # Instante temporal en el que se apaga la segunda etapa.
             masa_misil = masa_total
             # Esta masa irá variando a lo largo de la maniobra.
@@ -256,7 +256,8 @@ for gasto in [14]:
             # finalizará al llegar al tiempo de comuistión o si se
             # alcanza la condicion de que el misil cae o llega a 500km.
 
-            while t_fin_combustion2 >= tl > t_combustion and fil < pi / 2 and zl < 500000:
+            while (t_fin_combustion2 >= tl > t_combustion
+                   and fil < pi / 2 and zl < 500000):
 
                 tl = tl + dtl  # Evolución temporal (s).
                 xl = xl + dxl  # Posición horizontal (m).
