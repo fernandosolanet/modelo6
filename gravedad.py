@@ -20,4 +20,5 @@ def gravity(alt):
     alt: altitud (m)
     '''
     radio = RT + alt
+
     return MU / radio**2
