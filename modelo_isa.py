@@ -12,9 +12,11 @@ Funciones de gradiente de temperatura (alf_isa), temperatura
 """
 
 from math import exp
+
 from gravedad import MU, RT
 
 # Constantes atmosféricas.
+
 R_AIR = 287  # Constante de los gases ideales (J/Kkg)
 GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2)..
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
@@ -59,6 +61,7 @@ def alfa_isa(alt):
     else:
         alf = 0
     return alf
+
 
 def temperature(alt):
     '''Cálculo de la temperatura en función de la altura dada por el
@@ -166,6 +169,7 @@ def pressure(alt):
 
     alt: altitud (m)
     '''
+
     return density(alt) * R_AIR * temperature(alt)
 
 
