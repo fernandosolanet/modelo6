@@ -10,7 +10,7 @@ los mismos.
 """
 
 from math import log10, pi, degrees, atan
-from modelo_isa import GAMMA, density, temperature, R_AIR, viscosity
+from modeloISA import GAMMA, density, temperature, R_AIR, viscosity
 
 
 #--------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL--------------------
