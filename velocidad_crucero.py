@@ -13,7 +13,7 @@ empuje sea igual a la resistencia.
 from modeloISA import density, temperature, GAMMA, R_AIR
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import  k, cd0, cd_inducida, S_W
+from aero_avion import  k, cd0, cd_inducida, S_W, CD_interferencia
 from aero_avion import resistencia, sustentacion
 from aero_misil import cdll, SREF_MISIL
 
@@ -49,11 +49,13 @@ def vuelo_crucero(M):
     CD01 = cd0(M)
     CDmisilavion = cdll(M, v)
     CD_inducida1 = cd_inducida(k1, CL)
+    CD_interferencia1 = CD_interferencia(M)
     CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+    CD_avion = CD + 0.35*CD_interferencia1
     
     
       #Fuerzas.
-    Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+    Davion = resistencia(v, rho, CD_avion)  # Resistencia aerodinámica (N).
     Dmisil = 0.5 * rho * CDmisilavion * SREF_MISIL * v**2
       
     D = Davion + Dmisil
@@ -90,11 +92,13 @@ def vuelo_crucero(M):
       CD01 = cd0(M)
       CDmisilavion = cdll(M, v)
       CD_inducida1 = cd_inducida(k1, CL)
+      CD_interferencia1 = CD_interferencia(M)
       CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+      CD_avion = CD + 0.35*CD_interferencia1
     
 
       #Fuerzas.
-      Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+      Davion = resistencia(v, rho, CD_avion)  # Resistencia aerodinámica (N).
       Dmisil = 0.5 * rho * CDmisilavion * SREF_MISIL * v**2
       D = Davion + Dmisil
 
