@@ -8,7 +8,7 @@ from math import radians, cos, sin, degrees, pi
 from modelo_isa import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
+from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W, CD_interferencia
 from aero_avion import resistencia, sustentacion
 from aero_misil import cdll, SREF_MISIL
 from velocidad_crucero import vuelo_crucero
@@ -94,11 +94,13 @@ K1 = k(M)
 CD01 = cd0(M)
 CDMISIL_AVION = cdll(M, V)
 CD_INDUCIDA1 = cd_inducida(K1, CL)
+CD_interferencia1 = CD_interferencia(M)
 CD = CD01 + CD_INDUCIDA1  # Polar del avióN.  Coeficiente de resistencia.
+CD_avion = CD + 0.35*CD_interferencia1
 
 
 # Fuerzas.
-D_AVION = resistencia(V, RHO, CD)  # Resistencia aerodinámica (N).
+D_AVION = resistencia(V, RHO, CD_avion)  # Resistencia aerodinámica (N).
 D_MISIL = 0.5 * RHO * CDMISIL_AVION * SREF_MISIL * V**2
 D = D_AVION + D_MISIL
 
@@ -211,6 +213,7 @@ while GAMA < BETA and V > 0:
     F.write('%.8f\t' % X)  # Recorrido (m)
     F.write('%.8f\t' % V)  # Velocidad (m/s).
     F.write('%.8f\t' % M)  # Número de Mach.
+    F.write('%.8f\t' % D)  # Resistencia.
     F.write('%.8f\t' % ALFA_GRADOS)  # Ángulo de ataque (grados).
     F.write('%.8f\t' % GAMA_GRADOS)  # Asiento de la VELOCIDAD (grados).
     F.write('%.8f\t' % THETA_GRADOS)  # Ángulo de asiento (grados).
@@ -284,8 +287,10 @@ while GAMA < BETA and V > 0:
     VXT = V * cos(GAMA)  # ProyeccióN horiz VELOCIDAD en ejes tierra
     VYT = V * sin(GAMA)  # ProyeccióN vertical VELOCIDAD en ejes tierra
     CD_INDUCIDA1 = cd_inducida(K1, CL)  # Coef. resistencia inducida
+    CD_interferencia1 = CD_interferencia(M)
     CD = CD01 + CD_INDUCIDA1  # Coeficiente de resistencia total
-    D = resistencia(V, RHO, CD)  # Fuerza de resistencia (N).
+    CD_avion = CD + 0.35*CD_interferencia1
+    D = resistencia(V, RHO, CD_avion)  # Fuerza de resistencia (N).
     L = N * W  # Fuerza de sustentacióN (N).
 
     # Energías.
