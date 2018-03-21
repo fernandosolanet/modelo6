@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-
 @author: Team REOS
-
 Programa que nos permite calcular las masas del cohet a lanzar
 desde los distintos puntos de lanzamiento, optimizandolo para obtener
 la mínima masa total del cohete para una carga de pago dada o viceversa.
 Los cohetes optimizados son de 2 etapas y se lanzan desde los puntos
 obtenidos por el modulo avion,
-
 """
 from math import radians, cos, sin, degrees, pi, exp
 
-from modeloISA import density, temperature, GAMMA, viscosity, R_AIR, gravity
+from modelo_isa import density, temperature, GAMMA, viscosity, R_AIR
+from gravedad import gravity
 from aero_misil import cdll, SREF_MISIL, SGASES
-from avion import velocidad, altura, psi_list, fi_list
+from avion import VELOCIDAD, ALTURA, PSI_LIST, FI_LIST
 
 # --------------------------CONDICIONES GRAVITATORIAS-------------------
 G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
@@ -22,8 +20,8 @@ MT = 5.972e24  # Masa terrestre (kg).
 MU = G * MT
 RT = 6378136.3  # Radio terrestre (m).
 GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
-FI_GRADOS = fi_list
-PSI_GRADOS = psi_list
+FI_GRADOS = FI_LIST
+PSI_GRADOS = PSI_LIST
 
 MASA_PAYLOAD = 34
 for gasto in [14]:
@@ -38,9 +36,9 @@ for gasto in [14]:
                   '\tmasa total \tfil  \tindice \n')
     #
     # Este bucle permite recorrer los elementos de los vectores creados
-    # en el archivo avión, velocidad, altura, fi y psi.
+    # en el archivo avión, VELOCIDAD, ALTURA, fi y psi.
     # Esto quiere decir que cada de los vectores
-    # velocidad, altura, FI_GRADOS y PSI_GRADOS, indican
+    # VELOCIDAD, ALTURA, FI_GRADOS y PSI_GRADOS, indican
     # el un punto de lanzamiento calculado y asi con cada
     # indice, de tal manera que cada uno represneta un punto
     # de lanzamiento.
@@ -65,9 +63,9 @@ for gasto in [14]:
         # ----Iterador----
         #
         # Con este bucle realizamos la interación de la pérdida por
-        # velocidad. A partir de un valor incial dado calcula la
+        # VELOCIDAD. A partir de un valor incial dado calcula la
         # trayectoria del misi y con ella obtenemos la verdadera
-        # pérdida por velocidad. Tras ello se comparan valores.
+        # pérdida por VELOCIDAD. Tras ello se comparan valores.
         # Este proceso durará mientras que la diferencia entre ambos
         # valores sea mayor a 10, este valor se puede modificar para
         # mayor precisión, y mientras el contador de iteraciones sea
@@ -78,15 +76,15 @@ for gasto in [14]:
             # Los valores siguientes los obtiene de vectores generados
             # en el archivo avión con todos los puntos de lanzamiento.
             # Esto quiere decir que el indice 1 de los vectores
-            # velocidad, altura, FI_GRADOS y PSI_GRADOS, indican
+            # VELOCIDAD, ALTURA, FI_GRADOS y PSI_GRADOS, indican
             # el primer punto de lanzamiento calculado y asi con cada
             # indice, de tal manera que cada uno represneta un punto
             # de lanzamiento.
 
-            z0 = altura[i]  # Altura a la que se lanza.
-            v0 = velocidad[i]  # Velocidad inicial con la que se lanza.
+            z0 = ALTURA[i]  # Altura a la que se lanza.
+            v0 = VELOCIDAD[i]  # Velocidad inicial con la que se lanza.
             fil_grados0 = FI_GRADOS[i]
-            # Ángulo de ataque de la velocidad sobre la vertical local.
+            # Ángulo de ataque de la VELOCIDAD sobre la vertical local.
             psil_grados0 = PSI_GRADOS[i]
             # Ángulo de la vertical local en ejes centro tierra.
             theta_grados0 = 90 - fil_grados0 - psil_grados0
@@ -106,14 +104,14 @@ for gasto in [14]:
             rl = RT + zl  # Distancia al centro de la Tierra.
 
             # De nuevo creamos 'vl'. que ira variando a lo largo
-            # de la maniobra y además añadimos el efecto de la velocidad
+            # de la maniobra y además añadimos el efecto de la VELOCIDAD
             # rotacional.
             vl = v0 + v_rotacional
             Ml = vl / ((GAMMA * R_AIR * temperature(zl))**.5)
             vxl = vl * sin(fil)
-            # Inicialización de la componente horizontal de velocidad.
+            # Inicialización de la componente horizontal de VELOCIDAD.
             vyl = vl * cos(fil)
-            # Inicialización de la componente verical de velocidad.
+            # Inicialización de la componente verical de VELOCIDAD.
             tl = 0
             xl = 0
             # Iniciamos la variable x de desplazamiento del misil como
@@ -123,7 +121,7 @@ for gasto in [14]:
             dsl = 0  # Inicialización del diferncial del arco recorrido.
             dxl = 0  # Inicialización del diferencial de la posición.
             dzl = 0
-            # Inicialización del diferencial de la altura del misil.
+            # Inicialización del diferencial de la ALTURA del misil.
             dfil = 0
             # Inicialización de la variación del ángulo fi inicial.
             dpsil = 0
@@ -138,16 +136,16 @@ for gasto in [14]:
 
             # ---------OPTIMIZADOR---------
             # Este optimizador de 2 etapas, nos permite calcular el
-            # cohete de menor masa para una velocidad de orbita dada.
+            # cohete de menor masa para una VELOCIDAD de orbita dada.
             # La otra incógnita sería la pérdida por velcoidad que
             # se calcula posteriomente mediante la interación en la
             # que se encuentra sumergido el optimizador.
             #
             # ----Parámetros implicados----
             #
-            # Velocidad ideal, es la velocidad ideal que habría que
+            # Velocidad ideal, es la VELOCIDAD ideal que habría que
             # incrementar v0 para obtener la velcoidad orbital sin tener
-            # en cuenta las perdidas por velocidad ni la velocidad
+            # en cuenta las perdidas por VELOCIDAD ni la VELOCIDAD
             # rotacional, pero no es el incremento que hayq ue dar.
             # Hay que tener en cuenta los demás efectos.
 
@@ -181,7 +179,7 @@ for gasto in [14]:
             masa_misil = masa_total
             # Esta masa irá variando a lo largo de la maniobra.
             v_loss_empirica = 0
-            # Reinicio del valor de la pérdida de velocidad calculada,
+            # Reinicio del valor de la pérdida de VELOCIDAD calculada,
             # asi al iniciar una nueva iteración vuelve a adoptar
             # el valor de 0 en el momento de iniciar la maniobra.
 
@@ -206,7 +204,7 @@ for gasto in [14]:
                 psil_grados = degrees(psil)
                 # Conversión a grados de psil.
 
-                vl = vl + dvl  # Variación de la velocidad del misil.
+                vl = vl + dvl  # Variación de la VELOCIDAD del misil.
                 vxl = vl * sin(fil)  # Componente horizontal.
                 vyl = vl * cos(fil)  # Componente vertical.
 
@@ -214,7 +212,7 @@ for gasto in [14]:
                 rhol = density(zl)  # Densidad (kg/m3).
                 Tl = temperature(zl)  # Temperatura (K).
                 Mu_viscl = viscosity(zl)  # Viscosidad.
-                gl = gravity(zl)  # Gravedad variable con altura.
+                gl = gravity(zl)  # Gravedad variable con ALTURA.
                 Ml = vl / ((GAMMA * R_AIR * Tl)**0.5)
 
                 Ratio_areas = (SREF_MISIL - SGASES) / SREF_MISIL
@@ -223,8 +221,8 @@ for gasto in [14]:
                 Cdl = cdll(Ml, zl)
                 D_misil = 0.5 * rhol * Cdl * SREF_MISIL * vl**2
 
-                # Ecuación horizontal en ejes velocidad.
-                # Ecuación pricipal que nos determina la velocidad,
+                # Ecuación horizontal en ejes VELOCIDAD.
+                # Ecuación pricipal que nos determina la VELOCIDAD,
                 # a partir de ella se determinan el resto de variables.
                 dvl = dtl / masa_misil * (Empuje_misil - D_misil
                                           - gl * masa_misil * cos(fil))
@@ -238,11 +236,11 @@ for gasto in [14]:
 
                 dv_loss = dtl / masa_misil * (D_misil + gl * masa_misil
                                               * cos(fil))
-                # Diferencial de pérdidas por velocidad.
+                # Diferencial de pérdidas por VELOCIDAD.
                 v_loss_empirica = v_loss_empirica + dv_loss
                 # Sumatorio de los diferenciales de pérdidas por
-                # velocidad dan lugar a 'v_loss_empírica' que será
-                # la velocidad que compararemos con la 'v_loss' iniciada
+                # VELOCIDAD dan lugar a 'v_loss_empírica' que será
+                # la VELOCIDAD que compararemos con la 'v_loss' iniciada
                 # para iterar.
 
                 dxl = vxl * dtl  # Diferencial de la posición (m).
@@ -274,7 +272,7 @@ for gasto in [14]:
                 psil_grados = degrees(psil)
                 # Conversión a grados de psil.
 
-                vl = vl + dvl  # Variación de la velocidad del misil.
+                vl = vl + dvl  # Variación de la VELOCIDAD del misil.
                 vxl = vl * sin(fil)  # Componente horizontal.
                 vyl = vl * cos(fil)  # Componente vertical.
 
@@ -282,7 +280,7 @@ for gasto in [14]:
                 rhol = density(zl)  # Densidad (kg/m3).
                 Tl = temperature(zl)  # Temperatura (K).
                 Mu_viscl = viscosity(zl)  # Viscosidad.
-                gl = gravity(zl)  # Gravedad variable con altura.
+                gl = gravity(zl)  # Gravedad variable con ALTURA.
                 Ml = vl / ((GAMMA * R_AIR * Tl)**0.5)  # Mach de vuelo,
 
                 Ratio_areas = (SREF_MISIL - SGASES) / SREF_MISIL
@@ -291,8 +289,8 @@ for gasto in [14]:
                 Cdl = cdll(Ml, zl)
                 D_misil = 0.5 * rhol * Cdl * SREF_MISIL * vl**2
 
-                # Ecuación horizontal en ejes velocidad.
-                # Ecuación pricipal que nos determina la velocidad,
+                # Ecuación horizontal en ejes VELOCIDAD.
+                # Ecuación pricipal que nos determina la VELOCIDAD,
                 # a partir de ella se determinan el resto de variables.
                 dvl = dtl / masa_misil * (Empuje_misil - D_misil
                                           - gl * masa_misil * cos(fil))
@@ -306,11 +304,11 @@ for gasto in [14]:
 
                 dv_loss = dtl / masa_misil * (D_misil + gl * masa_misil
                                               * cos(fil))
-                # Diferencial de pérdidas por velocidad.
+                # Diferencial de pérdidas por VELOCIDAD.
                 v_loss_empirica = v_loss_empirica + dv_loss
                 # Sumatorio de los diferenciales de pérdidas por
-                # velocidad dan lugar a 'v_loss_empírica' que será
-                # la velocidad que compararemos con la 'v_loss' iniciada
+                # VELOCIDAD dan lugar a 'v_loss_empírica' que será
+                # la VELOCIDAD que compararemos con la 'v_loss' iniciada
                 # para iterar.
 
                 dxl = vxl * dtl  # Diferencial de la posición (m).
@@ -337,7 +335,7 @@ for gasto in [14]:
                 psil_grados = degrees(psil)
                 # Conversión a grados de psil.
 
-                vl = vl + dvl  # Variación de la velocidad del misil.
+                vl = vl + dvl  # Variación de la VELOCIDAD del misil.
                 vxl = vl * sin(fil)  # Componente horizontal.
                 vyl = vl * cos(fil)  # Componente vertical.
 
@@ -345,7 +343,7 @@ for gasto in [14]:
                 rhol = density(zl)  # Densidad (kg/m3).
                 Tl = temperature(zl)  # Temperatura (K).
                 Mu_viscl = viscosity(zl)  # Viscosidad.
-                gl = gravity(zl)  # Gravedad variable con altura.
+                gl = gravity(zl)  # Gravedad variable con ALTURA.
                 Ml = vl / ((GAMMA * R_AIR * Tl)**0.5)  # Mach de vuelo,
 
                 Ratio_areas = 1
@@ -354,8 +352,8 @@ for gasto in [14]:
                 Cdl = cdll(Ml, zl)
                 D_misil = 0.5 * rhol * Cdl * SREF_MISIL * vl**2
 
-                # Ecuación horizontal en ejes velocidad.
-                # Ecuación pricipal que nos determina la velocidad,
+                # Ecuación horizontal en ejes VELOCIDAD.
+                # Ecuación pricipal que nos determina la VELOCIDAD,
                 # a partir de ella se determinan el resto de variables.
                 dvl = dtl / masa_misil * (- D_misil - gl * masa_misil
                                           * cos(fil))
@@ -366,13 +364,13 @@ for gasto in [14]:
                 # Diferencial de la vertical local.
 
                 dv_loss = - dvl
-                # Diferencial de pérdidas por velocidad. En este caso
+                # Diferencial de pérdidas por VELOCIDAD. En este caso
                 # coincide con el diferencial de 'dvl', ya que solo se
-                # pierde velocidad al no haber empuje.
+                # pierde VELOCIDAD al no haber empuje.
                 v_loss_empirica = v_loss_empirica + dv_loss
                 # Sumatorio de los diferenciales de pérdidas por
-                # velocidad dan lugar a 'v_loss_empírica' que será
-                # la velocidad que compararemos con la 'v_loss' iniciada
+                # VELOCIDAD dan lugar a 'v_loss_empírica' que será
+                # la VELOCIDAD que compararemos con la 'v_loss' iniciada
                 # para iterar.
 
                 dxl = vxl * dtl  # Diferencial de la posición (m).
@@ -389,7 +387,7 @@ for gasto in [14]:
             contador = contador + 1
 
         print('para ', theta_grados0, 'la masa del misil es ', masa_total,
-              ' la altura es ', zl, ' y el angulo de llegada', fil_grados)
+              ' la ALTURA es ', zl, ' y el angulo de llegada', fil_grados)
         print('El gasto es: ', gasto, 'el numeor de la lista es ', i)
 
         archivo.write('%.8f\t' % gasto)
