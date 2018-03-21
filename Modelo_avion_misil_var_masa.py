@@ -90,7 +90,10 @@ for isp in range(int(220 * 9.8), int(320 * 9.8), 100):
     k1 = k(M)
     CD01 = cd0(M)
     CD_inducida1 = cd_inducida(k1, CL)
+    CD_interferencia1 = CD_interferencia(M)     #Resistencia debida a interferencias con el misil
     CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
+    CD_avion = CD + CD_interferencia1
+    
     '''
     -------------------------INICIO DE LA MANIOBRA-------------------------
     '''
@@ -106,7 +109,7 @@ for isp in range(int(220 * 9.8), int(320 * 9.8), 100):
     epotencial = MASS * g0 * h  # Energía potencial (J).
     emecanica = ecinetica + epotencial  # Energía mecánica (J).
     #Fuerzas.
-    D = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
+    D = resistencia(v, rho, CD_avion)  # Resistencia aerodinámica (N).
     L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
     Th = thrust(M, rho)  # Empuje (N).
     diferencia_T_D = Th - D
@@ -222,8 +225,10 @@ for isp in range(int(220 * 9.8), int(320 * 9.8), 100):
         vx = v * cos(gama)  # Proyección horizontal de la velocidad (m/s).
         vy = v * sin(gama)  # Proyección vertical de la velocidad (m/s).
         CD_inducida1 = cd_inducida(k1, CL)
+        CD_interferencia1 = CD_interferencia(M)       #Resistencia debida a interferencias con el misil
         CD = CD01 + CD_inducida1  # Polar del avión.
-        D = resistencia(v, rho, CD)  # Fuerza de resistencia (N).
+        CD_avion = CD + CD_interferencia
+        D = resistencia(v, rho, CD_avion)  # Fuerza de resistencia (N).
         L = n * W  # Fuerza de sustentación (N).
         #Energías.
         ecinetica = .5 * MASS * v**2  # Energía cinética (J).
