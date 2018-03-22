@@ -5,6 +5,7 @@
 
 from math import radians, cos, sin, degrees, pi
 
+from inputs_iniciales import Z0, M1, MASS
 from modelo_isa import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from gravedad import gravity
 from modelo_empuje import thrust
@@ -25,7 +26,6 @@ GRAV = MU / RT**2  # AceleracióN de la gravedad a nivel del mar (m/s2).
 # -------------------CARACTERÍSTICAS DE LA AERONAVE--------------------
 
 N = 3.5  # Factor de carga máximo.
-MASS = 14273  # Masa del avióN cargado (kg).
 W = MASS * GRAV  # Peso del avióN (N).
 
 BETA = 89
@@ -63,7 +63,7 @@ PSI_LIST = []
 # Vectores VELOCIDAD, ALTURA, fil y psil vacios, en ellos guardaremos
 # los valores de las distintas variables para su posterior uso
 
-Z0 = 12000  # Altitud inicial del misil (m).
+
 R = RT + Z0  # Distancia desde el centro de la Tierra (m).
 G0 = gravity(Z0)  # AceleracióN gravitatoria inicial (m/s2).
 RHO = density(Z0)  # Densidad inicial del aire (kg/m3).
@@ -72,8 +72,7 @@ TEMPERATURE = temperature(Z0)  # Temperatura inicial del aire (K).
 MU_VICS = viscosity(Z0)  # Viscosidad inicial.
 W = MASS * G0  # Peso inicial del avióN dependiente de la gravedad
 
-# A la ALTURA inicial el avióN vuela en vuelo estacionario.
-M1 = 1.4  # Número de Mach inicial.
+# A la ALTURA inicial el avión vuela en vuelo estacionario.
 M = vuelo_crucero(M1)
 V = M * (GAMMA * R_AIR * TEMPERATURE)**.5  # Velocidad inicial (m/s).
 
