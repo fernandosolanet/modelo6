@@ -8,15 +8,13 @@ aquello relacionado con los mismos.
 
 from math import log10, pi, degrees, atan
 
-from modeloISA import GAMMA, density, temperature, R_AIR, viscosity
+from modelo_isa import GAMMA, density, temperature, R_AIR, viscosity
+from inputs_iniciales import (DIAMETRO_M, LONGITUD_CONO, LONGITUD_MISIL,
+                              NUM_ALETAS, ESPESOR_ALETA, CMEDIA_ALETA,
+                              CRAIZ_ALETA, SW_ALETA)
 
 
 # ----------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL----------------
-
-DIAMETRO_M = .5  # Diámetro del misil (m).
-LONGITUD_CONO = .9  # Longitud del cono del misil (m).
-LONGITUD_MISIL = 3  # Longitud total del misil (m).
-
 # Ángulo del cono (deg).
 ANGULO_CONO = degrees(atan(.5 * DIAMETRO_M / LONGITUD_CONO))
 
@@ -32,13 +30,7 @@ SGASES = pi * (DIAMETRO_M * .45)**2
 # Área de salida de los gases (consideramos el área de salida de la tobera,
 # m2).
 RATIO_AREAS = 1 - SGASES / SREF_MISIL  # Relación de áreas.
-
-ESPESOR_ALETA = .0065  # Espesor de la aleta (m).
-CMEDIA_ALETA = .18  # Cuerda media de la aleta (m).
-CRAIZ_ALETA = .24  # Cuerda raiz de la aleta (m).
 TAO_ALETA = ESPESOR_ALETA / CMEDIA_ALETA  # TAO de la aleta.
-SW_ALETA = .07875  # Superficie de una aleta del AIM (tomado como ref., m2).
-NUM_ALETAS = 4  # Número de aletas.
 SWTOTAL_ALETAS = SW_ALETA * NUM_ALETAS  # Superficie total de aletas (m2).
 
 
