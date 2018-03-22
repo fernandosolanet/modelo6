@@ -1,118 +1,81 @@
 # -*- coding: utf-8 -*-
 """
 
-@author: Team REOS
+@authrustor: Team REOS
 
 Esta función proporciona la velocidad exacta de crucero para que el
 empuje sea igual a la resistencia.
 
 """
 
-
-
-from modeloISA import density, temperature, GAMMA, R_AIR
+from inputs_iniciales import Z0, MASS
+from modelo_isa import GAMMA, R_AIR, temperature, density
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import  k, cd0, cd_inducida, S_W
-from aero_avion import resistencia, sustentacion
-from aero_misil import cdll, SREF_MISIL
+from aero_avion import k, cd0, cd_inducida, S_W, CD_interferencia
+from aero_avion import resistencia
 
 
+def vuelo_crucero(mach):
 
+    '''Función que calcula la velocidad de crucero del avión. Los datos
+    iniciales los toma del módulo "datos".
+    '''
 
-def vuelo_crucero(M):
+    temperature1 = temperature(Z0)  # Temperatura inicial.
+    rho = density(Z0)  # Densidad inicial del aire (kg/m3).
+    g_0 = gravity(Z0)  # Aceleración gravitatoria inicial (m/s2).
+    weight = MASS * g_0
+    # Peso inicial del avión dependiente de la gravedad
+    # A la altura inicial el avión vuela en vuelo estacionario.
+    velocity = mach * (GAMMA * R_AIR * temperature1)**.5
+    # velocidad inicial (m/s).
 
+    # Coeficientes aerodinámicos
+    # Ecuacion de vuelo en crucero L = W
+    c_l = 2 * weight / (rho * velocity**2 * S_W)
+    k_1 = k(mach)
+    c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión.
 
-    
-      #------------------------CARACTERÍSTICAS DE LA AERONAVE------------------------
-    
-     
-    
-    
-    
-    h = 12000  # Altitud inicial (m).
-       
-    g0 =gravity(h)  # Aceleración g0itatoria (m/s2).
-    W = 14273 * g0
-    rho = density(h)  # Densidad inicial del aire (kg/m3).
-    
-    T = temperature(h)  # Temperatura inicial del aire (K).
-    
-      #A la altura inicial el avión vuela en vuelo estacionario.
-    v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
-    
-      #Coeficientes aerodinámicos
-    
-    '''Ecuacion de vuelo en crucero L = W ''' 
-    CL = 2 * W / (rho * v**2 * S_W)
-    k1 = k(M)
-    CD01 = cd0(M)
-    CDmisilavion = cdll(M, v)
-    CD_inducida1 = cd_inducida(k1, CL)
-    CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
-    
-    
-      #Fuerzas.
-    Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
-    Dmisil = 0.5 * rho * CDmisilavion * SREF_MISIL * v**2
-      
-    D = Davion + Dmisil
-    
-    L = sustentacion(v, rho, CL)  # Sustentación aerodinámica (N).
-    Th = thrust(M, rho)  # Empuje (N).
-    
-    ''' Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos cumplir
-    por ello calculamos la diferencia y en el while se intenta que sea 0 '''
-    
-    diferencia_T_D = Th - D
-    
-    
-    dM = 0.00001 #Variaremos el Mach para iterar
-    
-    if diferencia_T_D < 0:
-        print('Error. La resistencia es mayor que el empuje en vuelo rectilíneo')
-        
-    
-        
-        
-    while diferencia_T_D >= 0:
-     
-      M = M + dM
-      v = M * (GAMMA * R_AIR * T)**.5  # Velocidad inicial (m/s).
-    
-      
-    
-      #Coeficientes aerodinámicos
-    
-      '''Ecuacion de vuelo en crucero L = W ''' 
-      CL = 2 * W / (rho * v**2 * S_W)
-      k1 = k(M)
-      CD01 = cd0(M)
-      CDmisilavion = cdll(M, v)
-      CD_inducida1 = cd_inducida(k1, CL)
-      CD = CD01 + CD_inducida1  # Polar del avión.  Coeficiente de resistencia.
-    
+    cd_avion = c_d + CD_interferencia(mach)
+    # Coeficiente de resistencia total.
 
-      #Fuerzas.
-      Davion = resistencia(v, rho, CD)  # Resistencia aerodinámica (N).
-      Dmisil = 0.5 * rho * CDmisilavion * SREF_MISIL * v**2
-      D = Davion + Dmisil
+    # Fuerzas.
+    drag_aircraft = resistencia(velocity, rho, cd_avion)
+    # Resistencia aerodinámica (N).
+    thrust_aircraft = thrust(mach, rho)  # Empuje (N).
+    # Esta es la ecuacion en eje horizontal T = D que es la condicion
+    # que queremos cumplir por ello calculamos la diferencia y en el
+    # while se intenta que sea 0.
+    diferencia_t_d = abs(thrust_aircraft - drag_aircraft)
+    # Se hace el absoluto para que no haya problemas.
+    dmach = 0.000001  # Variaremos el Mach para iterar.
 
-      Th = thrust(M, rho)  # Empuje (N).
-    
-      ''' Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos cumplir
-      por ello calculamos la diferencia y en el while se intenta que sea 0 '''
-    
-      diferencia_T_D = Th - D
-    
-#    print('El número de Mach es: ',M)
-#    
-#    print('Thrust: ', Th) 
-#    
-#    print('Drag: ', D)
-    
-  
-    return M
+    while diferencia_t_d >= 10:
 
+        mach = mach + dmach
+        velocity = mach * (GAMMA * R_AIR * temperature1)**.5
+        # velocidad inicial (m/s).
 
+        # Coeficientes aerodinámicos
+        # Ecuacion de vuelo en crucero L = W
+        c_l = 2 * weight / (rho * velocity**2 * S_W)
+        k_1 = k(mach)
+        c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión.
 
+        cd_avion = c_d + CD_interferencia(mach)
+        # Coeficiente de resistencia.
+
+        # Fuerzas.
+        drag_aircraft = resistencia(velocity, rho, cd_avion)
+        # Resistencia aerodinámica (N).
+        thrust_aircraft = thrust(mach, rho)  # Empuje (N).
+        # Esta es la ecuacion en eje horizontal T = D que es la
+        # condicion que queremos cumplir por ello calculamos la
+        # diferencia y en el While se intenta que sea 0.
+
+        diferencia_t_d = abs(thrust_aircraft - drag_aircraft)
+
+    print('El número de mach es: ', mach)
+
+    return mach
