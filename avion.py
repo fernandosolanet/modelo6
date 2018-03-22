@@ -100,9 +100,7 @@ CD_avion = CD + 0.35*CD_interferencia1
 
 
 # Fuerzas.
-D_AVION = resistencia(V, RHO, CD_avion)  # Resistencia aerodinámica (N).
-D_MISIL = 0.5 * RHO * CDMISIL_AVION * SREF_MISIL * V**2
-D = D_AVION + D_MISIL
+D = resistencia(V, RHO, CD_avion)  # Resistencia aerodinámica (N).
 
 TH = thrust(M, RHO)  # Empuje (N).
 L = sustentacion(V, RHO, CL)
