@@ -13,7 +13,7 @@ from math import log10, pi, degrees, atan
 from modelo_isa import GAMMA, density, temperature, R_AIR, viscosity
 
 
-#--------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL--------------------
+# --------------------CARACTERÍSTICAS GEOMÉTRICAS DEL MISIL--------------------
 
 DIAMETRO_M = .5  # Diámetro del misil (m).
 LONGITUD_CONO = .9  # Longitud del cono del misil (m).

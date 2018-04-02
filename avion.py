@@ -5,13 +5,13 @@
 
 from math import radians, cos, sin, degrees, pi
 
-from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modelo_isa import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from gravedad import gravity
 from modelo_empuje import thrust
 from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W
 from aero_avion import resistencia, sustentacion
 from aero_misil import cdll, SREF_MISIL
-from velocidad_crucero import vuelo_crucero
+
 
 
 # -------------------CONDICIONES GRAVITATORIAS-------------------------
@@ -73,8 +73,7 @@ MU_VICS = viscosity(Z0)  # Viscosidad inicial.
 W = MASS * G0  # Peso inicial del avióN dependiente de la gravedad
 
 # A la ALTURA inicial el avióN vuela en vuelo estacionario.
-M1 = 1.4  # Número de Mach inicial.
-M = vuelo_crucero(M1)
+M = 1.6385
 V = M * (GAMMA * R_AIR * TEMPERATURE)**.5  # Velocidad inicial (m/s).
 
 CL_ALFA1 = cl_alfa(M)  # Pendiente del coeficiente de sustentacióN.
