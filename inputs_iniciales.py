@@ -4,10 +4,15 @@
 Módulo que contiene los inputs del programa
 """
 
-# Inputs de altura, velocidad y masa del avión.
-MASS = 14273  # Masa del avión cargado (kg).
+from math import radians
+
+
+# Inputs de altura, posición velocidad y masa del avión.
 Z0 = 12000  # Altitud inicial del misil (m).
+AZ = radians(90)   # AZimut de Lanzamiento dirección (grados).
+LAT = radians(0)  # LATitud Terrestre desde donde se (grados).
 M1 = 0.8  # Número de Mach inicial.
+MASS = 14273  # Masa del avión cargado (kg).
 
 # Caracterísiticas geométricas del misil.
 

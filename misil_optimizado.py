@@ -9,10 +9,12 @@ obtenidos por el modulo avion,
 """
 from math import radians, cos, sin, degrees, pi, exp
 
+from inputs_iniciales import AZ, LAT
 from modelo_isa import density, temperature, GAMMA, viscosity, R_AIR
 from gravedad import gravity
 from aero_misil import cdll, SREF_MISIL, SGASES
 from avion import VELOCIDAD, ALTURA, PSI_LIST, FI_LIST
+from velocidad_rotacional1 import vel_rotacional
 
 # --------------------------CONDICIONES GRAVITATORIAS-------------------
 G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
@@ -23,7 +25,7 @@ GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
 FI_GRADOS = FI_LIST
 PSI_GRADOS = PSI_LIST
 
-MASA_PAYLOAD = 34
+MASA_PAYLOAD = 36.125
 for gasto in [14]:
     # Creamos un string a partir del gasto para crear archivos con el
     # nombre del valor de la variable gasto.
@@ -42,7 +44,7 @@ for gasto in [14]:
     # el un punto de lanzamiento calculado y asi con cada
     # indice, de tal manera que cada uno represneta un punto
     # de lanzamiento.
-    for i in range(144, 284, 1):
+    for i in range(132, 284, 1):
 
         gasto_etapa2 = gasto
         isp1 = 280
@@ -56,7 +58,6 @@ for gasto in [14]:
         v_orb = 7800
         v_loss = 782        # Velocidad con la que empieza a iterar
         v_loss_empirica = 0
-        v_rotacional = 400
         error = 800
         contador = 1
         #
@@ -106,6 +107,10 @@ for gasto in [14]:
             # De nuevo creamos 'vl'. que ira variando a lo largo
             # de la maniobra y además añadimos el efecto de la VELOCIDAD
             # rotacional.
+            v_rotacional = vel_rotacional(z0, LAT, AZ)
+            # la velocidad va relacionada con la altura de lanzamiento,
+            # que corresponde a z0, latiturd y altitud definidas en
+            # 'inputs_iniciales'
             vl = v0 + v_rotacional
             Ml = vl / ((GAMMA * R_AIR * temperature(zl))**.5)
             vxl = vl * sin(fil)
