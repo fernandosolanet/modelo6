@@ -1,2 +1,3 @@
-# Estan los distintos modulos en proceso de depurado del código, unicamente faltan a fecha de hoy aero-avion y aero-misil.
-# aero avion esta siendo modificado por lo que hasta qu eno se acabe no se puede depurar y aero misil esta Carlos en ello
+# Este será el modelo 8 en el que se ha añadido:
+# - El incremento del CD debido a la interferencial misil-avion
+# - Nuevo modulo que calcula la velocidad rotacional
