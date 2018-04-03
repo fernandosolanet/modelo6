@@ -25,7 +25,7 @@ GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
 FI_GRADOS = FI_LIST
 PSI_GRADOS = PSI_LIST
 
-MASA_PAYLOAD = 36.125
+
 for gasto in [14]:
     # Creamos un string a partir del gasto para crear archivos con el
     # nombre del valor de la variable gasto.
@@ -44,8 +44,8 @@ for gasto in [14]:
     # el un punto de lanzamiento calculado y asi con cada
     # indice, de tal manera que cada uno represneta un punto
     # de lanzamiento.
-    for i in range(132, 284, 1):
-
+    for i in range(1250, 2840, 1):
+        masa_total = 1000
         gasto_etapa2 = gasto
         isp1 = 280
         Empuje_misil = gasto * isp1 * 9.81
@@ -53,7 +53,6 @@ for gasto in [14]:
         ratio_estructural = .05
         # Incremento de un 6% de la masa final
         # para la maniobras de circulacion.
-        masa_util = MASA_PAYLOAD * 1.06
         # Velocidades implicadas y parametros del optimizador
         v_orb = 7800
         v_loss = 782        # Velocidad con la que empieza a iterar
@@ -161,8 +160,7 @@ for gasto in [14]:
             # Coeficiente dado por el optimizador.
 
             # MASAS DEL COHETE
-
-            masa_total = masa_util / (f**2)  # Masa inicial del cohete.
+            masa_util = (masa_total*(f**2)) / 1.06 # Masa inicial del cohete.
             masa_etapa2 = masa_util / f  # Masa de la segunda etapa.
             masa_propulsante_etapa1 = ((masa_total - masa_etapa2)
                                        / (1 + ratio_estructural))
@@ -392,7 +390,8 @@ for gasto in [14]:
             contador = contador + 1
 
         print('para ', theta_grados0, 'la masa del misil es ', masa_total,
-              ' la ALTURA es ', zl, ' y el angulo de llegada', fil_grados)
+              ' la ALTURA es ', zl, ' y el angulo de llegada', fil_grados,
+              'la masa util es', masa_util)
         print('El gasto es: ', gasto, 'el numeor de la lista es ', i)
 
         archivo.write('%.8f\t' % gasto)
