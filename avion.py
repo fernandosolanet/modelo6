@@ -134,7 +134,7 @@ RADIUS = V**2 / (G0 * (N - 1))  # Radio de giro inicial (m).
 # Este radio de giro se obtiene para la VELOCIDAD inicial en vuelo
 # estacionario y para un factor de carga máximo segúN los pilones de
 # carga, N = 3,5.
-DT = 0.1  # Diferencial de tiempo (s).
+DT = 0.01  # Diferencial de tiempo (s).
 
 # -----SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
 
