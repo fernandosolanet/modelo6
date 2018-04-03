@@ -9,6 +9,9 @@ Funciones de temperatura (temperature), densidad (density), presión
 (pressure) y viscosidad (viscosity).  Sólo requieren una variable de
 entrada: la altitud.
 
+Los datos se obtienen en la página
+https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php.
+
 """
 
 from scipy.interpolate import interp1d
@@ -51,7 +54,7 @@ def temperature(alt):
     La variable de salida es un float con la temperatura (K).
     '''
     tem = interp1d(HEIGHT, TEMP, kind='cubic')
-    return tem(alt)
+    return float(tem(alt))
 
 
 def density(alt):
@@ -64,7 +67,7 @@ def density(alt):
     La variable de salida es un float con la densidad (kg/m3).
     '''
     den = interp1d(HEIGHT, DENS, kind='cubic')
-    return den(alt)
+    return float(den(alt))
 
 
 def pressure(alt):
