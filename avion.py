@@ -6,7 +6,7 @@
 from math import radians, cos, sin, degrees, pi
 
 from inputs_iniciales import Z0, M1, MASS
-from modelo_isa import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modelo_msise00 import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from gravedad import gravity
 from modelo_empuje import thrust
 from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W, CD_interferencia
