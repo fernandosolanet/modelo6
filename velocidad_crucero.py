@@ -9,7 +9,7 @@ empuje sea igual a la resistencia.
 """
 
 from inputs_iniciales import Z0, MASS
-from modelo_isa import GAMMA, R_AIR, temperature, density
+from modelo_msise00 import GAMMA, R_AIR, temperature, density
 from gravedad import gravity
 from modelo_empuje import thrust
 from aero_avion import k, cd0, cd_inducida, S_W, CD_interferencia
