@@ -10,7 +10,7 @@ obtenidos por el modulo avion,
 from math import radians, cos, sin, degrees, pi, exp
 
 from inputs_iniciales import AZ, LAT
-from modelo_isa import density, temperature, GAMMA, viscosity, R_AIR
+from modelo_msise00 import density, temperature, GAMMA, viscosity, R_AIR
 from gravedad import gravity
 from aero_misil import cdll, SREF_MISIL, SGASES
 from avion import VELOCIDAD, ALTURA, PSI_LIST, FI_LIST
