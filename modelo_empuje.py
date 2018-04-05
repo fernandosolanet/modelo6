@@ -14,7 +14,7 @@ a cada altura en la que nos estemos moviendo.
 
 from math import exp
 
-from modelo_isa import density
+from modelo_msise00 import density
 
 TH_SL = 170000  # Empuje a nivel del mar (máximo).
 
