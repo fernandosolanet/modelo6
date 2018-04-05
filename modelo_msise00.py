@@ -53,7 +53,7 @@ def temperature(alt):
 
     La variable de salida es un float con la temperatura (K).
     '''
-    tem = interp1d(HEIGHT, TEMP, kind='cubic')
+    tem = interp1d(HEIGHT, TEMP)
     return float(tem(alt))
 
 
@@ -66,7 +66,7 @@ def density(alt):
 
     La variable de salida es un float con la densidad (kg/m3).
     '''
-    den = interp1d(HEIGHT, DENS, kind='cubic')
+    den = interp1d(HEIGHT, DENS)
     return float(den(alt))
 
 
