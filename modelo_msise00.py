@@ -13,17 +13,14 @@ https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php
 
 """
 
-from numpy import linspace
 
 # Constantes atmosféricas.
 R_AIR = 287  # Constante de los gases ideales (J/Kkg).
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
 GAMMA = 1.4  # Coeficiente de dilatación adiabática.
-BETA_VISC = .000001458  # Viscosidad de referencia (Pa s/K.5).
+BETA_VISC = 1.458e-6  # Viscosidad de referencia (Pa s/K.5).
 S_VISC = 110.4  # Temperatura de referencia para la viscosidad (K).
 
-
-HEIGHT = linspace(0, 799900, 8000)
 
 TEMPER = [[288.4, -.002696, -1.209e-6, 1.105e-10, -2.703e-15],  # 0-11
           [334.6, -.01953, 1.0485e-6, -2.145e-11, 1.303e-16],  # 11-20
@@ -64,7 +61,7 @@ def interval_msise00(alt):
     '''División de tramos del modelo atmosférico MSISE00
 
     La variable de entrada alt es la altitud (m).  Debe ser menor o
-    igual que 799900 metros.
+    igual que 800000 (8e5) metros.
     '''
     if alt < 11000:
         i = 0
@@ -100,7 +97,7 @@ def temperature(alt):
     modelo MSISE00.
 
     La variable de entrada alt es la altitud (m).  Debe ser menor o
-    igual que 799900 metros.
+    igual que 800000(8e5) metros.
 
     La variable de salida es un float con la temperatura (K).
     '''
@@ -116,7 +113,7 @@ def density(alt):
     MSISE00.
 
     La variable de entrada alt es la altitud (m).  Debe ser menor o
-    igual que 799900 metros.
+    igual que 800000 (8e5) metros.
 
     La variable de salida es un float con la densidad (kg/m3).
     '''
@@ -132,7 +129,7 @@ def pressure(alt):
     MSISE00.  Se implementa la ley de los gases ideales.
 
     La variable de entrada alt es la altitud (m).  Debe ser menor o
-    igual que 799900 metros.
+    igual que 800000 (8e5) metros.
 
     La variable de salida es un float con la presión (Pa).
     '''
@@ -144,7 +141,7 @@ def viscosity(alt):
     modelo MSISE00.  Se implementa la ley de Sutherland.
 
     La variable de entrada alt es la altitud (m).  Debe ser menor o
-    igual que 799900 metros.
+    igual que 800000 (8e5) metros.
 
     La variable de salida es un float con la presión (Pa).
     '''
