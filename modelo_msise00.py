@@ -9,6 +9,7 @@ Funciones de temperatura (temperature), densidad (density), presión
 (pressure) y viscosidad (viscosity).  Sólo requieren una variable de
 entrada: la altitud.
 
+Los datos se obtienen de la página
 https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php
 
 """
