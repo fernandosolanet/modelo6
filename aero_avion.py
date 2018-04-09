@@ -124,7 +124,7 @@ def cd_inducida(k_d, c_l):
 
 def CD_interferencia(mach):
     
-    if mach < 0.955:
+    if 0.7 < mach < 0.955:
        return 4.9704382*10**3*mach**6 - 2.5004431*10**4*mach**5 + 5.2386095*10**4*mach**4 - 5.8503607*10**4*mach**3 + 3.6730317*10**4*mach**2 - 1.2291490*10**4*mach + 1.7127795*10**3
     if 0.955 < mach < 0.9655:
         return -1.6067616*10*mach**2 + 3.0869911*10*mach - 1.4799698*10
@@ -132,7 +132,7 @@ def CD_interferencia(mach):
         return 1.963091*10**4*mach**4 - 7.7677873*10**4*mach**3 + 1.1526168*10**5*mach**2 - 7.6013338*10**4*mach + 1.8798642*10**4
     if 0.99 < mach < 1.38:
         return 2.5938426*10**(-2)*mach**2 - 7.3453378*10**(-2)*mach + 6.6405634*10**(-2)
-    if mach > 1.38:
+    if 1.38 < mach < 2:
         return 0.0002*mach**2 - 0.0008*mach + 0.0151
 
 def resistencia(vel, dens, c_d):
