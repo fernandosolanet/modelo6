@@ -4,88 +4,84 @@
 """
 
 from math import radians, cos, sin, degrees, pi
-
-from inputs_iniciales import Z0, M1, MASS
-from modelo_msise00 import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modeloISA import density, temperature, GAMMA, viscosity, pressure, R_AIR
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W, CD_interferencia
-from aero_avion import resistencia, sustentacion
+from aero_avion_interferencia import cl_alfa, angulo_ataque, k, cd0
+from aero_avion_interferencia import cd_inducida, S_W, CD_interferencia
+from aero_avion_interferencia import resistencia, sustentacion
 from aero_misil import cdll, SREF_MISIL
-from velocidad_crucero import vuelo_crucero
+from velocidad_crucero_interferencia import vuelo_crucero
 
 
-# -------------------CONDICIONES GRAVITATORIAS-------------------------
-G = 6.673e-11  # Constante de gravitacióN universal (N m2/kg2).
+# --------------------------CONDICIONES GRAVITATORIAS--------------------------
+G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
 MT = 5.972e24  # Masa terrestre (kg).
 MU = G * MT
 RT = 6378136.3  # Radio terrestre (m).
-GRAV = MU / RT**2  # AceleracióN de la gravedad a nivel del mar (m/s2).
+GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
 
 
-# -------------------CARACTERÍSTICAS DE LA AERONAVE--------------------
+# ------------------------CARACTERÍSTICAS DE LA AERONAVE-----------------------
 
 N = 3.5  # Factor de carga máximo.
-W = MASS * GRAV  # Peso del avióN (N).
+MASS = 14273  # Masa del avión cargado (kg).
+W = MASS * GRAV  # Peso del avión (N).
 
 BETA = 89
-
 BETA = radians(BETA)
-F = open('resultados', 'w')  # Fichero de escritura sin extensióN.
+F = open('resultados', 'w')  # Fichero de escritura sin extensión.
 
-
-# Las variables que se escriben a continuacióN corresponden al paso de
-# integracióN del avióN en cada paso.
-
+# Las variables que se escriben a continuación corresponden al paso de
+# integración del avión en cada paso
 F.write('TIME (s)\tALTURA lanzamiento (m) \tDesplazamiento (m)')
-F.write('\tVELOCIDAD (m/s)\tMACH\tALFA (deg) \tGAMMA (deg)')
+F.write('\tVELOCIDAD (m/s)\tMACH\tCD_avion \tRESISTENCIA')
+F.write('\tEMPUJE \tALFA (deg) \tGAMMA (deg)')
 F.write('\tTHETA (deg) \tfi (deg) \tpsi (deg) \tR \tE_MECANICA (J) \tD')
 
-# Las variables que es escriben en el archivo que aparecen a
-# continuacióN se corresponden con el punto final de maniobra del misil
-# para cada lanzamiento en cada paso de integracióN del misil
-
-F.write('\tTime (s) \tAltura \tDesplazamiento (m)')
-F.write('\tVelocidad \tMach \tFi_l \tPsi_l \tR_l \tEmec Misil \n')
+# Las variables que es escriben en el archivo que aparecen a continuación
+# se corresponden con el punto final de maniobra del misil para cada
+# lanzamiento en cada paso de integración del misil
+F.write('\tTime (s)  \tAltura \tDesplazamiento (m)')
+F.write('\tVelocidad  \tMach \tFi_l \tPsi_l \tR_l \tEmec Misil \n')
 
 # Cabezas de tabla.
+# -------------------------CONDICIONES INICIALES-------------------------
+# Ahora, para los próximos cálculos, se definen las variables termodinámicas
+# obtenidas del modelo ISA.
 
-# -------------------------CONDICIONES INICIALES-----------------------
-# Ahora, para los próximos cálculos, se definen las variables
-# termodinámicas obtenidas del modelo ISA.
-
+# Vectores velocidad, altura, fil y psil vacios, en ellos guardaremos
+# los valores de las distintas variables para su posterior uso.
 
 VELOCIDAD = []
 ALTURA = []
 FI_LIST = []
 PSI_LIST = []
 
-# Vectores VELOCIDAD, ALTURA, fil y psil vacios, en ellos guardaremos
-# los valores de las distintas variables para su posterior uso
-
-
+Z0 = 12000   # Altitud inicial del misil (m).
 R = RT + Z0  # Distancia desde el centro de la Tierra (m).
-G0 = gravity(Z0)  # AceleracióN gravitatoria inicial (m/s2).
+G0 = gravity(Z0)  # Aceleración gravitatoria inicial (m/s2).
 RHO = density(Z0)  # Densidad inicial del aire (kg/m3).
-P = pressure(Z0)  # PresióN inicial del aire (Pa).
+P = pressure(Z0)  # Presión inicial del aire (Pa).
 TEMPERATURE = temperature(Z0)  # Temperatura inicial del aire (K).
-MU_VICS = viscosity(Z0)  # Viscosidad inicial.
-W = MASS * G0  # Peso inicial del avióN dependiente de la gravedad
+MU_VISC = viscosity(Z0) # Viscosidad inicial.
+W = MASS * G0  # Peso inicial del avión dependiente de la gravedad.
 
-# A la ALTURA inicial el avión vuela en vuelo estacionario.
+# A la altura inicial el avión vuela en vuelo estacionario.
+M1 = 0.9  # Número de Mach inicial.
 M = vuelo_crucero(M1)
 V = M * (GAMMA * R_AIR * TEMPERATURE)**.5  # Velocidad inicial (m/s).
 
-CL_ALFA1 = cl_alfa(M)  # Pendiente del coeficiente de sustentacióN.
+CL_ALFA1 = cl_alfa(M)  # Pendiente del coeficiente de sustentación.
 
-# Ángulos de asiento, de ataque y de asiento de la VELOCIDAD iniciales.
+# Ángulos de asiento, de ataque y de asiento de la velocidad iniciales.
+
 ALFA_NUMERICO = 2 * W / (RHO * V**2 * S_W * CL_ALFA1)
 ALFA = angulo_ataque(ALFA_NUMERICO, M)  # Ángulo de ataque.
 ALFA_GRADOS = degrees(ALFA)  # Ángulo de ataque en grados.
-GAMA = 0  # Ángulo de asiento de la VELOCIDAD.
-GAMA_GRADOS = degrees(GAMA)
-# Ángulo de asiento de la VELOCIDAD en grados.
-THETA = GAMA + ALFA  # Ángulo de asiento de la VELOCIDAD.
+GAMA = 0  # Ángulo de asiento de la velocidad.
+GAMA_GRADOS = degrees(GAMA)  # Ángulo de asiento de la velocidad en grados.
+THETA = GAMA + ALFA  # Ángulo de asiento de la velocidad.
 THETA_GRADOS = degrees(THETA)  # Ángulo de asiento en grados.
 
 CL = 2 * W / (RHO * V**2 * S_W)
@@ -93,59 +89,57 @@ K1 = k(M)
 CD01 = cd0(M)
 CDMISIL_AVION = cdll(M, V)
 CD_INDUCIDA1 = cd_inducida(K1, CL)
-CD_interferencia1 = CD_interferencia(M)
-CD = CD01 + CD_INDUCIDA1  # Polar del avióN.  Coeficiente de resistencia.
-CD_avion = CD + 0.35*CD_interferencia1
+CD_INTERFERENCIA1 = CD_interferencia(M)
+CD = CD01 + CD_INDUCIDA1  # Polar del avión.  Coeficiente de resistencia.
+CD_AVION = CD + 0.35*CD_INTERFERENCIA1    #Añade resistencia de interferencia.
 
 
 # Fuerzas.
-D = resistencia(V, RHO, CD_avion)  # Resistencia aerodinámica (N).
+
+D_AVION = resistencia(V, RHO, CD_AVION)  # Resistencia aerodinámica (N).
+D_MISIL = 0.5 * RHO * CDMISIL_AVION * SREF_MISIL * V**2
+D = D_AVION + D_MISIL
 
 TH = thrust(M, RHO)  # Empuje (N).
 L = sustentacion(V, RHO, CL)
 
-# Esta es la ecuacion en eje horizontal T = D que es la condicion que
-# queremos cumplir por ello calculamos la diferencia y en el while se
-# intenta que sea 0
+# Esta es la ecuacion en eje horizontal T = D que es la condicion que queremos
+# cumplir,por ello calculamos la diferencia y en el while se intenta que sea 0.
 
-DIFERENCIA_T_D = TH - D
+DIFERENCIA_TH_D = TH - D
 
-# Ángulos de movimiento bidimensional terrestre iniciales
-PSI = 0  # Ángulo desplazado de la Tierra
-FI = - PSI - GAMA + pi / 2
-# Ángulo de la VELOCIDAD sobre vertical local
-PSI_GRADOS = degrees(PSI)  # Ángulo desplazado de la Tierra en grados
-FI_GRADOS = degrees(FI)
-# Ángulo VELOCIDAD sobre vertical local en grados
+# Ángulos de movimiento bidimensional terrestre iniciales.
+PSI = 0      # Ángulo desplazado de la Tierra.
+FI = - PSI - GAMA + pi / 2    # Ángulo de la velocidad sobre vertical local.
+PSI_GRADOS = degrees(PSI) # Ángulo desplazado de la Tierra en grados.
+FI_GRADOS = degrees(FI)   # Ángulo velocidad sobre vertical local en grados.
 
 VELOCIDAD.append(V)
 PSI_LIST.append(PSI_GRADOS)
 ALTURA.append(Z0)
 FI_LIST.append(FI_GRADOS)
-# ------------------------INICIO DE LA MANIOBRA------------------------
+# -------------------------INICIO DE LA MANIOBRA-------------------------
 
 
-# Se impone un valor constante del radio de giro, es decir, giro
-# ascendente a radio constante.  En futuras versiones de este cálculo,
-# esto se cambiará para buscar una solucióN más realista.  Por ahora,
-# con objeto de facilitar cálculos, se dejará así.
-
+# Se impone un valor constante del radio de giro, es decir, giro ascendente
+# a radio constante.  En futuras versiones de este cálculo, esto se
+# cambiará para buscar una solución más realista.  Por ahora, con objeto de
+# facilitar cálculos, se dejará así.
 RADIUS = V**2 / (G0 * (N - 1))  # Radio de giro inicial (m).
-# Este radio de giro se obtiene para la VELOCIDAD inicial en vuelo
-# estacionario y para un factor de carga máximo segúN los pilones de
-# carga, N = 3,5.
-DT = 0.01  # Diferencial de tiempo (s).
-
-# -----SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
-
-# Energías.
-E_CINETICA = .5 * MASS * V**2  # Energía cinética (J).
-E_POTENCIAL = MASS * G0 * Z0  # Energía potencial (J).
-E_MECANICA = E_CINETICA + E_POTENCIAL  # Energía mecánica (J).
+# Este radio de giro se obtiene para la velocidad inicial en vuelo
+# estacionario y para un factor de carga máximo según los pilones de carga
+# n = 3,5.
+DT = 0.1  # Diferencial de tiempo (s).
+'''------SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
+'''
+#Energías.
+ECINETICA = .5 * MASS * V**2  # Energía cinética (J).
+EPOTENCIAL = MASS * G0 * Z0  # Energía potencial (J).
+EMECANICA = ECINETICA + EPOTENCIAL  # Energía mecánica (J).
 
 N = L / W  # Factor de carga.
 
-# Condiciones iniciales para la integracióN.
+#Condiciones iniciales para la integración.
 T = 0
 X = 0
 Z = Z0
@@ -156,178 +150,173 @@ OMEGA = V / RADIUS  # Velocidad angular en la maniobra de giro (rad/s).
 # Segunda ley de Newton en el eje horizontal (ejes cuerpo).
 DV = DT * (TH * cos(ALFA) - D - W * cos(FI)) / MASS
 
-VX = V * sin(FI)  # Velocidad horizontal del avióN en ejes HL.
-VY = V * cos(FI)  # Velocidad vertical del avióN en ejes VL.
+VX = V * sin(FI)  # Velocidad horizontal del avión en ejes HL.
+VY = V * cos(FI)  # Velocidad vertical del avión en ejes VL.
 
-VXT = V * cos(GAMA)  # Veloc horizontal del avióN en ejes tierra.
-VYT = V * sin(GAMA)  # Veloc vertical del avióN en ejes tierra.
+VXT = V * cos(GAMA) # Velocidad horizontal del avión en ejes tierra (m/s).
+VYT = V * sin(GAMA) # Velocidad vertical del avión en ejes tierra (m/s).
 
-DX = VX * DT  # VariacióN horizontal de la posicióN en "Horizonte local"
-DZ = VY * DT  # VariacióN vertical de la posicióN en "Vertical local".
+DX = VX * DT  # Variación horizontal de la posición en "Horizonte local".
+DZ = VY * DT  # Variación vertical de la posición en "Vertical local".
 
-DXT = VXT * DT  # VariacióN horizontal de la posicióN en ejes tierra.
-DZT = VYT * DT  # VariacióN vertical de la posicióN en ejes tierra.
+DXT = VXT * DT  # Variación horizontal de la posición en ejes tierra (m/s).
+DZT = VYT * DT  # Variación vertical de la posición en ejes tierra (m/s).
 
-DTHETA = V * DT / RADIUS  # VariacióN del ángulo de asiento.
-DPSI = ((V*sin(FI))/(R))*DT  # VariacióN del ángulo de la vertical local
+DTHETA = V * DT / RADIUS  # Variación del ángulo de asiento.
+DPSI = ((V*sin(FI))/(R))*DT # Variación del ángulo de la vertical local.
 
-# IncializacióN de las primeras variables del misil.
-VL = V  # Se declara que la VELOCIDAD de lanz. del misil es la del avióN
-ML = VL / ((GAMMA * R_AIR * TEMPERATURE)**0.5)
-# Mach VELOCIDAD del misil.
+# Incialización de las primeras variables del misil.
+VL = V    # Se declara que la velocidad de lanz. del misil es la del avión.
+ML = VL / ((GAMMA * R_AIR * TEMPERATURE)**0.5) # Mach para velocidad del misil.
 CDL = cdll(ML, Z)  # Cd del misil para la cond. de vuelo.
 D_MISIL = 0.5 * RHO * CDL * SREF_MISIL * VL**2  # Resis. del misil.
 
 
-# ------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO------
+# -------SISTEMA DE ECUACIONES PARA SEGUNDO TRAMO: MANIOBRA DE GIRO-------
 # Ahora comienza el bucle relativo al giro ascendente, que analiza la
-# trayectoria con nuevas ecuaciones y condiciones de vuelo que se
-# detallan más afelante.  El significado de THETA < BETA implica que el
-#  bucle realice el cálculo requerido siempre que el ángulo THETA sea
-# menor que BETA.  Se ha obligado a que BETA sea el ángulo de final de
-# giro (al inicio del programa se le ha dado un rango de valores).
-# Por tanto, una vez que THETA sea igual a BETA, se dará por concluida
-# la maniobra de giro y se comenzará con el siguiente tramo. Todo ello
-# mientras la VELOCIDAD sea positiva, condicióN que permite ver si el
-# resultado es realista o no.
-
+# trayectoria con nuevas ecuaciones y condiciones de vuelo que se detallan
+# más afelante.  El significado de theta < beta implica que el bucle realice
+# el cálculo requerido siempre que el ángulo theta sea menor que beta.  Se ha
+# obligado a que beta sea el ángulo de final de giro (al inicio del programa
+# se le ha dado un rango de valores).  Por tanto, una vez que theta sea igual
+# a beta, se dará por concluida la maniobra de giro y se comenzará con el
+# siguiente tramo. Todo ello mientras la velocidad sea positiva, condición
+# que permite ver si el resultado es realista o no.
 
 while GAMA < BETA and V > 0:
-    # A continuacióN, se escriben en un fichero todas las variables aquí
-    # detalladas para cada valor de THETA < BETA.
+    # A continuación, se escriben en un fichero todas las variables aquí
+    # detalladas para cada valor de theta < beta.
 
-    # Ya que este análisis de maniobra, a diferencia del anterior
-    # lleva un cálculo para distintos valores de tiempo y VELOCIDAD,
-    # se debe programar su evolucióN en Términos de sus variaciones
-    # diferenciales.  Aquí se escriben los incrementos diferenciales
-    # de las coordenadas espaciales, temporales y de VELOCIDAD.
-    # Los diferenciales se obtienen del tramo anterior, y sirven para
-    # que estos nuevos valores actúen en las nuevas condiciones para
-    # calcular nuevas variables.
+    F.write('%.8f\t' %T)  # Tiempo (s).
+    F.write('%.8f\t' %Z)  # Altitud (m).
+    F.write('%.8f\t' %X) # Recorrido (m).
+    F.write('%.8f\t' %V) # Velocidad (m/s).
+    F.write('%.8f\t' %M)  # Número de Mach.
+    F.write('%.8f\t' %CD_AVION)    # Coeficiente de Resistencia.
+    F.write('%.8f\t' %D)
+    F.write('%.8f\t' %TH)
+    F.write('%.8f\t' %ALFA_GRADOS)  # Ángulo de ataque (grados).
+    F.write('%.8f\t' %GAMA_GRADOS)  # Asiento de la velocidad (grados).
+    F.write('%.8f\t' %THETA_GRADOS)  # Ángulo de asiento (grados).
+    F.write('%.8f\t' %FI_GRADOS)     # Ángulo del avión sobre la VL.
+    F.write('%.8f\n' %PSI_GRADOS)    # Ángulo de la vertical local.
 
-    F.write('%.8f\t' % T)  # Tiempo (s).
-    F.write('%.8f\t' % Z)  # Altitud (m).
-    F.write('%.8f\t' % X)  # Recorrido (m)
-    F.write('%.8f\t' % V)  # Velocidad (m/s).
-    F.write('%.8f\t' % M)  # Número de Mach.
-    F.write('%.8f\t' % D)  # Resistencia.
-    F.write('%.8f\t' % ALFA_GRADOS)  # Ángulo de ataque (grados).
-    F.write('%.8f\t' % GAMA_GRADOS)  # Asiento de la VELOCIDAD (grados).
-    F.write('%.8f\t' % THETA_GRADOS)  # Ángulo de asiento (grados).
-    F.write('%.8f\t' % FI_GRADOS)     # Ángulo del avióN sobre la VL.
-    F.write('%.8f\n' % PSI_GRADOS)    # Ángulo de la vertical local.
+    # Ya que este análisis de maniobra, a diferencia del anterior, lleva un
+    # cálculo para distintos valores de tiempo y velocidad, se debe
+    # programar su evolución en términos de sus variaciones diferenciales.
+    # Aquí se escriben los incrementos diferenciales de las coordenadas
+    # espaciales, temporales y de velocidad.  Los diferenciales se obtienen
+    # del tramo anterior, y sirven para que estos nuevos valores actúen en
+    # las nuevas condiciones para calcular nuevas variables.
 
-    # Inicio del cálculo de la maniobra del avióN
+    # Inicio del cálculo de la maniobra del avión.
 
-    # Incrementos
-    T = T + DT  # EvolucióN temporal (s).
+    # Incrementos.
+
+    T = T + DT  # Evolución temporal (s).
     V = V + DV  # Velocidad (m/s).
-    X = X + DX  # PosicióN horizontal-local (m).
-    XT = XT + DXT  # PosicióN horizontal en ejes tierra (m)
+    X = X + DX  # Posición horizontal-local (m).
+    XT = XT + DXT  # Posición horizontal en ejes tierra (m).
     Z = Z + DZ  # Altitud en horizonte-local (m).
     ZT = ZT + DZT  # Altitud en ejes del punto de lanzamiento.
 
-    # Guardamos las variables en la lista
+    # Guardamos las variables en la lista.
     VELOCIDAD.append(V)
     ALTURA.append(Z)
 
-    # GravitacióN
+    # Gravitación
     R = RT + Z  # Distancia al centro de la Tierra (m).
-    G = gravity(Z)  # AceleracióN de la gravedad (m/s2).
-    W = MASS * G  # Peso dependiente de la gravedad.
+    G = gravity(Z)  # Aceleración de la gravedad (m/s2).
+    W = MASS * G    # Peso dependiente de la gravedad
 
-    # Las variables termodinámicas habráN variado con la ALTURA.
+    # Las variables termodinámicas habrán variado con la altura.
     RHO = density(Z)  # Densidad (kg/m3).
     TEMPERATURE = temperature(Z)  # Temperatura (K).
-    MU_VICS = viscosity(Z)  # Viscosidad
+    MU_VISC = viscosity(Z) # Viscosidad
 
-    M = V / (GAMMA * R_AIR * TEMPERATURE)**.5  # Mach de vuelo.
-    N = 3.5  # Tomamos la condicióN de factor de carga máximo y cte.
-    RADIUS = V**2 / (G * (N - 1))  # Radio de giro varía con la veloc.
+    M = V / (GAMMA * R_AIR * TEMPERATURE)**.5 # Mach de vuelo.
+    N = 3.5  # Tomamos la condición de factor de carga máximo y constante.
+    RADIUS = V**2 / (G * (N - 1))  # Radio de giro varía con la velocidad.
 
-    # Las características aerodinámicas varían con el Número de Mach.
+    #Las características aerodinámicas varían con el número de Mach.
     CL_ALFA1 = cl_alfa(M)
     K1 = k(M)
     CD01 = cd0(M)
     ALFA_NUMERICO = 2 * W * N / (RHO * V**2 * S_W * CL_ALFA1)
-    # El nuevo ángulo de ataque resultará del nuevo factor de carga
-    # (antes 1 y ahora máximo), la nueva VELOCIDAD y las nuevas
-    # características aerodinámicas.
-
+    #El nuevo ángulo de ataque resultará del nuevo factor de carga (antes 1
+    # y ahora máximo), la nueva velocidad y las nuevas características
+    # aerodinámicas.
     ALFA = angulo_ataque(ALFA_NUMERICO, M)  # Ángulo de ataque.
     THETA = THETA + DTHETA  # Ángulo de asiento (empuje horizontal).
-    GAMA = THETA - ALFA  # Ángulo de asiento de la VELOCIDAD.
+    GAMA = THETA - ALFA  # Ángulo de asiento de la velocidad.
     PSI = PSI + DPSI     # Ángulo de vertical local
-    FI = - PSI - GAMA + pi / 2 
-    # Ángulo de la vel sobre la vertical local
+    FI = - PSI - GAMA + pi / 2  # Ángulo de la vel sobre la vertical local
 
-    # Ángulos en grados para la exportacióN a los ficheros.
+    # Ángulos en grados para la exportación a los ficheros.
     ALFA_GRADOS = degrees(ALFA)  # Ángulo de ataque (grados).
     THETA_GRADOS = degrees(THETA)  # Ángulo de asiento (grados).
-    GAMA_GRADOS = degrees(GAMA)  # Asiento de la VELOCIDAD (grados).
+    GAMA_GRADOS = degrees(GAMA)  # Asiento de la velocidad (grados).
     PSI_GRADOS = degrees(PSI)    # Ángulo de vertical local (grados).
-    FI_GRADOS = degrees(FI)  # Ángulo VELOCIDAD sobre la vertical
-    # local (grados).
+    FI_GRADOS = degrees(FI)  # Ángulo velocidad sobre la vert loca(grados).
 
-    # Guardamos las variables en la lista
+    'Guardamos las variables en la lista'
     PSI_LIST.append(PSI_GRADOS)
     FI_LIST.append(FI_GRADOS)
 
-    CL = ALFA * CL_ALFA1  # Coeficiente de sustentacióN.
+    CL = ALFA * CL_ALFA1  # Coeficiente de sustentación.
     N = .5 * RHO * V**2 * S_W * CL / W
 
-    # Nuevas proyecciones de la VELOCIDAD (ejes radiales y ejes
-    # posicióN inicial).
+    # Nuevas proyecciones de la velocidad
+    # (ejes radiales y ejes posición inicial).
 
-    VX = V * sin(FI)  # Velocidad horizontal en ejes locales
-    VY = V * cos(FI)  # Velocidad vertical en ejes locales
-    VXT = V * cos(GAMA)  # ProyeccióN horiz VELOCIDAD en ejes tierra
-    VYT = V * sin(GAMA)  # ProyeccióN vertical VELOCIDAD en ejes tierra
-    CD_INDUCIDA1 = cd_inducida(K1, CL)  # Coef. resistencia inducida
-    CD_interferencia1 = CD_interferencia(M)
+    VX = V * sin(FI) # Velocidad horizontal en ejes locales
+    VY = V * cos(FI) # Velocidad vertical en ejes locales
+    VXT = V * cos(GAMA) # Proyección horizontal velocidad en ejes tierra
+    VYT = V * sin(GAMA) # Proyección vertical velocidad en ejes tierra
+    CD_INDUCIDA1 = cd_inducida(K1, CL) # Coef. resistencia inducida
+    CD_INTERFERENCIA1 = CD_interferencia(M)
     CD = CD01 + CD_INDUCIDA1  # Coeficiente de resistencia total
-    CD_avion = CD + 0.35*CD_interferencia1
-    D = resistencia(V, RHO, CD_avion)  # Fuerza de resistencia (N).
-    L = N * W  # Fuerza de sustentacióN (N).
+    CD_AVION = CD + 0.35 * CD_INTERFERENCIA1
+    D = resistencia(V, RHO, CD_AVION)  # Fuerza de resistencia (N).
+    L = N * W  # Fuerza de sustentación (N).
 
-    # Energías.
-    E_CINETICA = .5 * MASS * V**2  # Energía cinética (J).
-    E_POTENCIAL = MASS * G * Z  # Energía potencial (J).
-    E_MECANICA = E_CINETICA + E_POTENCIAL  # Energía mecánica (J).
+    #Energías.
+    ECINETICA = .5 * MASS * V**2  # Energía cinética (J).
+    EPOTENCIAL = MASS * G * Z   # Energía potencial (J).
+    EMECANICA = ECINETICA + EPOTENCIAL  # Energía mecánica (J).
 
-    # Empuje.
+    #Empuje.
     TH = thrust(M, RHO)  # Empuje (N).
-    DIFERENCIA_T_D = TH - D  # Diferencia de empuje frente a resitencia.
+    DIFERENCIA_TH_D = TH - D # Diferencia de empuje frente a resitencia.
 
-    # Velocidad angular.
+    #Velocidad angular.
     OMEGA = V / RADIUS  # Velocidad angular (rad/s).
 
-    # Nuevas variaciones diferenciales.  Segunda ley de Newton.
+    #Nuevas variaciones diferenciales.  Segunda ley de Newton.
     DV = DT * (TH * cos(ALFA) - D - W * cos(FI)) / MASS
     DPSI = ((V * sin(FI)) / (R)) * DT
-    # Esta última ecuacióN nos permite obtener un nuevo incvremento de
-    # VELOCIDAD (m/s) que, al reiniciar el bucle será sumado al último
-    # valor de la VELOCIDAD, obteniendo la variacióN de la VELOCIDAD.
+    #Esta última ecuación nos permite obtener un nuevo incvremento de
+    # velocidad (m/s) que, al reiniciar el bucle será sumado al último
+    # valor de la velocidad, obteniendo la variación de la velocidad.
 
     # Diferenciales
-    DX = VX * DT  # VariacióN horizontal de la posicióN (m).
-    DZ = VY * DT  # VariacióN vertical de la posicióN (m).
+    DX = VX * DT  # Variación horizontal de la posición (m).
+    DZ = VY * DT  # Variación vertical de la posición (m).
 
-    DXT = VXT * DT  # VariacióN horiz. posicióN en ejes tierra (m/s).
-    DZT = VYT * DT  # VariacióN vertical posicióN en ejes tierra (m/s).
+    DXT = VXT * DT # Variación horizontal posición en ejes tierra (m/s).
+    DZT = VYT * DT # Variación vertical posición en ejes tierra (m/s).
 
-    DTHETA = OMEGA * DT  # VariacióN del ángulo de asiento
+    DTHETA = OMEGA * DT  # Variación del ángulo de asiento.
 
 
 F.close()
 
 # Como resumen:
-# 1) El código ha empezado en una condicióN de vuelo uniforme.
-# 2) La siguiente maniobra es un giro ascendente, a factor de carga
-# máximo y constante, y con mínima resistencia.
+# 1) El código ha empezado en una condición de vuelo uniforme.
+# 2) La siguiente maniobra es un giro ascendente, a factor de carga máximo y
+# constante, y con mínima resistencia.
 # 3) La última maniobra es un ascenso con el ángulo final del giro, con
-# coeficiente de sustentacióN óptimo.
-# Este programa nos exportará un total de 9 archivos (uno para cada
-# incremento de 10º del ángulo final de giro) que, exportados a Excel
-# nos permiten observar cómo cambian las variables segúN las condiciones
-# de vuelo.
+# coeficiente de sustentación óptimo.
+# Este programa nos exportará un total de 9 archivos (uno para cada incremento
+# de 10º del ángulo final de giro) que, exportados a Excel nos permiten
+# observar cómo cambian las variables según las condiciones de vuelo.
