@@ -61,6 +61,11 @@ DENSIT = [[1.2113, -1.0767e-4, 2.8143e-9],  # 0-11
 
 
 def interval_msise00(alt):
+    '''División de tramos del modelo atmosférico MSISE00
+
+    La variable de entrada alt es la altitud (m).  Debe ser menor o
+    igual que 799900 metros.
+    '''
     if alt < 11000:
         i = 0
     elif alt < 20000:
