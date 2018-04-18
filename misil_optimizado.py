@@ -155,8 +155,9 @@ for gasto in [14]:
 
             velocidad_ideal = v_orb - v_rotacional + v_loss - v0
             # Velocidad ideal, necesaria para 'f'.
-            f = ((1 + ratio_estructural) / exp(velocidad_ideal
-                 / (2 * isp1 * gravity(zl)))) - ratio_estructural
+            f = ((1 + ratio_estructural)
+                 / exp(velocidad_ideal
+                       / (2 * isp1 * gravity(zl)))) - ratio_estructural
             # Coeficiente dado por el optimizador.
 
             # MASAS DEL COHETE
