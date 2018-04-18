@@ -78,35 +78,37 @@ def cd0(mach):
     '''
     if mach <= 0.85:
 
-        return 0.0277
+        cd_0 = 0.0277
 
     elif 0.85 < mach <= 1:
 
-        return 0.1287 * mach - 0.0817
+        cd_0 = 0.1287 * mach - 0.0817
 
     elif 1 < mach <= 1.05:
 
-        return 0.036 * mach + 0.011
+        cd_0 = 0.036 * mach + 0.011
 
     elif 1.05 < mach <= 1.20:
 
-        return 0.014 * mach + 0.0341
+        cd_0 = 0.014 * mach + 0.0341
 
     elif 1.20 < mach <= 1.32:
 
-        return -0.0058 * mach + 0.0579
+        cd_0 = -0.0058 * mach + 0.0579
 
     elif 1.32 < mach <= 1.5:
 
-        return -0.0133 * mach + 0.0678
+        cd_0 = -0.0133 * mach + 0.0678
 
     elif 1.5 < mach <= 1.9:
 
-        return 0.0478
+        cd_0 = 0.0478
 
     elif 1.9 < mach <= 2:
 
-        return -0.019 * mach + 0.0839
+        cd_0 = -0.019 * mach + 0.0839
+
+    return cd_0
 
 
 def k(mach):
@@ -129,21 +131,25 @@ def cd_inducida(k_d, c_l):
     return k_d * c_l**2
 
 
-def CD_interferencia(mach):
+def cd_interferencia(mach):
+    '''Coeficiente de resistencia debido a la interferencia misil-avión.
+    '''
 
     if 0.7 < mach < 0.955:
-        return (4.9704382e3*mach**6 - 2.5004431e4*mach**5 + 5.2386095e4*mach**4
+        cd_i = (4.9704382e3*mach**6 - 2.5004431e4*mach**5 + 5.2386095e4*mach**4
                 - 5.8503607e4*mach**3 + 3.6730317e4*mach**2 - 1.2291490e4*mach
                 + 1.7127795e3)
     if 0.955 < mach < 0.9655:
-        return -1.6067616e1*mach**2 + 3.0869911e1*mach - 1.4799698e1
+        cd_i = -1.6067616e1*mach**2 + 3.0869911e1*mach - 1.4799698e1
     if 0.9655 < mach < 0.99:
-        return (1.963091e4*mach**4 - 7.7677873e4*mach**3 + 1.1526168e5*mach**2
+        cd_i = (1.963091e4*mach**4 - 7.7677873e4*mach**3 + 1.1526168e5*mach**2
                 - 7.6013338e4*mach + 1.8798642e4)
     if 0.99 < mach < 1.38:
-        return 2.5938426e-2*mach**2 - 7.3453378e-2*mach + 6.6405634e-2
+        cd_i = 2.5938426e-2*mach**2 - 7.3453378e-2*mach + 6.6405634e-2
     if 1.38 < mach < 2:
-        return 0.0002*mach**2 - 0.0008*mach + 0.0151
+        cd_i = 0.0002*mach**2 - 0.0008*mach + 0.0151
+
+    return cd_i
 
 
 def resistencia(vel, dens, c_d):
