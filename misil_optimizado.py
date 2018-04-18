@@ -1,27 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 @author: Team REOS
-Programa que nos permite calcular las masas del cohete a lanzar
-desde los distintos puntos de lanzamiento, optimizándolo para obtener
+Programa que nos permite calcular las masas del cohet a lanzar
+desde los distintos puntos de lanzamiento, optimizandolo para obtener
 la mínima masa total del cohete para una carga de pago dada o viceversa.
 Los cohetes optimizados son de 2 etapas y se lanzan desde los puntos
-obtenidos por el módulo avion.
+obtenidos por el modulo avion,
 """
 from math import radians, cos, sin, degrees, pi, exp
 
 from inputs_iniciales import AZ, LAT
 from modelo_msise00 import density, temperature, GAMMA, viscosity, R_AIR
-from gravedad import gravity
+from gravedad import gravity, RT
 from aero_misil import cdll, SREF_MISIL, SGASES
 from avion import VELOCIDAD, ALTURA, PSI_LIST, FI_LIST
 from velocidad_rotacional1 import vel_rotacional
 
-# --------------------------CONDICIONES GRAVITATORIAS-------------------
-G = 6.673e-11  # Constante de gravitación universal (N m2/kg2).
-MT = 5.972e24  # Masa terrestre (kg).
-MU = G * MT
-RT = 6378136.3  # Radio terrestre (m).
-GRAV = MU / RT**2  # Aceleración de la gravedad a nivel del mar (m/s2).
+
 FI_GRADOS = FI_LIST
 PSI_GRADOS = PSI_LIST
 
@@ -394,7 +389,7 @@ for gasto in [14]:
               '\n Masa del misil:   ', format(masa_total, '.0f'),
               '\n Altura:           ', format(zl, '.0f'),
               '\n Ángulo de llegada:', format(fil_grados, '.3f'),
-              '\n Masa útil:        ', format(masa_util, '.3f') + '\n')
+              '\n Masa útil:        ', format(masa_util, '.3f') + '.\n')
         print(' Gasto:          ', str(gasto),
               '\n Número de lista:', i, '\n',
               '\n------------------------------\n')
