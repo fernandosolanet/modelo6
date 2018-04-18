@@ -45,7 +45,7 @@ F.write('\tVelocidad \tMach \tFi_l \tPsi_l \tR_l \tEmec Misil \n')
 
 # -------------------------CONDICIONES INICIALES-----------------------
 # Ahora, para los próximos cálculos, se definen las variables
-# termodinámicas obtenidas del modelo ISA.
+# termodinámicas obtenidas del modelo atmosférico.
 
 
 VELOCIDAD = []
