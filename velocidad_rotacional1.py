@@ -6,7 +6,6 @@ Created on Tue Mar 13 14:47:11 2018
 """
 
 from math import cos, sin
-
 from gravedad import RT
 
 # LATtitudes del mundo (ciudades).
@@ -30,7 +29,13 @@ from gravedad import RT
 
 
 def vel_rotacional(altitud, latitud, azimut):
+    '''Velocidad rotacional en m/s.
 
-    V_ANGULAR = .7292e-4  # Velocidad angular terretre (rad/sg).
+    altitud :  altitud (m)
+    latitud :  latitud (rad)
+    azimut  :  azimut (rad)
+    '''
 
-    return V_ANGULAR * (RT + altitud) * cos(latitud) * sin(azimut)  # (m/sg)
+    v_angular = .7292e-4  # Velocidad angular terretre (rad/s).
+
+    return v_angular * (RT + altitud) * cos(latitud) * sin(azimut)  # (m/s)
