@@ -4,4 +4,4 @@
 
 
 1) Ejecutar avion.py.
-2) Ejecutar misil_optimizad.py.
+2) Ejecutar misil_optimizado.py.
