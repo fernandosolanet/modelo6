@@ -394,7 +394,7 @@ for gasto in [14]:
               '\n Masa del misil:   ', format(masa_total, '.0f'),
               '\n Altura:           ', format(zl, '.0f'),
               '\n Ángulo de llegada:', format(fil_grados, '.3f'),
-              '\n Masa útil:        ', format(masa_util, '.3f') + '.\n')
+              '\n Masa útil:        ', format(masa_util, '.3f') + '\n')
         print(' Gasto:          ', str(gasto),
               '\n Número de lista:', i, '\n',
               '\n------------------------------\n')
