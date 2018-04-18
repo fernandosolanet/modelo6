@@ -160,7 +160,7 @@ for gasto in [14]:
             # Coeficiente dado por el optimizador.
 
             # MASAS DEL COHETE
-            masa_util = (masa_total*(f**2)) / 1.06 # Masa inicial del cohete.
+            masa_util = (masa_total*(f**2)) / 1.06  # Masa inicial del cohete.
             masa_etapa2 = masa_util / f  # Masa de la segunda etapa.
             masa_propulsante_etapa1 = ((masa_total - masa_etapa2)
                                        / (1 + ratio_estructural))
