@@ -53,28 +53,28 @@ def coef_resistencia_base_misil(mach_misil):
         term_tres = 2.96129532
         term_cuatro = 0
     elif mach_misil < 1.1:
-        term_indep = 5.79090984*10**3
-        term_uno = -2.19843314*10**4
-        term_dos = 3.12774812*10**4
-        term_tres = -1.97644892*10**4
-        term_cuatro = 4.68059822*10**3
+        term_indep = 5.79090984e3
+        term_uno = -2.19843314e4
+        term_dos = 3.12774812e4
+        term_tres = -1.97644892e4
+        term_cuatro = 4.68059822e3
     elif mach_misil < 1.5:
         term_indep = -4.11856506
-        term_uno = 1.42267421*10**1
-        term_dos = -1.69678524*10**1
+        term_uno = 1.42267421e1
+        term_dos = -1.69678524e1
         term_tres = 8.771665
         term_cuatro = -1.67398037
     elif mach_misil < 2.2:
-        term_indep = 3.0748*10**-1
-        term_uno = -1.3258*10**-1
-        term_dos = 2.8812*10**-2
+        term_indep = 3.0748e-1
+        term_uno = -1.3258e-1
+        term_dos = 2.8812e-2
         term_tres = 0
         term_cuatro = 0
     elif mach_misil <= 3.5:
-        term_indep = 1.8481*10**-1
-        term_uno = -2.2895*10**-2
-        term_dos = 5.1876*10**-3
-        term_tres = -4.0742*10**-4
+        term_indep = 1.8481e-1
+        term_uno = -2.2895e-2
+        term_dos = 5.1876e-3
+        term_tres = -4.0742e-4
         term_cuatro = 0
     elif mach_misil > 3.5:
         term_indep = 0.15

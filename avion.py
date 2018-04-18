@@ -6,11 +6,12 @@
 from math import radians, cos, sin, degrees, pi
 
 from inputs_iniciales import Z0, M1, MASS
-from modelo_msise00 import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modelo_msise00 import (density, temperature, GAMMA, viscosity, pressure,
+                            R_AIR)
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W, CD_interferencia
-from aero_avion import resistencia, sustentacion
+from aero_avion import (cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W,
+                        cd_interferencia, resistencia, sustentacion)
 from aero_misil import cdll, SREF_MISIL
 from velocidad_crucero import vuelo_crucero
 
@@ -93,13 +94,13 @@ K1 = k(M)
 CD01 = cd0(M)
 CDMISIL_AVION = cdll(M, V)
 CD_INDUCIDA1 = cd_inducida(K1, CL)
-CD_interferencia1 = CD_interferencia(M)
+CD_INTERFERENCIA1 = cd_interferencia(M)
 CD = CD01 + CD_INDUCIDA1  # Polar del avióN.  Coeficiente de resistencia.
-CD_avion = CD + 0.35*CD_interferencia1
+CD_AVION = CD + 0.35*CD_INTERFERENCIA1
 
 
 # Fuerzas.
-D = resistencia(V, RHO, CD_avion)  # Resistencia aerodinámica (N).
+D = resistencia(V, RHO, CD_AVION)  # Resistencia aerodinámica (N).
 
 TH = thrust(M, RHO)  # Empuje (N).
 L = sustentacion(V, RHO, CL)
@@ -183,7 +184,7 @@ D_MISIL = 0.5 * RHO * CDL * SREF_MISIL * VL**2  # Resis. del misil.
 # Ahora comienza el bucle relativo al giro ascendente, que analiza la
 # trayectoria con nuevas ecuaciones y condiciones de vuelo que se
 # detallan más afelante.  El significado de THETA < BETA implica que el
-#  bucle realice el cálculo requerido siempre que el ángulo THETA sea
+# bucle realice el cálculo requerido siempre que el ángulo THETA sea
 # menor que BETA.  Se ha obligado a que BETA sea el ángulo de final de
 # giro (al inicio del programa se le ha dado un rango de valores).
 # Por tanto, una vez que THETA sea igual a BETA, se dará por concluida
@@ -198,7 +199,7 @@ while GAMA < BETA and V > 0:
 
     # Ya que este análisis de maniobra, a diferencia del anterior
     # lleva un cálculo para distintos valores de tiempo y VELOCIDAD,
-    # se debe programar su evolucióN en Términos de sus variaciones
+    # se debe programar su evolucióN en términos de sus variaciones
     # diferenciales.  Aquí se escriben los incrementos diferenciales
     # de las coordenadas espaciales, temporales y de VELOCIDAD.
     # Los diferenciales se obtienen del tramo anterior, y sirven para
@@ -258,7 +259,7 @@ while GAMA < BETA and V > 0:
     THETA = THETA + DTHETA  # Ángulo de asiento (empuje horizontal).
     GAMA = THETA - ALFA  # Ángulo de asiento de la VELOCIDAD.
     PSI = PSI + DPSI     # Ángulo de vertical local
-    FI = - PSI - GAMA + pi / 2 
+    FI = - PSI - GAMA + pi / 2
     # Ángulo de la vel sobre la vertical local
 
     # Ángulos en grados para la exportacióN a los ficheros.
@@ -284,10 +285,10 @@ while GAMA < BETA and V > 0:
     VXT = V * cos(GAMA)  # ProyeccióN horiz VELOCIDAD en ejes tierra
     VYT = V * sin(GAMA)  # ProyeccióN vertical VELOCIDAD en ejes tierra
     CD_INDUCIDA1 = cd_inducida(K1, CL)  # Coef. resistencia inducida
-    CD_interferencia1 = CD_interferencia(M)
+    CD_INTERFERENCIA1 = cd_interferencia(M)
     CD = CD01 + CD_INDUCIDA1  # Coeficiente de resistencia total
-    CD_avion = CD + 0.35*CD_interferencia1
-    D = resistencia(V, RHO, CD_avion)  # Fuerza de resistencia (N).
+    CD_AVION = CD + 0.35*CD_INTERFERENCIA1
+    D = resistencia(V, RHO, CD_AVION)  # Fuerza de resistencia (N).
     L = N * W  # Fuerza de sustentacióN (N).
 
     # Energías.

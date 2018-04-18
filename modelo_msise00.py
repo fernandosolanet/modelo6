@@ -9,7 +9,6 @@ Los datos se obtienen de la página
 https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php
 """
 
-
 # Constantes atmosféricas.
 R_AIR = 287  # Constante de los gases ideales (J/Kkg).
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
@@ -63,32 +62,17 @@ def interval_msise00(alt):
     La variable de entrada alt es la altitud (m).  Debe ser menor o
     igual que 800000 (8e5) metros.
     '''
-    if alt < 11000:
-        i = 0
-    elif alt < 20000:
-        i = 1
-    elif alt < 32000:
-        i = 2
-    elif alt < 47000:
-        i = 3
-    elif alt < 51000:
-        i = 4
-    elif alt < 71000:
-        i = 5
-    elif alt < 85000:
-        i = 6
-    elif alt < 105000:
-        i = 7
-    elif alt < 125000:
-        i = 8
-    elif alt < 180000:
-        i = 9
-    elif alt < 300000:
-        i = 10
-    elif alt < 440000:
-        i = 11
-    else:
-        i = 12
+    i = -1
+    tramos = [0, 11e3, 20e3, 32e3, 47e3, 51e3, 71e3, 85e3, 105e3, 125e3, 180e3,
+              300e3, 440e3, 800e3]
+    en_tramo = False
+    while not en_tramo:
+        i = i + 1
+        try:
+            en_tramo = tramos[i] <= alt and alt <= tramos[i+1]
+        except IndexError:
+            raise Exception('Altitud superior a los ' + str(tramos[i+1])
+                            + ' km')
     return i
 
 

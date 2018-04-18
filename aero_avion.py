@@ -12,7 +12,7 @@ relacionado con los mismos.
 from math import radians, pi, cos
 
 
-#-------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
+# ------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO------------------
 
 S_W = 49.2  # Superficie alar (m2).
 LF = 19.2  # Longitud del fuselaje (m).
@@ -34,6 +34,7 @@ M_C = 1 - (.065 * (cos(FLECHA))**.6) * (100 * ESPESOR)**.637814
 M_D = 1.08 * M_C  # Mach de divergencia.
 M_D098 = .98 * M_D
 
+
 def cl_alfa(mach):
     '''Cálculo de la pendiente del coeficiente de sustentación, que es lineal
     respecto del ángulo de ataque.  Este coeficiente varía con respecto al Mach
@@ -49,6 +50,7 @@ def cl_alfa(mach):
     elif mach < 1.05:
         return 4.1216 * mach**3 - 13.25 * mach**2 + 14.343 * mach - 1.8055
     return .7534 * mach**3 - 4.2913 * mach**2 + 6.5935 * mach + .3476
+
 
 def angulo_ataque(alfa_posible, mach):
     '''En función de si el ángulo de ataque obtenido es inferior o superior al
@@ -66,50 +68,55 @@ def angulo_ataque(alfa_posible, mach):
         return alfa_posible
     return angulo_perdida
 
+
 def cd0(mach):
-    '''Esta función calcula el CD0 del avión. Las ecuaciones se han implementado 
-    gracias a una gráfica que representa la variación de CD0 con respecto al Mach 
-    para el avión  F-4 Phantom. Las instrucciones if y elif se refieren a los 
-    distintos tramos de la gráfica en función del número de Mach. 
+    '''Esta función calcula el CD0 del avión. Las ecuaciones se han
+    implementado gracias a una gráfica que representa la variación de CD0 con
+    respecto al Mach para el avión  F-4 Phantom. Las instrucciones if y elif se
+    refieren a los distintos tramos de la gráfica en función del número de
+    Mach.
     '''
     if mach <= 0.85:
-        
-        return 0.0277
-    
+
+        cd_0 = 0.0277
+
     elif 0.85 < mach <= 1:
-        
-        return 0.1287 * mach - 0.0817
-    
-    elif 1 < mach <=1.05:
-        
-        return 0.036 * mach +0.011
-    
-    elif 1.05 < mach <=1.20:
-        
-        return 0.014 * mach + 0.0341
-    
+
+        cd_0 = 0.1287 * mach - 0.0817
+
+    elif 1 < mach <= 1.05:
+
+        cd_0 = 0.036 * mach + 0.011
+
+    elif 1.05 < mach <= 1.20:
+
+        cd_0 = 0.014 * mach + 0.0341
+
     elif 1.20 < mach <= 1.32:
-        
-        return -0.0058 * mach + 0.0579
-    
-    elif 1.32 < mach <=1.5:
-        
-        return -0.0133 * mach + 0.0678
-    
+
+        cd_0 = -0.0058 * mach + 0.0579
+
+    elif 1.32 < mach <= 1.5:
+
+        cd_0 = -0.0133 * mach + 0.0678
+
     elif 1.5 < mach <= 1.9:
-        
-        return 0.0478
-    
+
+        cd_0 = 0.0478
+
     elif 1.9 < mach <= 2:
-        
-        return -0.019 * mach + 0.0839
+
+        cd_0 = -0.019 * mach + 0.0839
+
+    return cd_0
+
 
 def k(mach):
     '''Coeficiente de resistencia inducida que multiplica al coeficiente
     de sustentación.
     '''
     fos = .005 * (1 + 1.5 * (ESTRECHAMIENTO - .6)**2)
-    #Este valor es una función lambda que aparece dentro del factor de Oswald.
+    # Este valor es una función lambda que aparece dentro del factor de Oswald.
     e_mach = 1 / ((1 + .12 * mach**2) * (1 + (.1 * (3 * NE + 1)) / (4 + AR)
                                          + (.142 + fos * AR * (10
                                                                * ESPESOR)**.33)
@@ -117,28 +124,39 @@ def k(mach):
     # Factor de Oswald.
     return 1 / (e_mach * pi * AR)
 
+
 def cd_inducida(k_d, c_l):
     '''Coeficiente de resistencia inducida.
     '''
     return k_d * c_l**2
 
-def CD_interferencia(mach):
-    
+
+def cd_interferencia(mach):
+    '''Coeficiente de resistencia debido a la interferencia misil-avión.
+    '''
+
     if 0.7 < mach < 0.955:
-       return 4.9704382*10**3*mach**6 - 2.5004431*10**4*mach**5 + 5.2386095*10**4*mach**4 - 5.8503607*10**4*mach**3 + 3.6730317*10**4*mach**2 - 1.2291490*10**4*mach + 1.7127795*10**3
+        cd_i = (4.9704382e3*mach**6 - 2.5004431e4*mach**5 + 5.2386095e4*mach**4
+                - 5.8503607e4*mach**3 + 3.6730317e4*mach**2 - 1.2291490e4*mach
+                + 1.7127795e3)
     if 0.955 < mach < 0.9655:
-        return -1.6067616*10*mach**2 + 3.0869911*10*mach - 1.4799698*10
+        cd_i = -1.6067616e1*mach**2 + 3.0869911e1*mach - 1.4799698e1
     if 0.9655 < mach < 0.99:
-        return 1.963091*10**4*mach**4 - 7.7677873*10**4*mach**3 + 1.1526168*10**5*mach**2 - 7.6013338*10**4*mach + 1.8798642*10**4
+        cd_i = (1.963091e4*mach**4 - 7.7677873e4*mach**3 + 1.1526168e5*mach**2
+                - 7.6013338e4*mach + 1.8798642e4)
     if 0.99 < mach < 1.38:
-        return 2.5938426*10**(-2)*mach**2 - 7.3453378*10**(-2)*mach + 6.6405634*10**(-2)
+        cd_i = 2.5938426e-2*mach**2 - 7.3453378e-2*mach + 6.6405634e-2
     if 1.38 < mach < 2:
-        return 0.0002*mach**2 - 0.0008*mach + 0.0151
+        cd_i = 0.0002*mach**2 - 0.0008*mach + 0.0151
+
+    return cd_i
+
 
 def resistencia(vel, dens, c_d):
     '''Fuerza aerodinámica de resistencia total.
     '''
     return .5 * dens * S_W * c_d * vel**2
+
 
 def sustentacion(vel, dens, c_l):
     '''Fuerza aerodinámica de sustentación total.

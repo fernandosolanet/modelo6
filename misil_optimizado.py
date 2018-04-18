@@ -155,12 +155,13 @@ for gasto in [14]:
 
             velocidad_ideal = v_orb - v_rotacional + v_loss - v0
             # Velocidad ideal, necesaria para 'f'.
-            f = ((1 + ratio_estructural) / exp(velocidad_ideal
-                 / (2 * isp1 * gravity(zl)))) - ratio_estructural
+            f = ((1 + ratio_estructural)
+                 / exp(velocidad_ideal
+                       / (2 * isp1 * gravity(zl)))) - ratio_estructural
             # Coeficiente dado por el optimizador.
 
             # MASAS DEL COHETE
-            masa_util = (masa_total*(f**2)) / 1.06 # Masa inicial del cohete.
+            masa_util = (masa_total*(f**2)) / 1.06  # Masa inicial del cohete.
             masa_etapa2 = masa_util / f  # Masa de la segunda etapa.
             masa_propulsante_etapa1 = ((masa_total - masa_etapa2)
                                        / (1 + ratio_estructural))
@@ -389,10 +390,14 @@ for gasto in [14]:
                       'con un error de ', error, ' m/s')
             contador = contador + 1
 
-        print('para ', theta_grados0, 'la masa del misil es ', masa_total,
-              ' la ALTURA es ', zl, ' y el angulo de llegada', fil_grados,
-              'la masa util es', masa_util)
-        print('El gasto es: ', gasto, 'el numeor de la lista es ', i)
+        print(' Theta:            ', format(theta_grados0, '.3f'),
+              '\n Masa del misil:   ', format(masa_total, '.0f'),
+              '\n Altura:           ', format(zl, '.0f'),
+              '\n Ángulo de llegada:', format(fil_grados, '.3f'),
+              '\n Masa útil:        ', format(masa_util, '.3f') + '.\n')
+        print(' Gasto:          ', str(gasto),
+              '\n Número de lista:', i, '\n',
+              '\n------------------------------\n')
 
         archivo.write('%.8f\t' % gasto)
         archivo.write('%.8f\t' % z0)
