@@ -12,7 +12,7 @@ from inputs_iniciales import Z0, MASS
 from modelo_msise00 import GAMMA, R_AIR, temperature, density
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import k, cd0, cd_inducida, S_W, CD_interferencia
+from aero_avion import k, cd0, cd_inducida, S_W, cd_interferencia
 from aero_avion import resistencia
 
 
@@ -37,7 +37,7 @@ def vuelo_crucero(mach):
     k_1 = k(mach)
     c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión.
 
-    cd_avion = c_d + CD_interferencia(mach)
+    cd_avion = c_d + cd_interferencia(mach)
     # Coeficiente de resistencia total.
 
     # Fuerzas.
@@ -63,7 +63,7 @@ def vuelo_crucero(mach):
         k_1 = k(mach)
         c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión.
 
-        cd_avion = c_d + CD_interferencia(mach)
+        cd_avion = c_d + cd_interferencia(mach)
         # Coeficiente de resistencia.
 
         # Fuerzas.
