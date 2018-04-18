@@ -6,10 +6,12 @@
 from math import radians, cos, sin, degrees, pi
 
 from inputs_iniciales import Z0, M1, MASS
-from modelo_msise00 import density, temperature, GAMMA, viscosity, pressure, R_AIR
+from modelo_msise00 import (density, temperature, GAMMA, viscosity, pressure,
+                            R_AIR)
 from gravedad import gravity
 from modelo_empuje import thrust
-from aero_avion import cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W, CD_interferencia
+from aero_avion import (cl_alfa, angulo_ataque, k, cd0, cd_inducida, S_W,
+                        CD_interferencia)
 from aero_avion import resistencia, sustentacion
 from aero_misil import cdll, SREF_MISIL
 from velocidad_crucero import vuelo_crucero
@@ -258,7 +260,7 @@ while GAMA < BETA and V > 0:
     THETA = THETA + DTHETA  # Ángulo de asiento (empuje horizontal).
     GAMA = THETA - ALFA  # Ángulo de asiento de la VELOCIDAD.
     PSI = PSI + DPSI     # Ángulo de vertical local
-    FI = - PSI - GAMA + pi / 2 
+    FI = - PSI - GAMA + pi / 2
     # Ángulo de la vel sobre la vertical local
 
     # Ángulos en grados para la exportacióN a los ficheros.
