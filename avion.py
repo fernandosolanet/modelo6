@@ -16,14 +16,10 @@ from aero_misil import cdll, SREF_MISIL
 from velocidad_crucero import vuelo_crucero
 
 
-# -------------------CONDICIONES GRAVITATORIAS-------------------------
-GRAV = gravity(0)  # Aceleración de la gravedad a nivel del mar (m/s2).
-
-
 # -------------------CARACTERÍSTICAS DE LA AERONAVE--------------------
 
 N = 3.5  # Factor de carga máximo.
-W = MASS * GRAV  # Peso del avión (N).
+W = MASS * gravity(0)  # Peso del avión (N).
 
 BETA = 89
 
