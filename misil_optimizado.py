@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 @author: Team REOS
-Programa que nos permite calcular las masas del cohet a lanzar
-desde los distintos puntos de lanzamiento, optimizandolo para obtener
+Programa que nos permite calcular las masas del cohete a lanzar
+desde los distintos puntos de lanzamiento, optimizándolo para obtener
 la mínima masa total del cohete para una carga de pago dada o viceversa.
 Los cohetes optimizados son de 2 etapas y se lanzan desde los puntos
-obtenidos por el modulo avion,
+obtenidos por el módulo avion.
 """
 from math import radians, cos, sin, degrees, pi, exp
 
