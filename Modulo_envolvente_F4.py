@@ -114,4 +114,4 @@ elif P5 < PESO < P6:
     mach_enve.append(Mfin)
     alt_enve.append(36.0)
 
-F.close() # Sentencia para cerrar el archivo de levtura "Envolventes"
+F.close() # Sentencia para cerrar el archivo de lectura "Envolventes"
