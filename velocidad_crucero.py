@@ -17,35 +17,34 @@ from aero_avion import resistencia
 
 
 def vuelo_crucero(mach):
-
-    '''Función que calcula la velocidad de crucero del avión. Los datos
+    '''Función que calcula la velocidad de crucero del avión.  Los datos
     iniciales los toma del módulo "datos".
     '''
 
-    temperature1 = temperature(Z0)  # Temperatura inicial.
-    rho = density(Z0)  # Densidad inicial del aire (kg/m3).
-    g_0 = gravity(Z0)  # Aceleración gravitatoria inicial (m/s2).
+    temperature1 = temperature(Z0)  # Temperatura inicial
+    rho = density(Z0)  # Densidad inicial del aire (kg/m3)
+    g_0 = gravity(Z0)  # Aceleración gravitatoria inicial (m/s2)
     weight = MASS * g_0
-    # Peso inicial del avión dependiente de la gravedad
+    # Peso inicial del avión dependiente de la gravedad.
     # A la altura inicial el avión vuela en vuelo estacionario.
     velocity = mach * (GAMMA * R_AIR * temperature1)**.5
-    # velocidad inicial (m/s).
+    # Velocidad inicial (m/s).
 
     # Coeficientes aerodinámicos
-    # Ecuacion de vuelo en crucero L = W
+    # Ecuación de vuelo en crucero L = W
     c_l = 2 * weight / (rho * velocity**2 * S_W)
     k_1 = k(mach)
-    c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión.
+    c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión
 
     cd_avion = c_d + cd_interferencia(mach)
-    # Coeficiente de resistencia total.
+    # Coeficiente de resistencia total
 
-    # Fuerzas.
+    # Fuerzas
     drag_aircraft = resistencia(velocity, rho, cd_avion)
-    # Resistencia aerodinámica (N).
-    thrust_aircraft = thrust(mach, rho)  # Empuje (N).
-    # Esta es la ecuacion en eje horizontal T = D que es la condicion
-    # que queremos cumplir por ello calculamos la diferencia y en el
+    # Resistencia aerodinámica (N)
+    thrust_aircraft = thrust(mach, rho)  # Empuje (N)
+    # Esta es la ecuación en eje horizontal T = D que es la condición
+    # que queremos cumplir.  Por ello calculamos la diferencia y en el
     # while se intenta que sea 0.
     diferencia_t_d = abs(thrust_aircraft - drag_aircraft)
     # Se hace el absoluto para que no haya problemas.
@@ -55,27 +54,27 @@ def vuelo_crucero(mach):
 
         mach = mach + dmach
         velocity = mach * (GAMMA * R_AIR * temperature1)**.5
-        # velocidad inicial (m/s).
+        # Velocidad inicial (m/s)
 
         # Coeficientes aerodinámicos
-        # Ecuacion de vuelo en crucero L = W
+        # Ecuación de vuelo en crucero L = W
         c_l = 2 * weight / (rho * velocity**2 * S_W)
         k_1 = k(mach)
-        c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión.
+        c_d = cd0(mach) + cd_inducida(k_1, c_l)  # Polar del avión
 
         cd_avion = c_d + cd_interferencia(mach)
-        # Coeficiente de resistencia.
+        # Coeficiente de resistencia
 
-        # Fuerzas.
+        # Fuerzas
         drag_aircraft = resistencia(velocity, rho, cd_avion)
-        # Resistencia aerodinámica (N).
-        thrust_aircraft = thrust(mach, rho)  # Empuje (N).
-        # Esta es la ecuacion en eje horizontal T = D que es la
-        # condicion que queremos cumplir por ello calculamos la
-        # diferencia y en el While se intenta que sea 0.
+        # Resistencia aerodinámica (N)
+        thrust_aircraft = thrust(mach, rho)  # Empuje (N)
+        # Esta es la ecuación en eje horizontal T = D que es la
+        # condición que queremos cumplir por ello calculamos la
+        # diferencia y en el while se intenta que sea 0
 
         diferencia_t_d = abs(thrust_aircraft - drag_aircraft)
 
-    print('El número de mach es: ', mach)
+    print('El número de Mach es', format(mach, '.4f'))
 
     return mach
