@@ -102,6 +102,30 @@ for i in F:  # Bucle para recorrer el archivo de texto
         alt_enve.append(enve)
         mach_enve.append(i[0])
 
+    elif PESO == 42777.0:
+        alt_enve.append(i[1])
+        mach_enve.append(i[0])
+
+    elif PESO == 43035.0:
+        alt_enve.append(i[2])
+        mach_enve.append(i[0])
+
+    elif PESO == 45472.0:
+        alt_enve.append(i[3])
+        mach_enve.append(i[0])
+
+    elif PESO == 46279.0:
+        alt_enve.append(i[4])
+        mach_enve.append(i[0])
+
+    elif PESO == 46537.0:
+        alt_enve.append(i[5])
+        mach_enve.append(i[0])
+
+    elif PESO == 48974.0:
+        alt_enve.append(i[6])
+        mach_enve.append(i[0])
+
 # Los siguientes condicionales añaden el último punto a las listas
 if P2 < PESO < P3:
     mach_enve.append(Mfin)
@@ -225,16 +249,25 @@ for i in range(size(grad)):
 
     coef = aprox_pol(P_MACH, P_ALT, k)  # Este resultado es un array
     if k == 4:
-        print('Tramo', i + 1, 'p(x) =', coef[0], '+', coef[1], '·x +', coef[2],
-              '·x**2 +', coef[3], '·x**3 +', coef[4], '·x**4')
+        print('\nTramo', i + 1, 'p(x) = {0:.2f}+ {1:.2f}·x +'.format(coef[0],
+                                                                     coef[1]),
+              '{0:.2f}·x**2 + {1:.2f}·x**3 + {2:.2f}·x**4'.format(coef[2],
+                                                                  coef[3],
+                                                                  coef[4]))
     elif k == 5:
-        print('Tramo', i + 1, 'p(x) =', coef[0], ' + ', coef[1], '·x +',
-              coef[2], '·x**2 +', coef[3], '·x**3 +', coef[4], '·x**4 +',
-              coef[5], '·x**5')
+        print('\nTramo', i + 1, 'p(x) = {0:.2f}+ {1:.2f}·x +'.format(coef[0],
+                                                                     coef[1]),
+              '{0:.2f}·x**2 + {1:.2f}·x**3 + {2:.2f}·x**4'.format(coef[2],
+                                                                  coef[3],
+                                                                  coef[4]),
+              '{0:.2f}·x**5'.format(coef[5]))
     elif k == 6:
-        print('Tramo', i + 1, 'p(x) =', coef[0], ' +', coef[1], '·x +',
-              coef[2], '·x**2 +', coef[3], '·x**3 +', coef[4], '·x**4 +',
-              coef[5], '·x**5 +', coef[6], '·x**6')
+        print('\nTramo', i + 1, 'p(x) = {0:.2f}+ {1:.2f}·x +'.format(coef[0],
+                                                                     coef[1]),
+              '{0:.2f}·x**2 + {1:.2f}·x**3 + {2:.2f}·x**4'.format(coef[2],
+                                                                  coef[3],
+                                                                  coef[4]),
+              '{0:.2f}·x**5 + {1:.2f}·x**6'.format(coef[5], coef[6]))
     else:
         print('No está considerado ese grado de polinomio')
 
