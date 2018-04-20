@@ -208,9 +208,9 @@ def coef_det(y_1, y_2, y_m):
     y_1 = array(y_1)
     y_2 = array(y_2)
     y_m = array(y_m)
-    r_1 = y_m - y_1
-    r_2 = y_m - y_2
-    R_2 = (dot(r_2, r_2))/(dot(r_1, r_1))
+    r_1 = y_2 - y_1  # Error residual
+    r_2 = y_2 - y_m  # Variación de regresion
+    R_2 = (dot(r_2, r_2))/(dot(r_1, r_1) + dot(r_2, r_2))  # Coef. determ.
 
     return R_2
 
@@ -240,7 +240,7 @@ for i in range(size(grad)):
 
     C.append(coef)
 
-# Calculo las altitudes medias para cada tramo
+# Cálculo de las altitudes medias para cada tramo
 
 TRAMOS_ALT_M = []  # Lista que contiene las sublistas de altitudes medias
 for i in range(3):
