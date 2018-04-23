@@ -95,7 +95,7 @@ for i in F:  # Bucle para recorrer el archivo de texto
     elif PESO > P6:
         if i[0] < 0.9:
             cte = -0.00043214
-        elif 0.9 <= i[0] >= 1:
+        elif 0.9 <= i[0] <= 1:
             cte = -0.000693476
         elif 1 < i [0]:
             cte = -0.001720016
