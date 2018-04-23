@@ -44,19 +44,16 @@ for i in F:  # Bucle para recorrer el archivo de texto
     if PESO < P1:
         if i[0] < 0.9:
             cte = -0.000478303
-            enve = i[1] + cte * (PESO - P1)
-            alt_enve.append(enve)
-            mach_enve.append(i[0])
-        elif 0.9 <= i[0] >= 1:
+
+        elif 0.9 <= i[0] <= 1:
             cte = -0.000322528
-            enve = i[1] + cte * (PESO - P1)
-            alt_enve.append(enve)
-            mach_enve.append(i[0])
+
         elif 1 < i[0]:
             cte = -0.001747212
-            enve = i[1] + cte * (PESO - P1)
-            alt_enve.append(enve)
-            mach_enve.append(i[0])
+
+        enve = i[1] + cte * (PESO - P1)
+        alt_enve.append(enve)
+        mach_enve.append(i[0])
 
     elif P1 < PESO < P2:
         enve = i[1] + (i[2]-i[1]) * (PESO - P1) / (P2 - P1)
