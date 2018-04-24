@@ -266,17 +266,17 @@ for i in range(40000, 53000, 500):
     OUT.write('\n\tCoef.det.: R_2= {0:.6f}\n'.format(R_cuad[0]))
     OUT.write('Tramo 2 ({0:.2f}, {1:.2f}): p(x)= '.format(dom_1, dom_2))
     if C_2[1] < 0 and C_2[2] < 0:
-        OUT.write('{0:.2f} - {1:.2f}x - {2:.2f}x**2'.format(C_2[0], abs(C_1[1]),
-                                                            abs(C_1[2])))
+        OUT.write('{0:.2f} - {1:.2f}x - {2:.2f}x**2'.format(C_2[0], abs(C_2[1]),
+                                                            abs(C_2[2])))
     elif C_2[1] < 0 and C_2[2] > 0:
-        OUT.write('{0:.2f} - {1:.2f}x + {2:.2f}x**2'.format(C_2[0], abs(C_1[1]),
-                                                            abs(C_1[2])))
+        OUT.write('{0:.2f} - {1:.2f}x + {2:.2f}x**2'.format(C_2[0], abs(C_2[1]),
+                                                            abs(C_2[2])))
     elif C_2[1] > 0 and C_2[2] < 0:
-        OUT.write('{0:.2f} + {1:.2f}x - {2:.2f}x**2'.format(C_2[0], abs(C_1[1]),
-                                                            abs(C_1[2])))
+        OUT.write('{0:.2f} + {1:.2f}x - {2:.2f}x**2'.format(C_2[0], abs(C_2[1]),
+                                                            abs(C_2[2])))
     else:
-        OUT.write('{0:.2f} + {1:.2f}x + {2:.2f}x**2'.format(C_2[0], abs(C_1[1]),
-                                                            abs(C_1[2])))
+        OUT.write('{0:.2f} + {1:.2f}x + {2:.2f}x**2'.format(C_2[0], abs(C_2[1]),
+                                                            abs(C_2[2])))
     if C_2[3] < 0 and C_2[4] < 0:
         OUT.write(' - {0:.2f}x**3 - {1:.2f}x**4'.format(abs(C_2[3]),
                                                         abs(C_2[4])))
