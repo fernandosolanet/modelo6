@@ -4,43 +4,43 @@ Created on Tue Apr 17 09:53:21 2018
 
 @author: Team REOS
 
-Módulo para sacar la envolvente de vuelo del avión F4. Como input tiene el 
+Módulo para sacar la envolvente de vuelo del avión F4. Como input tiene el
 PESO del avión cargado con el REOS. Se realiza una interpolación con las
 envolventes conocidas de unos pesos determinados y se realiza una aproximación
-polinómica de alto orden para recrear las ecuaciones de los límites de la 
+polinómica de alto orden para recrear las ecuaciones de los límites de la
 envolvente para el PESO de entrada.
 """
 
-#from inputs_iniciales import MASS
 from numpy import transpose, zeros, matmul, array, size, dot
 from numpy.linalg import cholesky, inv
+#from inputs_iniciales import MASS
 
 # Definción de variables. Todos los pesos en libras
-#PESO = MASS # Para cuando quitemos la línea de abajo e importemos directamente del otro módulo
-PESO = 47300.0  # Input de entrada. Peso del avión cargado con el cohete REOS
-P1 = 42777.0 
+#PESO = MASS # Para cuando importemos directamente del otro módulo
+PESO = 40000.0  # Input de entrada. Peso del avión cargado con el cohete REOS
+P1 = 42777.0
 P2 = 43035.0
 P3 = 45472.0
 P4 = 46279.0
 P5 = 46537.0
 P6 = 48974.0
 
-alt_enve = []  # Lista de valores de altitud de la curva límite de la envolvente
+alt_enve = []  # Lista valores de altitud de la curva límite de la envolvente
 mach_enve = []  # Lista de valores de Mach de la curva límite de la envolvente
 
 F = open("Envolventes.txt", 'r')  # Apertura del fichero de lectura.
 
 for i in F:  # Bucle para recorrer el archivo de texto
     i = i.strip()  # Sentencias para eliminar los espacios sobrantes de F
-    i = i.split() 
+    i = i.split()
     for j, a in enumerate(i):  # Bucle para recorrer las filas del archivo
             i[j] = float(i[j])  # Convierte los valores de strings a floats
     # Condicionales para separar los casos, las curvas entre las que hay que
     # interpolar. Interpolaciones lineales en altitud para mismo Mach
     # Para el último punto se realiza una interpolación lineal en el número
     # de Mach para igual valor final de altitud (36000ft)
-    # Para PESO < P1 y para PESO > P6 lo que se realiza es una extrapolación 
-    
+    # Para PESO < P1 y para PESO > P6 lo que se realiza es una extrapolación
+
     if PESO < P1:
         if i[0] < 0.9:
             cte = -0.000478303
@@ -64,15 +64,15 @@ for i in F:  # Bucle para recorrer el archivo de texto
         if i[0] <= 1.88:
             enve = i[2] + (i[3] - i[2]) * (PESO - P2) / (P3 - P2)
             alt_enve.append(enve)
-            mach_enve.append(i[0])                            
+            mach_enve.append(i[0])
         else:
-            Mfin = i[8] + (i[9] - i[8]) * (PESO - P2) / (P3 - P2)            
-    
+            Mfin = i[8] + (i[9] - i[8]) * (PESO - P2) / (P3 - P2)
+
     elif P3 < PESO < P4:
         if i[0] <= 1.78:
             enve = i[3] + (i[4] - i[3]) * (PESO - P3) / (P4 - P3)
             alt_enve.append(enve)
-            mach_enve.append(i[0])          
+            mach_enve.append(i[0])
         else:
             Mfin = i[9] + (i[10] - i[9]) * (PESO - P3) / (P4 - P3)
 
@@ -97,14 +97,14 @@ for i in F:  # Bucle para recorrer el archivo de texto
             cte = -0.00043214
         elif 0.9 <= i[0] <= 1:
             cte = -0.000693476
-        elif 1 < i [0]:
+        elif 1 < i[0]:
             cte = -0.001720016
-       
+
         if i[0] <= 1.5:
             enve = i[6] + cte * (PESO - P6)
             alt_enve.append(enve)
             mach_enve.append(i[0])
-        
+
     elif PESO == 42777.0:
         alt_enve.append(i[1])
         mach_enve.append(i[0])
@@ -132,7 +132,7 @@ for i in F:  # Bucle para recorrer el archivo de texto
 # Los siguientes condicionales añaden el último punto a las listas
 if P2 < PESO < P3:
     mach_enve.append(Mfin)
-    alt_enve.append(36.0)       
+    alt_enve.append(36.0)
 elif P3 < PESO < P4:
     mach_enve.append(Mfin)
     alt_enve.append(36.0)
@@ -143,7 +143,7 @@ elif P5 < PESO < P6:
     mach_enve.append(Mfin)
     alt_enve.append(36.0)
 
-F.close() # Sentencia para cerrar el archivo de lectura "Envolventes"
+F.close()  # Sentencia para cerrar el archivo de levtura "Envolventes"
 
 # Una vez tenemos los puntos para cierto peso, realizamos una aproximación
 # discreta por mínimos cuadrados
@@ -165,8 +165,12 @@ for i in range(fin_1 + 1):
 # Tramo 2: (punto de altitud maxima, punto de altitud minima)
 c_2 = 0  # Volvemos a poner el contador a 0
 
-while alt_enve[c_2 + fin_1] >= alt_enve[c_2 + fin_1 + 1]:
+while alt_enve[c_2 + fin_1] >= alt_enve[c_2 + fin_1 + 1] or c_2 < 4:
+    # Este 'or' funciona como si fuese un 'and' se tienen que cumplir las 2
+    # condiciones en el mismo bucle, que alt_enve[0] sea un mínimo y c_2 >= 4
     c_2 = c_2 + 1
+    if c_2 == 8:  # Condición de salida de bucle en el caso de que no haya
+        break     # mínimo y haya punto de inflexión
 
 fin_2 = c_2  # Primer punto de mínima altitud
 TRAMO2_MACH = []
@@ -227,10 +231,10 @@ def coef_det(y_1, y_2, y_m):
     """
     Cálculo del coeficiente de determinación (R**2) que resulta de utilizar el
     polinomio aproximado.
-    y_m = lista con valor medio de la altitud en el tramo, mismo tamaño que
+    y_m = lista del valor medio de la altitud en el tramo, mismo tamaño que
           y_1 y que y_2
     y_1 = altitudes obtenidas interpolando (reales)
-    y_2 = altitudes obtenidas con el polinomio (aproximadas con polinomio)
+    y_2 = altitudes obtenidas con el polinomio (aproximadas)
     """
     y_1 = array(y_1)
     y_2 = array(y_2)
@@ -252,21 +256,21 @@ for i in range(size(grad)):
 
     coef = aprox_pol(P_MACH, P_ALT, k)  # Este resultado es un array
     if k == 4:
-        print('\nTramo', i + 1, 'p(x) = {0:.2f}+ {1:.2f}·x +'.format(coef[0],
-                                                                     coef[1]),
+        print('\nTramo', i + 1, 'p(x) = {0:.2f} + {1:.2f}·x +'.format(coef[0],
+                                                                      coef[1]),
               '{0:.2f}·x**2 + {1:.2f}·x**3 + {2:.2f}·x**4'.format(coef[2],
                                                                   coef[3],
                                                                   coef[4]))
     elif k == 5:
-        print('\nTramo', i + 1, 'p(x) = {0:.2f}+ {1:.2f}·x +'.format(coef[0],
-                                                                     coef[1]),
+        print('\nTramo', i + 1, 'p(x) = {0:.2f} + {1:.2f}·x +'.format(coef[0],
+                                                                      coef[1]),
               '{0:.2f}·x**2 + {1:.2f}·x**3 + {2:.2f}·x**4'.format(coef[2],
                                                                   coef[3],
                                                                   coef[4]),
               '{0:.2f}·x**5'.format(coef[5]))
     elif k == 6:
-        print('\nTramo', i + 1, 'p(x) = {0:.2f}+ {1:.2f}·x +'.format(coef[0],
-                                                                     coef[1]),
+        print('\nTramo', i + 1, 'p(x) = {0:.2f} + {1:.2f}·x +'.format(coef[0],
+                                                                      coef[1]),
               '{0:.2f}·x**2 + {1:.2f}·x**3 + {2:.2f}·x**4'.format(coef[2],
                                                                   coef[3],
                                                                   coef[4]),
@@ -276,7 +280,7 @@ for i in range(size(grad)):
 
     C.append(coef)
 
-# Cálculo de las altitudes medias para cada tramo
+# Calculo las altitudes medias para cada tramo
 
 TRAMOS_ALT_M = []  # Lista que contiene las sublistas de altitudes medias
 for i in range(3):
@@ -320,3 +324,4 @@ print('\nLos coeficientes de determinación son para cada tramo:')
 print('\nTramo 1:\t', R_cuad[0])
 print('\nTramo 2:\t', R_cuad[1])
 print('\nTramo 3:\t', R_cuad[2])
+
