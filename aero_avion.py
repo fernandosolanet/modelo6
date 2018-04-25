@@ -12,7 +12,7 @@ relacionado con los mismos.
 from math import radians, pi, cos
 
 
-#-------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO-------------------
+# ------------------CARACTERÍSTICAS GEOMÉTRICAS DEL VEHÍCULO------------------
 
 S_W = 49.2  # Superficie alar (m2).
 LF = 19.2  # Longitud del fuselaje (m).
@@ -71,35 +71,52 @@ def angulo_ataque(alfa_posible, mach):
 
 def cd0(mach):
     '''Esta función calcula el CD0 del avión. Las ecuaciones se han
-    implementado gracias a una gráfica que representa la variación de
-    CD0 con respecto al Mach para el avión  F-4 Phantom.
+    implementado gracias a una gráfica que representa la variación de CD0 con
+    respecto al Mach para el avión  F-4 Phantom. Las instrucciones if y elif se
+    refieren a los distintos tramos de la gráfica en función del número de
+    Mach.
     '''
-    if mach <= .85:
-        cd_0 = .0277
-    elif .85 < mach <= 1:
-        cd_0 = .1287 * mach - .0817
+    if mach <= 0.85:
+
+        cd_0 = 0.0277
+
+    elif 0.85 < mach <= 1:
+
+        cd_0 = 0.1287 * mach - 0.0817
+
     elif 1 < mach <= 1.05:
-        cd_0 = .036 * mach + .011
-    elif 1.05 < mach <= 1.2:
-        cd_0 = .014 * mach + .0341
-    elif 1.2 < mach <= 1.32:
-        cd_0 = -.0058 * mach + .0579
+
+        cd_0 = 0.036 * mach + 0.011
+
+    elif 1.05 < mach <= 1.20:
+
+        cd_0 = 0.014 * mach + 0.0341
+
+    elif 1.20 < mach <= 1.32:
+
+        cd_0 = -0.0058 * mach + 0.0579
+
     elif 1.32 < mach <= 1.5:
-        cd_0 = -.0133 * mach + .0678
+
+        cd_0 = -0.0133 * mach + 0.0678
+
     elif 1.5 < mach <= 1.9:
-        cd_0 = .0478
+
+        cd_0 = 0.0478
+
     elif 1.9 < mach <= 2:
-        cd_0 = -.019 * mach + .0839
+
+        cd_0 = -0.019 * mach + 0.0839
+
     return cd_0
 
 
 def k(mach):
-    '''Coeficiente de resistencia inducida que multiplica al
-    coeficiente de sustentación.
+    '''Coeficiente de resistencia inducida que multiplica al coeficiente
+    de sustentación.
     '''
     fos = .005 * (1 + 1.5 * (ESTRECHAMIENTO - .6)**2)
-    # Este valor es una función lambda que aparece dentro del factor de
-    # Oswald.
+    # Este valor es una función lambda que aparece dentro del factor de Oswald.
     e_mach = 1 / ((1 + .12 * mach**2) * (1 + (.1 * (3 * NE + 1)) / (4 + AR)
                                          + (.142 + fos * AR * (10
                                                                * ESPESOR)**.33)
@@ -112,6 +129,27 @@ def cd_inducida(k_d, c_l):
     '''Coeficiente de resistencia inducida.
     '''
     return k_d * c_l**2
+
+
+def cd_interferencia(mach):
+    '''Coeficiente de resistencia debido a la interferencia misil-avión.
+    '''
+
+    if 0.7 < mach < 0.955:
+        cd_i = (4.9704382e3*mach**6 - 2.5004431e4*mach**5 + 5.2386095e4*mach**4
+                - 5.8503607e4*mach**3 + 3.6730317e4*mach**2 - 1.2291490e4*mach
+                + 1.7127795e3)
+    if 0.955 < mach < 0.9655:
+        cd_i = -1.6067616e1*mach**2 + 3.0869911e1*mach - 1.4799698e1
+    if 0.9655 < mach < 0.99:
+        cd_i = (1.963091e4*mach**4 - 7.7677873e4*mach**3 + 1.1526168e5*mach**2
+                - 7.6013338e4*mach + 1.8798642e4)
+    if 0.99 < mach < 1.38:
+        cd_i = 2.5938426e-2*mach**2 - 7.3453378e-2*mach + 6.6405634e-2
+    if 1.38 < mach < 2:
+        cd_i = 0.0002*mach**2 - 0.0008*mach + 0.0151
+
+    return cd_i
 
 
 def resistencia(vel, dens, c_d):
