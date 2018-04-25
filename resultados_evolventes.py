@@ -11,6 +11,9 @@ from numpy import transpose, zeros, matmul, array, size, dot
 from numpy.linalg import cholesky, inv
 from Modulo_envolvente_F4 import aprox_pol, coef_det
 
+C_TRAMOS1 = []
+C_TRAMOS2 = []
+C_TRAMOS3 = []
 for i in range(40000, 53000, 500):
     PESO = i
     P1 = 42777.0
@@ -91,7 +94,7 @@ for i in range(40000, 53000, 500):
                 cte = -0.001720016
 
             if i[0] <= 1.5:
-                enve = i[1] + cte * (PESO - P6)
+                enve = i[6] + cte * (PESO - P6)
                 alt_enve.append(enve)
                 mach_enve.append(i[0])
 
@@ -191,6 +194,9 @@ for i in range(40000, 53000, 500):
     C_1 = C[0]  # Array con los coeficientes del tramo 1
     C_2 = C[1]  # Array con los coeficientes del tramo 2
     C_3 = C[2]  # Array con los coeficientes del tramo 3
+    C_TRAMOS1.append(C_1)
+    C_TRAMOS2.append(C_2)
+    C_TRAMOS3.append(C_3)
 
     # Calculo las altitudes medias para cada tramo
 
