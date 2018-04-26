@@ -42,7 +42,7 @@ for i in range(40000, 53000, 500):
                 cte = -0.000322528
 
             elif 1 < i[0]:
-                cte = -0.001747212
+                cte = -0.0005
 
             enve = i[1] + cte * (PESO - P1)
             alt_enve.append(enve)
