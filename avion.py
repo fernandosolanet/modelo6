@@ -19,7 +19,7 @@ from altura_crucero import mach_envolvente
 from misil_optimizado_calculo_masa_total import misil
 
 archivo = open('orbita', "w")
-archivo.write('Altura lanzamiento \tAltura objetivo '
+archivo.write('Mach lanzamiento \tAltura lanzamiento \tAltura objetivo '
               '\tAngulo lanz \tTheta final \tVelocidad final'
               '\tmasa total  \tindice \n')
 
@@ -340,6 +340,7 @@ for i in range(50, len(mach_envolvente)):
     (z0, zl, theta_grados0, theta_grados, vl, masa_total, i) = misil(VELOCIDAD, ALTURA, FI_LIST, PSI_LIST, MACH)
     
 
+    archivo.write('%.8f\t' % mach_lanzamiento)
     archivo.write('%.8f\t' % z0)
     archivo.write('%.8f\t' % zl)
     archivo.write('%.8f\t' % theta_grados0)
