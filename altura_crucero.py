@@ -274,17 +274,3 @@ def crucero(TRAMOS_MACH, mach):
         return altura
 
     return altura
-
-def mach_inicio(mach):
-    if mach < 0.6:
-       m1 = float(input('Introduce un número de Mach que pertenezca a la envolvente: '))
-       mach = mach_inicio(m1)
-       return mach
-    elif  dom_3 < mach:
-       m1 = float(input('Introduce un número de Mach que pertenezca a la envolvente: '))
-       mach = mach_inicio(m1)
-       return mach
-    else:
-       return mach
-    return mach
-
