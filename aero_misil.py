@@ -149,7 +149,7 @@ def cd_wave_aletas(mach):
     '''Coeficiente de onda de las aletas.
     '''
     # RÉGIMEN SUPERSÓNICO
-    if mach >= 1:
+    if mach > 1:
         return 4 * TAO_ALETA**2 / (mach**2 - 1)**.5 * (SWTOTAL_ALETAS
                                                        / SREF_MISIL)
     # RÉGIMEN SUBSÓNICO.
