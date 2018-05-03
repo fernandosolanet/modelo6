@@ -341,11 +341,11 @@ for i in range(50, len(mach_envolvente)):
     
 
     archivo.write('%.8f\t' % z0)
-    archivo.write('%.8f\t' % theta_grados0)
     archivo.write('%.8f\t' % zl)
+    archivo.write('%.8f\t' % theta_grados0)
+    archivo.write('%.8f\t' % theta_grados)
     archivo.write('%.8f\t' % vl)
     archivo.write('%.8f\t' % masa_total)
-    archivo.write('%.8f\t' % theta_grados)
     archivo.write('%.8f\n' % i)
         
        
