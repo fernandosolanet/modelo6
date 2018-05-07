@@ -16,22 +16,30 @@ from aero_misil import cdll, SREF_MISIL
 
 from altura_crucero import crucero, TRAMOS_MACH
 from altura_crucero import mach_envolvente
-from misil_optimizado_calculo_masa_total import misil
+#from misil_optimizado_calculo_masa_total import misil
+from misil_optimizado import misil_carga_pago
 
-archivo = open('orbita', "w")
+
+
+# -------------------CARACTERÍSTICAS DE LA AERONAVE--------------------
+
+archivo = open('orbita_prueba', "w")
 archivo.write('Mach lanzamiento \tAltura lanzamiento \tAltura objetivo '
               '\tAngulo lanz \tTheta final \tVelocidad final'
               '\tmasa total  \tindice \n')
+a = 52
+b = len(mach_envolvente)
 
-# -------------------CARACTERÍSTICAS DE LA AERONAVE--------------------
-for i in range(50, len(mach_envolvente)):
+for i in range(a, b):
     
     N = 3.5  # Factor de carga máximo.
     W = MASS * gravity(0)  # Peso del avión (N).
     
     BETA = 89
     velo = str(mach_envolvente[i])
+    mach_lanzamiento = mach_envolvente[i]
     BETA = radians(BETA)
+    
     F = open(velo, 'w')  # Fichero de escritura sin extensión.
     
     
@@ -39,16 +47,13 @@ for i in range(50, len(mach_envolvente)):
     # integración del avión en cada paso.
     
     F.write('TIME (s)\tALTURA lanzamiento (m) \tDesplazamiento (m)')
-    F.write('\tVELOCIDAD (m/s)\tMACH\tALFA (deg) \tGAMMA (deg)')
-    F.write('\tTHETA (deg) \tfi (deg) \tpsi (deg) \tR \tE_MECANICA (J) \tD')
+    F.write('\tVELOCIDAD (m/s)\tMACH\tDRAG \tALFA (deg)')
+    F.write('\tGAMA (deg) \tTHETA (deg) \tfi (deg) \tpsi \n')
     
     # Las variables que es escriben en el archivo que aparecen a
     # continuación se corresponden con el punto final de maniobra del misil
     # para cada lanzamiento en cada paso de integración del misil
-    
-    F.write('\tTime (s) \tAltura \tDesplazamiento (m)')
-    F.write('\tVelocidad \tMach \tFi_l \tPsi_l \tR_l \tEmec Misil \n')
-    
+
     # Cabezas de tabla.
     
     # -------------------------CONDICIONES INICIALES-----------------------
@@ -151,7 +156,7 @@ for i in range(50, len(mach_envolvente)):
     # Este radio de giro se obtiene para la VELOCIDAD inicial en vuelo
     # estacionario y para un factor de carga máximo según los pilones de
     # carga, n = 3,5.
-    DT = 0.1  # Diferencial de tiempo (s).
+    DT = 0.01  # Diferencial de tiempo (s).
     
     # -----SISTEMA DE ECUACIONES PARA PRIMER TRAMO: VUELO ESTACIONARIO------
     
@@ -336,9 +341,14 @@ for i in range(50, len(mach_envolvente)):
     
         DTHETA = OMEGA * DT  # Variación del ángulo de asiento
         
+    if i == a:
+        iniciar = 1390 # Este numero no tienes que decidir tu,
+                      # para a = 45 es 130. Se corresponde al indice del vector del programa del misil
+    elif i != a:
+        iniciar  = j + 8
         
-    (z0, zl, theta_grados0, theta_grados, vl, masa_total, i) = misil(VELOCIDAD, ALTURA, FI_LIST, PSI_LIST, MACH)
-    
+    (z0, zl, theta_grados0, theta_grados, vl, masa_util, j) = misil_carga_pago(VELOCIDAD, ALTURA, FI_LIST, PSI_LIST, MACH, iniciar)
+    iniciar = j
 
     archivo.write('%.8f\t' % mach_lanzamiento)
     archivo.write('%.8f\t' % z0)
@@ -346,8 +356,8 @@ for i in range(50, len(mach_envolvente)):
     archivo.write('%.8f\t' % theta_grados0)
     archivo.write('%.8f\t' % theta_grados)
     archivo.write('%.8f\t' % vl)
-    archivo.write('%.8f\t' % masa_total)
-    archivo.write('%.8f\n' % i)
+    archivo.write('%.8f\t' % masa_util)
+    archivo.write('%.8f\n' % j)
         
        
     

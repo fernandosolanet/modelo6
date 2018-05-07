@@ -257,7 +257,7 @@ def crucero(TRAMOS_MACH, mach):
                   C_1[3]*mach**3 + C_1[4]*mach**4 + C_1[5]*mach**5)*1000*0.3048
                   
         print('La altura inicial de la maniobra del avión es: ', format(altura, '.3f'))
-        print('El mach inicial de la maniobra del avión es: ', format(mach, '.3f')
+        print('El mach inicial de la maniobra del avión es: ', format(mach, '.3f'))
         return altura
 
     elif dom_1 < mach <= dom_2:
@@ -265,7 +265,7 @@ def crucero(TRAMOS_MACH, mach):
                   C_2[3]*mach**3 + C_2[4]*mach**4)*1000*0.3048
                   
         print('La altura inicial de la maniobra del avión es: ', format(altura, '.3f'))
-        print('El mach inicial de la maniobra del avión es: ', format(mach, '.3f')
+        print('El mach inicial de la maniobra del avión es: ', format(mach, '.3f'))
         return altura
 
     elif dom_2 < mach <= mach_enve[-1]:
@@ -273,7 +273,7 @@ def crucero(TRAMOS_MACH, mach):
                   C_3[3]*mach**3 + C_3[4]*mach**4 + C_3[5]*mach**5 +
                   C_3[6]*mach**6)*1000*0.3048
         print('La altura inicial de la maniobra del avión es: ', format(altura, '.3f'))
-        print('El mach inicial de la maniobra del avión es: ', format(mach, '.3f')
+        print('El mach inicial de la maniobra del avión es: ', format(mach, '.3f'))
         return altura
 
     return altura
