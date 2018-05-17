@@ -4,20 +4,29 @@ Created on Tue Apr 17 09:53:21 2018
 
 @author: Team REOS
 
-Módulo para sacar la envolvente de vuelo del avión F4. Como input tiene el
-PESO del avión cargado con el REOS. Se realiza una interpolación con las
-envolventes conocidas de unos pesos determinados y se realiza una aproximación
-polinómica de alto orden para recrear las ecuaciones de los límites de la
-envolvente para el PESO de entrada.
+Módulo para sacar la envolvente de vuelo del avión F4 y la región optima de
+lanzamiento en función de la energía mecánica.
+
+Como input tiene el PESO del avión cargado con el REOS y la entrada manual en
+la consola de la eficiencia para la energía mecánica óptima.
+
+Se realiza una interpolación con las envolventes conocidas de unos pesos
+determinados y se realiza una aproximación polinómica de alto orden para
+recrear las ecuaciones de los límites de la envolvente para el PESO de entrada.
+A continuación se calcula el punto de energía mecánica óptimo y una región
+óptima de lanzamiento.
 """
 
 from numpy import transpose, zeros, matmul, array, size, dot
 from numpy.linalg import cholesky, inv
-#from inputs_iniciales import MASS
+from numpy import linspace
+import matplotlib.pyplot as plt
+from Modulo_Emecanica import opt_em, region_opt, alt_min
+# from inputs_iniciales import MASS
 
 # Definción de variables. Todos los pesos en libras
-#PESO = MASS # Para cuando importemos directamente del otro módulo
-PESO = 40000.0  # Input de entrada. Peso del avión cargado con el cohete REOS
+# PESO = MASS # Para cuando importemos directamente del otro módulo
+PESO = 39000  # Input de entrada. Peso del avión cargado con el cohete REOS
 P1 = 42777.0
 P2 = 43035.0
 P3 = 45472.0
@@ -166,8 +175,6 @@ for i in range(fin_1 + 1):
 c_2 = 0  # Volvemos a poner el contador a 0
 
 while alt_enve[c_2 + fin_1] >= alt_enve[c_2 + fin_1 + 1] or c_2 < 4:
-    # Este 'or' funciona como si fuese un 'and' se tienen que cumplir las 2
-    # condiciones en el mismo bucle, que alt_enve[0] sea un mínimo y c_2 >= 4
     c_2 = c_2 + 1
     if c_2 == 8:  # Condición de salida de bucle en el caso de que no haya
         break     # mínimo y haya punto de inflexión
@@ -280,6 +287,9 @@ for i in range(size(grad)):
 
     C.append(coef)
 
+C_1 = C[0]  # Coeficientes Tramo 1 (Grado 5)
+C_2 = C[1]  # Coeficientes Tramo 2 (Grado 4)
+C_3 = C[2]  # Coeficientes Tramo 3 (Grado 6)
 # Calculo las altitudes medias para cada tramo
 
 TRAMOS_ALT_M = []  # Lista que contiene las sublistas de altitudes medias
@@ -325,3 +335,48 @@ print('\nTramo 1:\t', R_cuad[0])
 print('\nTramo 2:\t', R_cuad[1])
 print('\nTramo 3:\t', R_cuad[2])
 
+# Calculamos el punto óptimo
+
+P_opt = opt_em(TRAMO3_MACH, C_3, PESO)
+
+# Calculamos la región óptima para una eficiencia de nu = 0.85
+
+nu = float(input('Introduzca el factor de rendimiento para EM: '))
+region = region_opt(P_opt, nu, PESO, C_3, TRAMO3_MACH[-1])
+
+x_1 = linspace(0.6, TRAMO1_MACH[-1], 50)
+x_2 = linspace(TRAMO1_MACH[-1], TRAMO2_MACH[-1], 25)
+x_3 = linspace(TRAMO2_MACH[-1], TRAMO3_MACH[-1], 100)
+
+EQ_T1 = (C_1[0] + C_1[1]*x_1 + C_1[2]*x_1**2 + C_1[3]*x_1**3 + C_1[4]*x_1**4 +
+         C_1[5]*x_1**5)
+EQ_T2 = (C_2[0] + C_2[1]*x_2 + C_2[2]*x_2**2 + C_2[3]*x_2**3 + C_2[4]*x_2**4)
+EQ_T3 = (C_3[0] + C_3[1]*x_3 + C_3[2]*x_3**2 + C_3[3]*x_3**3 + C_3[4]*x_3**4 +
+         C_3[5]*x_3**5 + C_3[6]*x_3**6)
+
+plt.plot(x_1, EQ_T1, 'k', label='Tramo 1')
+plt.plot(x_2, EQ_T2, 'k', label='Tramo 2')
+plt.plot(x_3, EQ_T3, 'k', label='Tramo 3')
+plt.plot(P_opt[0], P_opt[2], 'ro', label='Punto de eficiencia máxima')
+plt.plot(region[0], region[1], 'b.-', label='Región óptima de lanzamiento')
+
+plt.xlabel('Mach')
+plt.ylabel('Altitud ft x1000')
+plt.title('Envolvente F-4 peso: {0}'.format(PESO))
+
+plt.show()
+
+print('La energía mecánica máxima es: {0:.2f} J'.format(P_opt[1]))
+print('Para mach M = {0:.3f} y altitud {1:.3f} m'.format(P_opt[0],
+                                                         P_opt[2]*1000*0.3048))
+print('\nEn una parte de la región no será posible volar pues estará fuera de',
+      '\nla envolvente, ya que falta el tramo de abajo de ésta, pero no es de'
+      '\nnuestro inetrés pues intentaremos volar al límite de la envolvente')
+
+M_v = float(input('Introduzca el mach de vuelo: '))
+EM_opt = nu*P_opt[1]
+h_min = alt_min(EM_opt, M_v, PESO)
+print('Para un vuelo a '
+      'M = {0} se debe volvar al menos a {1:.2f} ft'.format(M_v, h_min))
+h_met = h_min*0.3048
+print('En metros: {0:.2f} m'.format(h_met))
