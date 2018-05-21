@@ -13,7 +13,9 @@ AZ = radians(90)  # Azimut de Lanzamiento dirección
 LAT = radians(0)  # Latitud inicial del avión
 LON = 0  # Longitud inicial del avión
 M1 = 0.8  # Número de Mach inicial
-MASS = 13273 + 700  # Masa del avión cargado (kg)
+MASS_MISIL = 700  # Masa del misil (kg)
+MASS_AVION = 13273  # Masa del avión (kg)
+MASS = MASS_MISIL + MASS_AVION  # Masa del avión cargado (kg)
 N = 3.5  # Factor de carga máximo
 
 # Caracterísiticas geométricas del misil
