@@ -9,6 +9,8 @@ Los datos se obtienen de la página
 https://ccmc.gsfc.nasa.gov/modelweb/models/nrlmsise00.php
 """
 
+from errores import ValorInadmisibleError
+
 # Constantes atmosféricas.
 R_AIR = 287  # Constante de los gases ideales (J/Kkg).
 RHO_SL = 101325 / (R_AIR * 288.15)  # Densidad a nivel del mar (kg/m3).
@@ -41,10 +43,10 @@ DENSIT = [[1.2113, -1.0767e-4, 2.8143e-9],  # 0-11
           [.028566, -1.1743e-6, 1.6299e-11, -7.6239e-17],  # 51-71
           [.021858322344, -9.8512966001e-7, 1.6779533018e-11,
            -1.279121248e-16, 3.6795165237e-22],  # 71-85
-          [.0184773359, -9.02942889e-7, 1.77206449e-11, -1.74478699e-16,
-           8.61428221e-22, -1.70529948e-27],  # 85-105
-          [.0021797892824, -8.9868100230e-8, 1.4845673183e-12,
-           -1.2280410364e-17, 5.0858382431e-23, -8.4346471933e-29],  # 105-125
+          [.018477335855, -9.0294288939e-7, 1.7720644879e-11,
+           -1.7447869942e-16, 8.6142822069e-22, -1.7052994766e-27],  # 85-105
+          [2.1772683977e-3, -8.9767045236e-8, 1.4829610326e-12,
+           -1.2267775208e-17, 5.0809300164e-23, -8.427136289e-29],  # 105-125
           [6.21790234479e-5, -2.35674472104e-9, 3.72303267358e-14,
            -3.13620341158e-19, 1.48529238085e-24, -3.74874972816e-30,
            3.938525302088e-36],  # 125-180
@@ -58,21 +60,21 @@ DENSIT = [[1.2113, -1.0767e-4, 2.8143e-9],  # 0-11
 
 
 def interval_msise00(alt):
-    '''División de tramos del modelo atmosférico MSISE00
+    '''División de tramos del modelo atmosférico MSISE00.
     La variable de entrada alt es la altitud (m).  Debe ser menor o
     igual que 800000 (8e5) metros.
     '''
+    if alt < 0:
+        raise ValorInadmisibleError(dict(alt=alt), '.0f', 'positivo')
+    elif alt > 8e5:
+        raise ValorInadmisibleError(dict(alt=alt), '.0f', 'menor que 800000')
     i = -1
     tramos = [0, 11e3, 20e3, 32e3, 47e3, 51e3, 71e3, 85e3, 105e3, 125e3, 180e3,
               300e3, 440e3, 800e3]
     en_tramo = False
     while not en_tramo:
         i = i + 1
-        try:
-            en_tramo = tramos[i] <= alt and alt <= tramos[i+1]
-        except IndexError:
-            raise Exception('Altitud superior a los ' + str(tramos[i+1])
-                            + ' km')
+        en_tramo = tramos[i] <= alt and alt <= tramos[i+1]
     return i
 
 

@@ -2,4 +2,6 @@
 # - El incremento del CD debido a la interferencial misil-avion
 # - Nuevo modulo que calcula la velocidad rotacional
 
-Ejecutar misil_optimizado.py.
+
+1) Ejecutar avion.py.
+2) Ejecutar misil_optimizado.py.

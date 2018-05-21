@@ -6,7 +6,7 @@ Coeficientes aerodinámicos de sustentación y de resistencia y todo
 aquello relacionado con los mismos.
 """
 
-from math import log10, pi, degrees, atan
+from math import log10, pi, degrees, atan, sqrt
 
 from modelo_msise00 import GAMMA, density, temperature, R_AIR, viscosity
 from inputs_iniciales import (DIAMETRO_M, LONGITUD_CONO, LONGITUD_MISIL,
@@ -18,34 +18,29 @@ from inputs_iniciales import (DIAMETRO_M, LONGITUD_CONO, LONGITUD_MISIL,
 # Ángulo del cono (deg).
 ANGULO_CONO = degrees(atan(.5 * DIAMETRO_M / LONGITUD_CONO))
 
-# Superficie exterior del cono (m2).
-SUP_CONO = pi * DIAMETRO_M / 2 * (LONGITUD_CONO**2 + DIAMETRO_M**2 / 4)**.5
+# Superficie exterior del cono (m2)
+SUP_CONO = pi * DIAMETRO_M / 2 * sqrt(LONGITUD_CONO**2 + DIAMETRO_M**2 / 4)
 
-# Superficie de referencia del misil (m2).
+# Superficie de referencia del misil (m2)
 SREF_MISIL = pi * DIAMETRO_M**2 / 4
 
 SUP_TOTAL = pi * DIAMETRO_M * (LONGITUD_MISIL - LONGITUD_CONO)
-# Superficie exterior del misil (m2).
+# Superficie exterior del cilindro (m2)
 SGASES = pi * (DIAMETRO_M * .45)**2
-# Área de salida de los gases (consideramos el área de salida de la tobera,
-# m2).
-RATIO_AREAS = 1 - SGASES / SREF_MISIL  # Relación de áreas.
-TAO_ALETA = ESPESOR_ALETA / CMEDIA_ALETA  # TAO de la aleta.
-SWTOTAL_ALETAS = SW_ALETA * NUM_ALETAS  # Superficie total de aletas (m2).
+# Área de salida de los gases (consideramos el área de salida de la
+# tobera, m2)
+RATIO_AREAS = 1 - SGASES / SREF_MISIL  # Relación de áreas
+TAO_ALETA = ESPESOR_ALETA / CMEDIA_ALETA  # TAO de la aleta
+SWTOTAL_ALETAS = SW_ALETA * NUM_ALETAS  # Superficie total de aletas (m2)
 
 
 def coef_resistencia_base_misil(mach_misil):
-    '''
-    Esta función define la resistencia de base del misil en función del
-    Mach
+    '''Esta función define la resistencia de base del misil en función del
+    Mach.
     '''
 
     if mach_misil < 0.8:
-        term_indep = 0
-        term_uno = 0
-        term_dos = 0
-        term_tres = 0
-        term_cuatro = 0
+        return 0
     elif mach_misil < 1:
         term_indep = -1.548523
         term_uno = 6.05972764
@@ -77,11 +72,7 @@ def coef_resistencia_base_misil(mach_misil):
         term_tres = -4.0742e-4
         term_cuatro = 0
     elif mach_misil > 3.5:
-        term_indep = 0.15
-        term_uno = 0
-        term_dos = 0
-        term_tres = 0
-        term_cuatro = 0
+        return .15
 
     return (term_cuatro * mach_misil**4 + term_tres * mach_misil**3 +
             term_dos * mach_misil**2 + term_uno * mach_misil +
@@ -89,24 +80,23 @@ def coef_resistencia_base_misil(mach_misil):
 
 
 def cfcono_misil(re_cono, machl):
-    '''
-    Coeficiente de fricción del cono.
+    '''Coeficiente de fricción del cono.
     '''
     # LAMINAR
     if re_cono < 1e6:
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE
         cfi_cono = .664 * re_cono**(-1 / 2)
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE
         cf_cono = 2 * cfi_cono
-        # CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO
         cfm_cono = cf_cono / (1 + .17 * machl**2)**.1295
     # TURBULENTO
     else:
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE
         cfi_cono = .288 / log10(re_cono)**2.45
-        # CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
+        # CALCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE
         cf_cono = cfi_cono * 1.597 / log10(re_cono)**.15
-        # CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO
         cfm_cono = cf_cono / (1 + (GAMMA - 1) / 2 * machl**2)**.467
     return cfm_cono * SUP_CONO / SREF_MISIL
 
@@ -117,19 +107,19 @@ def cfcil(re_cilindro, machl):
     '''
     # LAMINAR
     if re_cilindro < 1e6:
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE
         cfi_cil = .664 * re_cilindro**(-1 / 2)
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE
         cf_cil = 2 * cfi_cil
-        # CÁLCULO COEFICIENTE DE FRICCIÓN COMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO
         cfm_cil = cf_cil / (1 + .17 * machl**2)**.1295
     # TURBULENTO
     else:
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL INCOMPRESIBLE
         cfi_cil = .288 / log10(re_cilindro)**2.45
-        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL COMPRESIBLE
         cf_cil = cfi_cil * 1.597 / log10(re_cilindro)**.15
-        # CÁLCULO COEFICIENTE DE FRICCIÓN MEDIO.
+        # CÁLCULO COEFICIENTE DE FRICCIÓN LOCAL MEDIO
         cfm_cil = cf_cil / (1 + (GAMMA - 1) / 2 * machl**2)**.467
     return cfm_cil * SUP_TOTAL / SREF_MISIL
 
@@ -181,7 +171,7 @@ def cf_aletas(reyn_aleta, mach):
 def cdll(machl, alt):
     '''Coeficiente de resistencia total del misil.
     '''
-    vel = machl * (GAMMA * R_AIR * temperature(alt))**.5
+    vel = machl * sqrt(GAMMA * R_AIR * temperature(alt))
     # CÁLCULO DEL COEFICIENTE DE RESISTENCIA BASE.
     cd_base_misil = coef_resistencia_base_misil(machl) * RATIO_AREAS
     re_cono = density(alt) * vel * LONGITUD_CONO / viscosity(alt)

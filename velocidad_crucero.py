@@ -75,6 +75,6 @@ def vuelo_crucero(mach):
 
         diferencia_t_d = abs(thrust_aircraft - drag_aircraft)
 
-    print('El número de Mach es', format(mach, '.4f'))
+    print('El número de Mach es', format(mach, '.6f'))
 
     return mach
