@@ -6,10 +6,13 @@ Este módulo contiene las funciones matemáticas necesarias para el módulo
 launch.py.
 """
 
-from numpy import arctan, sqrt, pi, sign, array, cos, sin, arctan2, arccos, dot
+from numpy import (arctan, sqrt, pi, sign, array, cos, sin, arctan2, arccos,
+                   dot, radians, cross)
 from numpy.linalg import norm
 
 from gravedad import RT
+from velocidad_rotacional1 import OMEGA_R
+from avion import DT as DT_AVION
 
 
 def esfericas(vector):
@@ -153,3 +156,44 @@ def angulo_vectores(vec1, vec2):
     v1, v2 : array (3 componentes)
     '''
     return arccos(dot(vec1, vec2) / (norm(vec1) * norm(vec2)))
+
+
+EXPORTS = open('exports', 'r')
+ALTURA = EXPORTS.readline().split()
+VELOCIDAD = EXPORTS.readline().split()
+FI_LIST = EXPORTS.readline().split()
+PSI_LIST = EXPORTS.readline().split()
+EXPORTS.close()
+
+
+def condiciones_iniciales(indice, latitud, longitud, azimut):
+    '''Define las condiciones iniciales (tiempo <tiempo>, posición
+    <posicion> y velocidad <velocidad>) de cada punto de la trayectoria
+    del avión.
+
+    indice : int
+        Índice que señala cada punto de la trayectoria del avión.
+
+    latitud : float
+        Latitud inicial del avión (rad).
+
+    longitud : float
+        Longitud inicial del avión (rad).
+
+    azimut : float
+        Azimut inicial del avión (rad).
+    '''
+    tiempo = indice * DT_AVION
+    altura = float(ALTURA[indice])
+    psi = radians(float(PSI_LIST[indice]))
+    velocidad_inicial = float(VELOCIDAD[indice])
+    fil = radians(float(FI_LIST[indice]))
+
+    r_inicial = RT + altura
+    s_inicial = psi * RT
+    theta, phi, alpha = inicio(pi / 2 - latitud, longitud, azimut, s_inicial)
+    posicion = cartesianas([r_inicial, theta, phi])
+    velocidad = (vector_esf(velocidad_inicial, fil, alpha, posicion)
+                 + cross(OMEGA_R, posicion))
+
+    return tiempo, posicion, velocidad

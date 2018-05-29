@@ -14,7 +14,8 @@ from gravedad import RT
 DT = .05
 
 
-def step(mas, tie, pos, vel, gasto, isp, vloss=0, masa_minima=0, step_size=DT):
+def step(mas, tie, pos, vel, gasto, isp, vloss=0, masa_minima=0, step_size=DT,
+         perdidas=False):
     '''Paso de integración.
 
     mas : float
@@ -29,8 +30,24 @@ def step(mas, tie, pos, vel, gasto, isp, vloss=0, masa_minima=0, step_size=DT):
     vel : array (3 componentes)
         Velocidad.
 
+    gasto : float
+        Gasto másico.
+
+    isp : float
+        Impulso específico.
+
+    vloss : float
+        Pérdidas de velocidad. Por defecto es vloss=0.
+
+    masa_minima : float
+        Masa mínima. Por defecto es masa_minima=0.
+
     step_size : float
-        Salto temporal. Por defecto es step_size=0.01.
+        Salto temporal. Por defecto es step_size=DT (DT=0.05).
+
+    perdidas : bool
+        Indica si deben computarse las pérdidas de velocidad o no. Por
+        defecto es perdidas=False.
     '''
     dtl = step_size
     masa = mas - gasto * dtl
@@ -42,39 +59,60 @@ def step(mas, tie, pos, vel, gasto, isp, vloss=0, masa_minima=0, step_size=DT):
     posicion = pos + vel * dtl + 0.5 * acc * dtl**2
     velocidad = vel + acc * dtl
     # Pérdida de velocidad
-    pos_media = (pos + posicion) / 2
-    vel_media = (vel + velocidad) / 2
-    mas_media = (mas + masa) / 2
-    loss_aero = dtl * norm(resistencia(pos_media, vel_media)) / mas_media
-    loss_grav = dtl * (dot(peso(pos_media, mas_media), vel_media)
-                       / (norm(vel_media) * mas_media))
-    vloss = vloss + loss_aero + loss_grav
-
-    return masa, tiempo, posicion, velocidad, vloss
+    if perdidas:
+        pos_media = (pos + posicion) / 2
+        vel_media = (vel + velocidad) / 2
+        mas_media = (mas + masa) / 2
+        loss_aero = dtl * norm(resistencia(pos_media, vel_media)) / mas_media
+        loss_grav = dtl * (dot(peso(pos_media, mas_media), vel_media)
+                           / (norm(vel_media) * mas_media))
+        vloss = vloss + loss_aero + loss_grav
+        return masa, tiempo, posicion, velocidad, vloss
+    return masa, tiempo, posicion, velocidad
 
 
 def etapa(masa_etapa, masa_total, gasto, isp, posicion_inicial,
-          velocidad_inicial, tiempo_inicial=0, vloss=0,
-          step_size=DT, altura_maxima=inf, imprimir=False):
+          velocidad_inicial, tiempo_inicial=0, vloss=0, step_size=DT,
+          altura_maxima=inf, perdidas=False, imprimir=False):
     '''Ejecuta todos los pasos de integración de una etapa.
 
-    masa_inicial : float
-        Masa inicial.
+    masa_etapa : float
+        Masa inicial de la etapa.
 
-    pos : array (3 componentes)
+    masa_total : float
+        Masa total inicial del lanzador.
+
+    gasto : float
+        Gasto másico.
+
+    isp : float
+        Impulso específico.
+
+    posicion_inicial : array (3 componentes)
         Posición inicial.
 
-    vel : array (3 componentes)
+    velocidad_inicial : array (3 componentes)
         Velocidad inicial.
 
+    tiempo_inicial : float
+        Tiempo inicial. Por defecto es tiempo_inicial=0.
+
+    vloss : float
+        Pérdidas de velocidad. Por defecto es vloss=0.
+
     step_size : float
-        Salto temporal. Por defecto es step_size=0.01.
+        Salto temporal. Por defecto es step_size=DT (DT=0.05).
 
     altura_maxima : float
-        Altura máxima. Por defecto es 500000.
+        Altura máxima. Por defecto es altura_maxima=inf.
+
+    perdidas : bool
+        Indica si deben computarse las pérdidas de velocidad o no. Por
+        defecto es perdidas=False.
 
     imprimir : string
-        Nombre del archivo de escritura. Si False, no se escribe.
+        Nombre del archivo de escritura. Si imprimir=False, no se
+        escribe. Por defecto es imprimir=False.
     '''
     mase = masa_etapa
     masa = masa_total
@@ -93,10 +131,16 @@ def etapa(masa_etapa, masa_total, gasto, isp, posicion_inicial,
         # 1) que se haya superado la altura máxima
         # 2) que el misil esté cayendo
         # 3) que se haya consumido todo el combustible de la etapa
-        masa, tiempo, pos, vel, vloss = step(masa, tiempo, pos, vel, gasto,
-                                             isp, vloss=vloss,
-                                             masa_minima=resto,
-                                             step_size=step_size)
+        if perdidas:
+            masa, tiempo, pos, vel, vloss = step(masa, tiempo, pos, vel, gasto,
+                                                 isp, vloss=vloss,
+                                                 masa_minima=resto,
+                                                 step_size=step_size,
+                                                 perdidas=perdidas)
+        else:
+            masa, tiempo, pos, vel = step(masa, tiempo, pos, vel, gasto, isp,
+                                          masa_minima=resto,
+                                          step_size=step_size)
         altur = norm(pos) - RT
         mase = masa - resto
         consumido = mase <= 0
@@ -106,14 +150,47 @@ def etapa(masa_etapa, masa_total, gasto, isp, posicion_inicial,
                            + '\t' + format(altur, '.0f')
                            + '\t' + format(norm(vel), '.0f')
                            + '\t' + format(masa, '.1f'))
+    if perdidas:
+        return masa, tiempo, pos, vel, vloss
 
-    return masa, tiempo, pos, vel, vloss
+    return masa, tiempo, pos, vel
 
 
-def vuelo_libre(masa, posicion_inicial, velocidad_inicial, tiempo_de_vuelo=inf,
+def vuelo_libre(masa, posicion_inicial, velocidad_inicial, t_de_vuelo=inf,
                 tiempo_inicial=0, vloss=0, step_size=DT, altura_maxima=inf,
-                imprimir=False):
-    '''Integración del vuelo sin empuje.
+                perdidas=False, imprimir=False):
+    '''Ejecuta todos los pasos de integración de una etapa.
+
+    masa : float
+        Masa.
+
+    posicion_inicial : array (3 componentes)
+        Posición inicial.
+
+    velocidad_inicial : array (3 componentes)
+        Velocidad inicial.
+
+    t_de_vuelo : float
+
+    tiempo_inicial : float
+        Tiempo inicial. Por defecto es tiempo_inicial=0.
+
+    vloss : float
+        Pérdidas de velocidad. Por defecto es vloss=0.
+
+    step_size : float
+        Salto temporal. Por defecto es step_size=DT (DT=0.05).
+
+    altura_maxima : float
+        Altura máxima. Por defecto es altura_maxima=inf.
+
+    perdidas : bool
+        Indica si deben computarse las pérdidas de velocidad o no. Por
+        defecto es perdidas=False.
+
+    imprimir : string
+        Nombre del archivo de escritura. Si imprimir=False, no se
+        escribe. Por defecto es imprimir=False.
     '''
     t_vuelo = 0
     tiempo = tiempo_inicial
@@ -123,17 +200,23 @@ def vuelo_libre(masa, posicion_inicial, velocidad_inicial, tiempo_de_vuelo=inf,
     encendido = False
 
     while (altur < altura_maxima
-           and t_vuelo <= tiempo_de_vuelo
+           and t_vuelo <= t_de_vuelo
            and dot(pos, vel) >= 0):
         # Condiciones de parada:
         # 1) que se haya superado la altura máxima
         # 2) que se haya superado el tiempo de vuelo libre
         # 3) que el misil esté cayendo
-        if tiempo_de_vuelo < step_size + t_vuelo:
-            step_size = tiempo_de_vuelo - t_vuelo
+        if t_de_vuelo < step_size + t_vuelo:
+            step_size = t_de_vuelo - t_vuelo
             encendido = True
-        masa, t_vuelo, pos, vel, vloss = step(masa, t_vuelo, pos, vel, 0, 0,
-                                              vloss=vloss, step_size=step_size)
+        if perdidas:
+            masa, t_vuelo, pos, vel, vloss = step(masa, t_vuelo, pos, vel, 0,
+                                                  0, vloss=vloss,
+                                                  step_size=step_size,
+                                                  perdidas=perdidas)
+        else:
+            masa, t_vuelo, pos, vel = step(masa, t_vuelo, pos, vel, 0, 0,
+                                           step_size=step_size)
         altur = norm(pos) - RT
         tiempo = t_vuelo + tiempo_inicial
         if imprimir:
@@ -144,20 +227,63 @@ def vuelo_libre(masa, posicion_inicial, velocidad_inicial, tiempo_de_vuelo=inf,
         if encendido:
             break
 
-    return masa, tiempo, pos, vel, vloss
+    if perdidas:
+        return masa, tiempo, pos, vel, vloss
+
+    return masa, tiempo, pos, vel
 
 
 def lanzamiento(masas, estructuras, gastos, isps, posicion_inicial,
                 velocidad_inicial, retardos, tiempo=0, step_size=DT,
-                altura_maxima=inf, imprimir=False):
-    '''Calcula el lanzamiento del cohete multietapa.
+                alt_maxima=inf, perdidas=False, imprimir=False):
+    '''Ejecuta todos los pasos de integración de una etapa.
+
+    masas : array
+        Masas de las distintas etapas, incluyendo la masa de la carga de
+        pago como último elemento.
+
+    estructuras : array
+        Razones estructurales de las distintas etapas.
+
+    gastos : array
+        Gastos másicos de las distintas etapas.
+
+    isps : array
+        Impulsos específicos de las distintas etapas.
+
+    posicion_inicial : array (3 componentes)
+        Posición inicial.
+
+    velocidad_inicial : array (3 componentes)
+        Velocidad inicial.
+
+    retardos : array
+        Tiempos de retardo de encendido de las distintas etapas.
+
+    tiempo : float
+        Tiempo inicial. Por defecto es tiempo=0.
+
+    step_size : float
+        Salto temporal. Por defecto es step_size=DT (DT=0.05).
+
+    altura_maxima : float
+        Altura máxima. Por defecto es altura_maxima=inf.
+
+    perdidas : bool
+        Indica si deben computarse las pérdidas de velocidad o no. Por
+        defecto es perdidas=False.
+
+    imprimir : string
+        Nombre del archivo de escritura. Si imprimir=False, no se
+        escribe. Por defecto es imprimir=False.
     '''
     # Condiciones iniciales
     mas = sum(masas)
     pos = posicion_inicial
     vel = velocidad_inicial
     tie = tiempo
-    vloss = 0
+    if perdidas:
+        per = 0
     altur = norm(pos) - RT
     archivo = False
     if imprimir:
@@ -171,71 +297,71 @@ def lanzamiento(masas, estructuras, gastos, isps, posicion_inicial,
                       + '\t' + format(norm(vel), '.0f')
                       + '\t' + format(mas, '.1f'))
 
-    # Retardo de lanzamiento
-    if retardos[0] != 0:
-        mas, tie, pos, vel, vloss = vuelo_libre(mas, pos, vel,
-                                                tiempo_de_vuelo=retardos[0],
-                                                tiempo_inicial=tie,
-                                                vloss=vloss,
-                                                step_size=step_size,
-                                                altura_maxima=altura_maxima,
-                                                imprimir=archivo)
-        altur = norm(pos) - RT
-        if altur >= altura_maxima:
-            if imprimir:
-                archivo.close()
-            return mas, tie, pos, vel, vloss
-    # Primera etapa
-    mas, tie, pos, vel, vloss = etapa(masas[0] * (1 - estructuras[0]), mas,
-                                      gastos[0], isps[0], pos, vel,
-                                      tiempo_inicial=tie, vloss=vloss,
-                                      step_size=step_size,
-                                      altura_maxima=altura_maxima,
-                                      imprimir=archivo)
-    altur = norm(pos) - RT
-    if altur >= altura_maxima:
-        if imprimir:
-            archivo.close()
-        return mas, tie, pos, vel, vloss
-    mas = mas - masas[0] * estructuras[0]
-    # Retardo de etapa
-    if retardos[1] != 0:
-        mas, tie, pos, vel, vloss = vuelo_libre(mas, pos, vel,
-                                                tiempo_de_vuelo=retardos[1],
-                                                tiempo_inicial=tie,
-                                                vloss=vloss,
-                                                step_size=step_size,
-                                                altura_maxima=altura_maxima,
-                                                imprimir=archivo)
-        altur = norm(pos) - RT
-        if altur >= altura_maxima:
-            if imprimir:
-                archivo.close()
-            return mas, tie, pos, vel, vloss
-    # Segunda etapa
-    mas, tie, pos, vel, vloss = etapa(masas[1] * (1 - estructuras[1]), mas,
-                                      gastos[1], isps[1], pos, vel,
-                                      tiempo_inicial=tie, vloss=vloss,
-                                      step_size=step_size,
-                                      altura_maxima=altura_maxima,
-                                      imprimir=archivo)
-    altur = norm(pos) - RT
-    if altur >= altura_maxima:
-        if imprimir:
-            archivo.close()
-        return mas, tie, pos, vel, vloss
-    mas = mas - masas[1] * estructuras[1]
-    # Vuelo libre
-    mas, tie, pos, vel, vloss = vuelo_libre(mas, pos, vel, tiempo_inicial=tie,
-                                            vloss=vloss, step_size=step_size,
-                                            altura_maxima=altura_maxima,
+    for i, gas in enumerate(gastos):
+        # Retardo de encendido
+        if retardos[i] != 0:
+            if perdidas:
+                mas, tie, pos, vel, per = vuelo_libre(mas, pos, vel,
+                                                      t_de_vuelo=retardos[i],
+                                                      tiempo_inicial=tie,
+                                                      vloss=per,
+                                                      step_size=step_size,
+                                                      altura_maxima=alt_maxima,
+                                                      perdidas=perdidas,
+                                                      imprimir=archivo)
+            else:
+                mas, tie, pos, vel = vuelo_libre(mas, pos, vel,
+                                                 t_de_vuelo=retardos[i],
+                                                 tiempo_inicial=tie,
+                                                 step_size=step_size,
+                                                 altura_maxima=alt_maxima,
+                                                 imprimir=archivo)
+            altur = norm(pos) - RT
+            if altur >= alt_maxima:
+                if imprimir:
+                    archivo.close()
+                if perdidas:
+                    return mas, tie, pos, vel, per
+                return mas, tie, pos, vel
+        # Primera etapa
+        if perdidas:
+            mas, tie, pos, vel, per = etapa(masas[i] * (1 - estructuras[i]),
+                                            mas, gas, isps[i], pos, vel,
+                                            tiempo_inicial=tie, vloss=per,
+                                            step_size=step_size,
+                                            altura_maxima=alt_maxima,
+                                            perdidas=perdidas,
                                             imprimir=archivo)
-    altur = norm(pos) - RT
-    if altur >= altura_maxima:
-        if imprimir:
-            archivo.close()
-        return mas, tie, pos, vel, vloss
+        else:
+            mas, tie, pos, vel = etapa(masas[i] * (1 - estructuras[i]), mas,
+                                       gas, isps[i], pos, vel,
+                                       tiempo_inicial=tie, step_size=step_size,
+                                       altura_maxima=alt_maxima,
+                                       imprimir=archivo)
+        altur = norm(pos) - RT
+        if altur >= alt_maxima:
+            if imprimir:
+                archivo.close()
+            if perdidas:
+                return mas, tie, pos, vel, per
+            return mas, tie, pos, vel
+        mas = mas - masas[i] * estructuras[i]
+    # Vuelo libre
+    if perdidas:
+        mas, tie, pos, vel, per = vuelo_libre(mas, pos, vel,
+                                              tiempo_inicial=tie, vloss=per,
+                                              step_size=step_size,
+                                              altura_maxima=alt_maxima,
+                                              perdidas=perdidas,
+                                              imprimir=archivo)
+    else:
+        mas, tie, pos, vel = vuelo_libre(mas, pos, vel, tiempo_inicial=tie,
+                                         step_size=step_size,
+                                         altura_maxima=alt_maxima,
+                                         imprimir=archivo)
 
     if imprimir:
         archivo.close()
-    return mas, tie, pos, vel, vloss
+    if perdidas:
+        return mas, tie, pos, vel, per
+    return mas, tie, pos, vel

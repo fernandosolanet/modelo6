@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 @author: TeamREOS
-Módulo que contiene los inputs del programa
+Módulo que contiene los inputs del programa.
 """
 
-from math import radians
+from numpy import radians
 
 
 # Inputs de altura, posición, velocidad y masa del avión
@@ -13,9 +13,9 @@ AZ = radians(90)  # Azimut de Lanzamiento dirección
 LAT = radians(0)  # Latitud inicial del avión
 LON = 0  # Longitud inicial del avión
 M1 = 0.8  # Número de Mach inicial
-MASS_MISIL = 700  # Masa del misil (kg)
+MASS_MISIL = 1000
 MASS_AVION = 13273  # Masa del avión (kg)
-MASS = MASS_MISIL + MASS_AVION  # Masa del avión cargado (kg)
+MASS = MASS_MISIL + MASS_AVION
 N = 3.5  # Factor de carga máximo
 
 # Caracterísiticas geométricas del misil
