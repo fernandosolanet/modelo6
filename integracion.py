@@ -56,7 +56,7 @@ def step(mas, tie, pos, vel, gasto, isp, vloss=0, masa_minima=0, step_size=DT,
         dtl = (mas - masa_minima) / gasto
     tiempo = tie + dtl
     acc = aceleracion(pos, vel, (mas + masa) / 2, gasto, isp)
-    posicion = pos + vel * dtl + 0.5 * acc * dtl**2
+    posicion = pos + vel * dtl + .5 * acc * dtl**2
     velocidad = vel + acc * dtl
     # Pérdida de velocidad
     if perdidas:
