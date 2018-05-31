@@ -2,12 +2,12 @@
 """
 @author: Team REOS
 
-Este módulo contiene las funciones matemáticas necesarias para el módulo
-launch.py.
+Este módulo contiene las funciones matemáticas necesarias para la
+función <lanzamiento> del módulo integracion.py.
 """
 
-from numpy import (arctan, sqrt, pi, sign, array, cos, sin, arctan2, arccos,
-                   dot, radians, cross)
+from numpy import (arctan, sqrt, pi, sign, array, cos, sin, arctan2, radians,
+                   cross)
 from numpy.linalg import norm
 
 from gravedad import RT
@@ -16,8 +16,8 @@ from avion import DT as DT_AVION
 
 
 def esfericas(vector):
-    '''Calcula las coordenadas esféricas de un vector dado en
-    coordenadas cartesianas.
+    '''Calcula las coordenadas esféricas de un vector de posición dado
+    en coordenadas cartesianas.
 
     vector : array (3 componentes)
         vector[0] : float
@@ -55,8 +55,8 @@ def esfericas(vector):
 
 
 def cartesianas(vector):
-    '''Calcula las coordenadas cartesianas de un vector dado en
-    coordenadas esféricas.
+    '''Calcula las coordenadas cartesianas de un vector de posición dado
+    en coordenadas esféricas.
 
     vector : array (3 componentes)
         vector[0] : float
@@ -75,12 +75,13 @@ def cartesianas(vector):
     x_car = r_car * round(sin(theta_car), 15) * round(cos(phi_car), 15)
     y_car = r_car * round(sin(theta_car), 15) * round(sin(phi_car), 15)
     z_car = r_car * round(cos(theta_car), 15)
+
     return array([x_car, y_car, z_car])
 
 
 def inicio(theta0, phi0, alpha0, arc0):
     '''Calcula la colatitud <theta1>, la longitud <phi1> y el azimut
-    <alpha1> del punto final.
+    <alpha1> del punto inicial de la trayectoria del lanzador.
 
     theta0 : float
         Colatitud inicial (rad).
@@ -148,14 +149,6 @@ def vector_esf(modulo, inc, azimut, pos):
            - t_vec * round(sin(thet), 15))
 
     return array([x_1, x_2, x_3])
-
-
-def angulo_vectores(vec1, vec2):
-    '''Ángulo entre dos vectores.
-
-    v1, v2 : array (3 componentes)
-    '''
-    return arccos(dot(vec1, vec2) / (norm(vec1) * norm(vec2)))
 
 
 EXPORTS = open('exports', 'r')

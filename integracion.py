@@ -64,8 +64,8 @@ def step(mas, tie, pos, vel, gasto, isp, vloss=0, masa_minima=0, step_size=DT,
         vel_media = (vel + velocidad) / 2
         mas_media = (mas + masa) / 2
         loss_aero = dtl * norm(resistencia(pos_media, vel_media)) / mas_media
-        loss_grav = dtl * (dot(peso(pos_media, mas_media), vel_media)
-                           / (norm(vel_media) * mas_media))
+        loss_grav = -dtl * (dot(peso(pos_media, mas_media), vel_media)
+                            / (norm(vel_media) * mas_media))
         vloss = vloss + loss_aero + loss_grav
         return masa, tiempo, posicion, velocidad, vloss
     return masa, tiempo, posicion, velocidad
@@ -159,7 +159,7 @@ def etapa(masa_etapa, masa_total, gasto, isp, posicion_inicial,
 def vuelo_libre(masa, posicion_inicial, velocidad_inicial, t_de_vuelo=inf,
                 tiempo_inicial=0, vloss=0, step_size=DT, altura_maxima=inf,
                 perdidas=False, imprimir=False):
-    '''Ejecuta todos los pasos de integración de una etapa.
+    '''Ejecuta todos los pasos de integración del vuelo sin propulsión.
 
     masa : float
         Masa.
@@ -236,7 +236,7 @@ def vuelo_libre(masa, posicion_inicial, velocidad_inicial, t_de_vuelo=inf,
 def lanzamiento(masas, estructuras, gastos, isps, posicion_inicial,
                 velocidad_inicial, retardos, tiempo=0, step_size=DT,
                 alt_maxima=inf, perdidas=False, imprimir=False):
-    '''Ejecuta todos los pasos de integración de una etapa.
+    '''Ejecuta todos los pasos de integración del lanzamiento.
 
     masas : array
         Masas de las distintas etapas, incluyendo la masa de la carga de

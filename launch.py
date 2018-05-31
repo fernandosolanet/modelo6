@@ -56,10 +56,16 @@ if __name__ == '__main__':
                                          alt_maxima=7.999e5, perdidas=True,
                                          imprimir='14')
 
+#    print('\n\nÁngulo de asiento: '
+#          + format(90 - degrees(angulo_vectores(X, V)), '.2f') + ' deg')
     print('Velocidad del misil: '
           + format(norm(V) / vel_orbital(norm(X) - RT), '.3%')
           + ' de la velocidad orbital')
+#    print('Energía mecánica: ' + format(energia_mecanica(M, X, V), '.3e')
+#          + ' J')
 
+#    print('\nMasa final: ' + format(M, '.2f') + ' kg')
+#    print('\nTiempo de lanzamiento: ' + format(TIEMPO, '.3f') + ' s')
     print('Altura final: ' + format((norm(X) - RT) / 1000, '.3f') + ' km')
 
     print('\nMasa de la primera etapa: ' + format(MASAS[0], '.0f') + ' kg'

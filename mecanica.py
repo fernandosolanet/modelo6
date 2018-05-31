@@ -5,7 +5,7 @@
 Este módulo contiene la mecánica del lanzamiento.
 """
 
-from numpy import sqrt, cross
+from numpy import sqrt, cross, dot
 from numpy.linalg import norm
 
 from gravedad import gravity, MU, RT
@@ -17,7 +17,7 @@ G0 = 9.81  # Constante de normalización del impulso específico (m/s2)
 
 
 def empuje(gasto, impulso, vel):
-    '''Calcula el empuje del misil.
+    '''Calcula el empuje del lanzador.
 
     gasto : float
         Gasto másico.
@@ -49,7 +49,7 @@ def numero_mach(pos, vel):
 
 
 def resistencia(pos, vel):
-    '''Calcula la fuerza de resistencia del misil.
+    '''Calcula la fuerza de resistencia del lanzador.
 
     pos : array (3 componentes)
         Vector posición.
@@ -66,10 +66,13 @@ def resistencia(pos, vel):
 
 
 def peso(pos, mas):
-    '''Calcula el peso del misil.
+    '''Calcula el peso del lanzador.
 
     pos : array (3 componentes)
         Vector posición.
+
+    mas : float
+        Masa.
     '''
     altur = norm(pos) - RT
 
@@ -77,13 +80,22 @@ def peso(pos, mas):
 
 
 def aceleracion(pos, vel, mas, gasto, isp):
-    '''Calcula la aceleración total del misil.
+    '''Calcula la aceleración total del lanzador.
 
     pos : array (3 componentes)
         Vector posición.
 
     vel : array (3 componentes)
         Vector velocidad.
+
+    mas : float
+        Masa.
+
+    gasto : float
+        Gasto másico.
+
+    isp : float
+        Impulso específico.
     '''
     emp = empuje(gasto, isp, vel)  # Empuje
     res = resistencia(pos, vel)  # Resistencia
@@ -95,10 +107,19 @@ def aceleracion(pos, vel, mas, gasto, isp):
 
 
 def energia_mecanica(mas, pos, vel):
-    '''Cálculo de la energía mecánica del misil.
+    '''Calcula la energía mecánica del lanzador.
+
+    mas : float
+        Masa.
+
+    pos : array (3 componentes)
+        Vector posición.
+
+    vel : array (3 componentes)
+        Vector velocidad.
     '''
-    cin = 0.5 * mas * norm(vel)**2
-    pot = - MU * mas / norm(pos)
+    cin = .5 * mas * dot(vel, vel)
+    pot = -MU * mas / norm(pos)
     mec = cin + pot
 
     return mec
