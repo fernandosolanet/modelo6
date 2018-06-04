@@ -14,7 +14,7 @@ LAT = radians(0)  # Latitud inicial del avión
 LON = 0  # Longitud inicial del avión
 M1 = 0.8  # Número de Mach inicial
 MASS_MISIL = 1000
-MASS_AVION = 13273  # Masa del avión (kg)
+MASS_AVION = 18504  # Masa del avión (kg)
 MASS = MASS_MISIL + MASS_AVION
 N = 3.5  # Factor de carga máximo
 

@@ -10,8 +10,14 @@ from numpy import (arctan, sqrt, pi, sign, array, cos, sin, arctan2, radians,
                    cross)
 from numpy.linalg import norm
 
-from gravedad import RT
-from velocidad_rotacional1 import OMEGA_R
+import sys
+sys.path.insert(0, '/path/to/modulos')
+sys.path.insert(0, '/path/to/aerodinamica')
+sys.path.insert(0, '/path/to/atmosfera')
+sys.path.insert(0, '/path/to/empuje')
+
+from modulos.atmosfera.gravedad import RT
+from modulos.velocidad_rotacional1 import OMEGA_R
 from avion import DT as DT_AVION
 
 

@@ -8,8 +8,12 @@ Módulo que contiene las integraciones del movimiento
 from numpy import inf, dot
 from numpy.linalg import norm
 
+import sys
+sys.path.insert(0, '/path/to/modulos')
+sys.path.insert(0, '/path/to/atmosfera')
+
 from mecanica import aceleracion, resistencia, peso
-from gravedad import RT
+from modulos.atmosfera.gravedad import RT
 
 DT = .05
 

@@ -11,8 +11,12 @@ from time import time
 from numpy import array, inf
 from numpy.linalg import norm
 
+import sys
+sys.path.insert(0, '/path/to/modulos')
+sys.path.insert(0, '/path/to/atmosfera')
+
 from inputs_iniciales import LAT, LON, AZ
-from gravedad import vel_orbital, RT
+from modulos.atmosfera.gravedad import vel_orbital, RT
 from mecanica import energia_mecanica
 from apoyo import condiciones_iniciales, ALTURA
 from integracion import lanzamiento

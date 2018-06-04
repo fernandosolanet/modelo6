@@ -12,7 +12,7 @@ sys.path.insert(0, '/path/to/atmosfera')
 sys.path.insert(0, '/path/to/empuje')
 
 
-from modulos.inputs_iniciales import MASS
+from inputs_iniciales import MASS
 from modulos.atmosfera.modelo_msise00 import GAMMA, viscosity, R_AIR
 from modulos.atmosfera.modelo_msise00 import density, temperature, pressure
 from modulos.atmosfera.gravedad import gravity, RT

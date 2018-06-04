@@ -8,10 +8,16 @@ Este módulo contiene la mecánica del lanzamiento.
 from numpy import sqrt, cross, dot
 from numpy.linalg import norm
 
-from gravedad import gravity, MU, RT
-from modelo_msise00 import temperature, pressure, GAMMA, R_AIR
-from velocidad_rotacional1 import OMEGA_R
-from aero_misil import cdll, SREF_MISIL
+import sys
+sys.path.insert(0, '/path/to/modulos')
+sys.path.insert(0, '/path/to/aerodinamica')
+sys.path.insert(0, '/path/to/atmosfera')
+sys.path.insert(0, '/path/to/empuje')
+
+from modulos.atmosfera.gravedad import gravity, MU, RT
+from modulos.atmosfera.modelo_msise00 import temperature, pressure, GAMMA, R_AIR
+from modulos.velocidad_rotacional1 import OMEGA_R
+from modulos.aerodinamica.aero_misil import cdll, SREF_MISIL
 
 G0 = 9.81  # Constante de normalización del impulso específico (m/s2)
 

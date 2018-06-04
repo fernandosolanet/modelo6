@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 13 14:47:11 2018
-
-@autHor: diego.rodriguezparra
+@author: Team REOS
+Cálculo de la velocidad rotacional de la Tierra.
 """
 
-from math import cos, sin
-from gravedad import RT
+from numpy import cos, sin, pi, array
+from modulos.atmosfera.gravedad import RT
 
 # LATtitudes del mundo (ciudades).
 
@@ -28,14 +27,49 @@ from gravedad import RT
 # -90º Polo Sur.
 
 
-def vel_rotacional(altitud, latitud, azimut):
-    '''Velocidad rotacional en m/s.
+ANO_MEDIO = (365 * 400 + 100 - 1) / 400  # Año calendario medio en días
+PERIODO = ANO_MEDIO / (ANO_MEDIO + 1) * 24 * 60 * 60
+# Periodo de rotación de la Tierra
+V_ANGULAR = 2 * pi / PERIODO  # Velocidad angular rotacional
+OMEGA_R = array([0, 0, V_ANGULAR])  # Velocidad angular (rad/s)
 
-    altitud :  altitud (m)
-    latitud :  latitud (rad)
-    azimut  :  azimut (rad)
+
+def vel_rot_lon(altitud, latitud, azimut):
+    '''Componente longitudinal (paralela a la velocidad de vuelo) de la
+    velocidad rotacional en m/s.
+    altitud : float
+        Altitud (m)
+    latitud : float
+        Latitud (rad)
+    azimut : float
+        Azimut (rad)
     '''
 
-    v_angular = .7292e-4  # Velocidad angular terretre (rad/s).
+    return V_ANGULAR * (RT + altitud) * cos(latitud) * sin(azimut)
 
-    return v_angular * (RT + altitud) * cos(latitud) * sin(azimut)  # (m/s)
+
+def vel_rot_tra(altitud, latitud, azimut):
+    '''Componente transversal (perpendicular a la velocidad de vuelo) de la
+    velocidad rotacional en m/s.
+    altitud : float
+        Altitud (m)
+    latitud : float
+        Latitud (rad)
+    azimut : float
+        Azimut (rad)
+    '''
+
+    return V_ANGULAR * (RT + altitud) * cos(latitud) * cos(azimut)
+
+
+def vel_rot(altitud, latitud):
+    '''Módulo de la velocidad rotacional en m/s.
+    altitud : float
+        Altitud (m)
+    latitud : float
+        Latitud (rad)
+    azimut : float
+        Azimut (rad)
+    '''
+
+    return V_ANGULAR * (RT + altitud) * cos(latitud)
