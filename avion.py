@@ -5,19 +5,31 @@
 
 from math import radians, cos, sin, degrees, pi
 
-from inputs_iniciales import MASS
-from modelo_msise00 import GAMMA, viscosity, R_AIR
-from modelo_msise00 import density, temperature, pressure
-from gravedad import gravity, RT
-from modelo_empuje import thrust
-from aero_avion import cl, angulo_ataque, angulo_ataqueT, S_W, k, cd_inducida
-from aero_avion import cd_interferencia, cd0
-from aero_avion import resistencia, sustentacion
+import sys
+sys.path.insert(0, '/path/to/modulos')
+sys.path.insert(0, '/path/to/aerodinamica')
+sys.path.insert(0, '/path/to/atmosfera')
+sys.path.insert(0, '/path/to/empuje')
+
+
+from modulos.inputs_iniciales import MASS
+from modulos.atmosfera.modelo_msise00 import GAMMA, viscosity, R_AIR
+from modulos.atmosfera.modelo_msise00 import density, temperature, pressure
+from modulos.atmosfera.gravedad import gravity, RT
+
+from modulos.empuje.modelo_empuje import thrust
+from modulos.aerodinamica.aero_avion import cl, angulo_ataque, angulo_ataqueT, S_W, k, cd_inducida
+from modulos.aerodinamica.aero_avion import cd_interferencia, cd0
+from modulos.aerodinamica.aero_avion import resistencia, sustentacion
+
+
 
 
 
 
 lanz = open('lanzamientos.txt', 'r')
+
+#lanz = open('lanzamientos.txt', 'r')
 
 altura_inicio  = []
 mach_inicio = []
@@ -29,7 +41,7 @@ for line in lanz:
     mach_inicio.append(float(s[1]))  # Mach
 lanz.close()
 
-DT = 0.05  # Diferencial de tiempo (s).
+DT = 0.1  # Diferencial de tiempo (s).
 
 a = 0
 b = len(mach_inicio)
@@ -39,7 +51,7 @@ for i in range(a, b):
       N = 3.5  # Factor de carga máximo.
       BETA = radians(89)
       altura = str(round(altura_inicio[i],0))
-      nombre = str(altura+' metros')
+      nombre = str(altura+' m')
       F = open(nombre, 'w')  # Fichero de escritura sin extensión.
 
       # Las variables que se escriben a continuación corresponden al paso de
@@ -214,7 +226,8 @@ for i in range(a, b):
           F.write('%.8f\t' % GAMA_GRADOS)  # Asiento de la VELOCIDAD (grados)
           F.write('%.8f\t' % THETA_GRADOS)  # Ángulo de asiento (grados)
           F.write('%.8f\t' % FI_GRADOS)     # Ángulo del avión sobre la VL
-          F.write('%.8f\n' % PSI_GRADOS)    # Ángulo de la vertical local
+          F.write('%.8f\t' % PSI_GRADOS)    # Ángulo de la vertical local
+          F.write('%.8f\n' % ALFA_NUMERICO)  # Ángulo de ataque (grados)
 
           # Inicio del cálculo de la maniobra del avión
 
@@ -252,7 +265,7 @@ for i in range(a, b):
           # un ángulo de ataque que asegure que el avión en pérdida, es decir 
           # CL > 1 implica ángulos de ataque muy altos que no están implementados
           #por falta de información. 
-          if CL1 > 1:
+          if CL1 > 1.01691651:
               ALFA_NUMERICO = radians(50)
           else:
               ALFA_NUMERICO = round(angulo_ataque(M, CL1),5)
@@ -260,6 +273,7 @@ for i in range(a, b):
           # El nuevo ángulo de ataque resultará del nuevo factor de carga
           # (antes 1 y ahora máximo), la nueva VELOCIDAD y las nuevas
           # características aerodinámicas.
+#          ALFA_NUMERICO = round(angulo_ataque(M, CL1),5)
           ALFA_NUMERICO_GRADOS = degrees(ALFA_NUMERICO)
           ALFA = round(angulo_ataqueT(ALFA_NUMERICO, M),5)  # Ángulo de ataque.
           
