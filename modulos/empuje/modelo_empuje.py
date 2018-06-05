@@ -14,9 +14,11 @@ a cada altura en la que nos estemos moviendo.
 
 from math import exp
 
-from modelo_msise00 import density
+import sys
+sys.path.insert(0, '/path/to/atmosfera')
+from modulos.atmosfera.modelo_msise00 import density
 
-TH_SL = 170000  # Empuje a nivel del mar (máximo).
+TH_SL = 158000  # Empuje a nivel del mar (máximo).
 
 
 def thrust(mach, den):

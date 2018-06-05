@@ -8,7 +8,7 @@ aquello relacionado con los mismos.
 
 from math import log10, pi, degrees, atan, sqrt
 
-from modelo_msise00 import GAMMA, density, temperature, R_AIR, viscosity
+from modulos.atmosfera.modelo_msise00 import GAMMA, density, temperature, R_AIR, viscosity
 from inputs_iniciales import (DIAMETRO_M, LONGITUD_CONO, LONGITUD_MISIL,
                               NUM_ALETAS, ESPESOR_ALETA, CMEDIA_ALETA,
                               CRAIZ_ALETA, SW_ALETA)
