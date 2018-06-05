@@ -7,11 +7,11 @@ Módulo que contiene los inputs del programa
 from math import radians
 
 # Inputs de altura, posición velocidad y masa del avión.
-PESO_SI = 20000
+PESO_SI = 19504
 AZ = radians(90)   # AZimut de Lanzamiento dirección (grados).
 LAT = radians(0)  # LATitud Terrestre desde donde se (grados).
 #M1 = input('Introduce un mach entre')   # Número de Mach inicial.
-MASS = 20000  # Masa del avión cargado (kg).
+MASS = 19504  # Masa del avión cargado (kg).
 
 
 # Caracterísiticas geométricas del misil.
