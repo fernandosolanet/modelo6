@@ -12,7 +12,7 @@ sys.path.insert(0, '/path/to/atmosfera')
 sys.path.insert(0, '/path/to/empuje')
 
 
-from inputs_iniciales import MASS
+from modulos.inputs_iniciales import MASS
 from modulos.atmosfera.modelo_msise00 import GAMMA, viscosity, R_AIR
 from modulos.atmosfera.modelo_msise00 import density, temperature, pressure
 from modulos.atmosfera.gravedad import gravity, RT
@@ -27,11 +27,7 @@ from misil_optimizado import misil_carga_pago
 
 
 
-archivo = open('orbita_prueba', "w")
-archivo.write('Mach inicial \tVelocidad inicial \tAltura inicial \tEnergía mecánica del avión al inicio'
-              '\tVelocidad lanzamiento \tAltura lanzamiento \tángulo lanzamiento \tEnergía mecánica del misil al ser lanzado'
-              '\tVelocidad llegada \tAltura llegada \tángulo llegada'
-              '\tmasa útil \tindice \n')
+
 
 lanz = open('lanzamientos.txt', 'r')
 
@@ -46,6 +42,12 @@ for line in lanz:
     altura_inicio.append(float(s[0]))  # Altura .
     mach_inicio.append(float(s[1]))  # Mach
 lanz.close()
+
+archivo = open('orbita_prueba', "w")
+archivo.write('Mach inicial \tAltura inicial'
+              '\tVelocidad lanzamiento \tAltura lanzamiento \tángulo lanzamiento'
+              '\tVelocidad llegada \tAltura llegada \tángulo llegada'
+              '\tmasa útil \tEnergía mecánica del avión al inicio \tEnergía mecánica del misil al ser lanzado \tindice \n')
 
 DT = 0.1  # Diferencial de tiempo (s).
 
@@ -82,25 +84,22 @@ for i in range(a, b):
       FI_LIST = []
       PSI_LIST = []
       MACH = []
-
       # Vectores VELOCIDAD, ALTURA, fil y psil vacios, en ellos guardaremos
       # los valores de las distintas variables para su posterior uso
       M_inicio = mach_inicio[i]
       M = mach_inicio[i]
-      Z_INICIAL = altura_inicio[i]
-      R = RT + Z_INICIAL  # Distancia desde el centro de la Tierra (m)
-      G0 = gravity(Z_INICIAL)  # Aceleración gravitatoria inicial (m/s2)
-      RHO = density(Z_INICIAL)  # Densidad inicial del aire (kg/m3)
-      P = pressure(Z_INICIAL)  # Presión inicial del aire (Pa)
-      TEMPERATURE = temperature(Z_INICIAL)  # Temperatura inicial del aire (K)
-      MU_VICS = viscosity(Z_INICIAL)  # Viscosidad inicial
+      Z0 = altura_inicio[i]
+      R = RT + Z0  # Distancia desde el centro de la Tierra (m)
+      G0 = gravity(Z0)  # Aceleración gravitatoria inicial (m/s2)
+      RHO = density(Z0)  # Densidad inicial del aire (kg/m3)
+      P = pressure(Z0)  # Presión inicial del aire (Pa)
+      TEMPERATURE = temperature(Z0)  # Temperatura inicial del aire (K)
+      MU_VICS = viscosity(Z0)  # Viscosidad inicial
       W = MASS * G0  # Peso inicial del avión dependiente de la gravedad
 
       # A la ALTURA inicial el avión vuela en vuelo estacionario
       
       V = M * (GAMMA * R_AIR * TEMPERATURE)**.5  # Velocidad inicial (m/s)
-
-
 
       CL1 = 2 * W / (RHO * V**2 * S_W)
       K1 = k(M)
@@ -149,7 +148,7 @@ for i in range(a, b):
 
       VELOCIDAD.append(V)
       PSI_LIST.append(PSI_GRADOS)
-      ALTURA.append(Z_INICIAL)
+      ALTURA.append(Z0)
       FI_LIST.append(FI_GRADOS)
       MACH.append(M)
       # ------------------------INICIO DE LA MANIOBRA------------------------
@@ -168,7 +167,7 @@ for i in range(a, b):
 
       # Energías
       E_CINETICA = .5 * MASS * V**2  # Energía cinética (J)
-      E_POTENCIAL = MASS * G0 * Z_INICIAL  # Energía potencial (J)
+      E_POTENCIAL = MASS * G0 * Z0  # Energía potencial (J)
       E_MECANICA = E_CINETICA + E_POTENCIAL  # Energía mecánica (J)
 
       N = round(L / W,0)  # Factor de carga.
@@ -176,9 +175,9 @@ for i in range(a, b):
       # Condiciones iniciales para la integración
       T = 0
       X = 0
-      Z = Z_INICIAL
+      Z = Z0
       XT = X
-      ZT = Z_INICIAL
+      ZT = Z0
       OMEGA = V / RADIUS  # Velocidad angular en la maniobra de giro (rad/s)
 
       # Segunda ley de Newton en el eje horizontal (ejes cuerpo)
@@ -264,6 +263,7 @@ for i in range(a, b):
           MU_VICS = viscosity(Z)  # Viscosidad
 
           M = V / (GAMMA * R_AIR * TEMPERATURE)**.5  # Mach de vuelo.
+          MACH.append(M)
           N = 3.5  # Tomamos la condición de factor de carga máximo y cte.
           RADIUS = V**2 / (G * (N - 1))  # Radio de giro varía con la veloc.
 
@@ -311,7 +311,6 @@ for i in range(a, b):
           # Guardamos las variables en la lista
           PSI_LIST.append(PSI_GRADOS)
           FI_LIST.append(FI_GRADOS)
-          MACH.append(M)
 
           #Se recalcula el CL en función de si el avión entra en pérdida o no
           # Se recalcula n con la ecuación del eje vertical
@@ -368,37 +367,38 @@ for i in range(a, b):
           DZT = VYT * DT  # Variación vertical posición en ejes tierra (m/s)
 
           DTHETA = OMEGA * DT  # Variación del ángulo de asiento
-
+       
       if i == a:
-        iniciar = 139 # Este numero no tienes que decidir tu,
+        iniciar = 200 # Este numero no tienes que decidir tu,
                       # para a = 45 es 130. Se corresponde al indice del vector del programa del misil
       elif i != a:
         iniciar  = j + 8
         
+      print('i: ', i)  
       (z0,v0, zl, theta_grados0, theta_grados, vl, masa_util,E_mecanica_misil_lanzamiento, j) = misil_carga_pago(VELOCIDAD, ALTURA, FI_LIST, PSI_LIST, MACH, iniciar)
-      iniciar = j
-      
+      iniciar = j 
+       
       # Energías.
       E_CINETICA = .5 * MASS * V**2  # Energía cinética (J).
-      E_POTENCIAL = MASS * G0 * Z_INICIAL  # Energía potencial (J).
+      E_POTENCIAL = MASS * G0 * Z0  # Energía potencial (J).
       E_MECANICA_INICIAL = E_CINETICA + E_POTENCIAL  # Energía mecánica (J).
-    
+      
       archivo.write('%.8f\t' % M_inicio)
-      archivo.write('%.8f\t' % V)
-      archivo.write('%.8f\t' % Z_INICIAL)
-      archivo.write('%.8f\t' % E_MECANICA_INICIAL)
+      archivo.write('%.8f\t' % Z0)
       archivo.write('%.8f\t' % v0)
       archivo.write('%.8f\t' % z0)
       archivo.write('%.8f\t' % theta_grados0)
-      archivo.write('%.8f\t' % E_mecanica_misil_lanzamiento)
       archivo.write('%.8f\t' % vl)
       archivo.write('%.8f\t' % zl)
       archivo.write('%.8f\t' % theta_grados)
       archivo.write('%.8f\t' % masa_util)
+      archivo.write('%.8f\t' % E_MECANICA_INICIAL)
+      archivo.write('%.8f\t' % E_mecanica_misil_lanzamiento)
       archivo.write('%.8f\n' % j)
 
-
       F.close()
+
+
 
       E = open('exports', 'w')
       for i, a in enumerate(ALTURA):
@@ -417,6 +417,8 @@ for i in range(a, b):
           E.write(str(a) + ' ')
 
       E.close()
+      
+archivo.close()
 
 # Como resumen:
 # 1) El código ha empezado en una condición de vuelo uniforme.
