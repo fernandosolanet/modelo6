@@ -1,0 +1,11 @@
+﻿Compilación iniciada a las 22/06/2018 13:22:28.
+     1>Proyecto "C:\Users\fernando.solanet\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.vcxproj" en el nodo 2 (Build destinos).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ConsoleApplication3.cpp
+         ConsoleApplication3.cpp
+     1>c:\users\fernando.solanet\documents\visual studio 2013\projects\consoleapplication3\consoleapplication3\consoleapplication3.cpp(3): fatal error C1083: No se puede abrir el archivo incluir: 'decimal/decimal': No such file or directory
+     1>Compilación del proyecto terminada "C:\Users\fernando.solanet\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.vcxproj" (Build destinos) -- ERROR.
+
+ERROR al compilar.
+
+Tiempo transcurrido 00:00:00.28
